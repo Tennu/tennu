@@ -1,0 +1,21 @@
+{
+  "name": "Node Relay Chat",
+  "version": "1.0",
+  "description": "Node.js IRC API",
+  "maintainers": [{
+    "name": "Ryan Scheel",
+    "email": "ryan.havvy@gmail.com",
+    "web": "http://widget.mibbit.com/?channel=%23havvy&server=irc.mibbit.net"
+  }],
+  "contributors": [{
+    "name": "Ryan Scheel",
+    "email": "ryan.havvy@gmail.com",
+    "web": "http://widget.mibbit.com/?channel=%23havvy&server=irc.mibbit.net"
+  }],
+  "main": "lib",
+  "directories": ["lib", "config"],
+  "engines": {
+    "node": ">=0.6.7"
+  },
+  "keywords": ["irc"]
+}
