@@ -31,7 +31,7 @@ describe('static methods', function staticMethods () {
 });
 
 describe('creating event objects', function creatingEventObjects () {
-  it('structurally stores an IRC message', function itKnowsTheSenderAndReceiver () {    
+  it('structurally stores an IRC message', function () {    
     var message = new Message(privmsg, self);
     
     expect(message.sender.equals(new Hostmask(sender))).toBeTruthy();
@@ -44,11 +44,20 @@ describe('creating event objects', function creatingEventObjects () {
     expect(message.type).toEqual("privmsg");
   });
 
-  it('stores parameters, including multiword parameters', function storesParametersIncludingMultiwordParameters () {
+  it('stores parameters, including multiword parameters', function () {
     var message = new Message(privmsg, self);
     
     expect(message.parameters.length).toBe(2);
     expect(message.parameters[0]).toEqual("#channel");
     expect(message.parameters[1]).toEqual("somebody said something");
+  });
+});
+
+describe("privmsg", function () {
+  it('knows when the privmsg is a query', function () {
+    var message = new Message(":sender!user@localhost PRIVMSG tbot :testcommand", self);
+    
+    expect(message.type).toEqual("privmsg");
+    expect(message.isQuery).toBeTruthy();
   });
 });

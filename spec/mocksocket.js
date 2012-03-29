@@ -1,44 +1,41 @@
+/**
+ * @author havvy
+ * mocksocket used for testing an ircsocket.
+ */
 var EE = require('events').EventEmitter;
 
 var Socket = function () {
-  this.ee = new EE();
+  EE.call(this);
 };
 
-Socket.prototype = {
-  connect : function () {
-    this.ee.emit("connect");
-    setTimeout((function () {
-      this.ee.emit("data", 'PING :PINGMESSAGE\r\n');
-    }).bind(this), 1000);
-  },
+Socket.prototype = new EE;
+
+Socket.prototype.connect = function () {
+  this.emit("connect");
+  setTimeout((function () {
+    this.emit("data", 'PING :PINGMESSAGE\r\n');
+    this.emit("data", ":irc.test.net 001 testbot :Welcome to the Test IRC Network testbot!testuser@localhost\r\n");
+    }).bind(this), 200);
+};
   
-  end : function () {
-    this.ee.emit("close")
-  },
+Socket.prototype.end = function () {
+    this.emit("close");
+};
   
-  write : function () {
-    void 0;
-  },
+Socket.prototype.write = function (message) {
+  void 0;
+};
   
-  setNoDelay : function () {
-    void 0;
-  },
+Socket.prototype.setNoDelay = function () {
+  void 0;
+};
   
-  setEncoding : function () {
-    void 0;
-  },
-  
-  once : function (name, handler) {
-    this.ee.once(name, handler);
-  },
-  
-  on : function (name, handler) {
-    this.ee.on(name, handler);
-  },
-  
-  off : function (name, handler) {
-    this.ee.off(name, handler);
-  },
+Socket.prototype.setEncoding = function () {
+  void 0;
+};
+
+Socket.prototype.sendFakeMessage = function (message) {
+  this.emit("data", message + "\r\n");
 }
 
 module.exports = Socket;
