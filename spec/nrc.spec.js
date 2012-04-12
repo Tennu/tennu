@@ -55,7 +55,9 @@ describe('the nrc api', function () {
           this.emit('data', ":testbot!testuser@localhost JOIN :#test\r\n:irc.localhost.net 353 testbot = #test :@testbot\r\n:irc.localhost.net 366 testbot #test :End of /NAMES list.");
           break;
         case "QUIT\n":
-          this.emit('data', "ERROR :Closing Link: testbot[localhost] (Quit: testbot)");
+          this.emit('data', "ERROR :Closing Link: testbot[localhost] (Quit: testbot)\r\n");
+        case "NICK newNick\n":
+          this.emit('data', ":testbot!testuser@localhost NICK :newNick\r\n")
         default:
           void 0;
       }
@@ -97,6 +99,27 @@ describe('the nrc api', function () {
   });
 });
 
+describe('state-tracking', function () {
+  it('knows when its nick changes', function () {
+    mocksocket = new MockSocket();
+    nrc = new NRC(network, {socket : mocksocket});
+    nrc.connect();
+    
+    expect(nrc.getNick()).toBe('testbot');
+    
+    runs(function () {
+      nrc.nick('newNick');
+    });    
+    
+    waits(100);
+    
+    runs(function () {
+      expect(nrc.getNick()).toBe('newNick');
+    });    
+  });
+});
+
+// TODO Move to commander.spec.js
 describe("listening to user commands", function () {
   mocksocket = new MockSocket();
   nrc = new NRC(network, {socket : mocksocket});
@@ -119,4 +142,4 @@ describe("listening to user commands", function () {
     mocksocket.sendFakeMessage(":sender!user@localhost PRIVMSG testbot :testcommand");
     expect(on.testcommand.callCount).toBe(3);
   });
-})
+});

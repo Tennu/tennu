@@ -6,6 +6,34 @@ API documenation will be here at some point.
 
 ----------
 
+## Basic Usage ##
+
+First require this module, and then create an NRC object and then have it connect.
+
+```javascript
+var nrc = require('nrc');
+var network = require('../config/myNetwork.json');
+var myLogger = new (require('myLogger').Logger)()
+var myNetwork = new nrc.NRC(network, {log: myLogger});
+myNetwork.connect();
+```
+
+Before connected, you can listen to events from the nrc object, or its commander object.
+
+```javascript
+myNetwork.on('join', function (event) {
+	// Do something when somebody, maybe yourself, joins
+});
+
+myNetwork.getCommandEmitter().on('hello', function (event) {
+	myNetwork.say(event.channel, 'world');
+});
+
+myNetwork.connect();
+```
+
+----------
+
 ## Network Configuration ##
 
 It is suggested that your static network configuration objects go in _/config/%NETWORK%.json_.
@@ -26,9 +54,11 @@ A network configuration object has the following properties:
 
 There are three value objects in this module, accessible via 
 
-* require('nrc').Message
-* require('nrc').Command
-* require('nrc').Hostmask
+```javascript
+require('nrc').Message
+require('nrc').Command
+require('nrc').Hostmask
+```
 
 ### Message ###
 

@@ -17,5 +17,6 @@
   "engines": {
     "node": ">=0.6.7"
   },
-  "keywords": ["irc"]
+  "keywords": ["irc"],
+  "comments": "dependencies not included in here yet."
 }
