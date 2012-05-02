@@ -90,7 +90,7 @@ A command has the following fields:
 * sender  - Sender of the command.
 * params  - Parameters of the command.
 * channel - Channel the command was sent through.
-* name    - Name of command. Also what the command is emitted as.
+* name    - Name of the command.
 * isQuery - True if message sent in a query.
 
 Constructor: String *sender*, String *msg*, String *channel*, boolean *isQuery*
