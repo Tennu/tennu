@@ -5,12 +5,22 @@
 
 var NRC = require('../lib/nrc');
 var MockSocket = require('./mocksocket');
+var util = require('util');
 
 var network = Object.freeze({
   nick : 'testbot',
   user : 'testuser',
   server : 'irc.test.net',
 });
+
+autonetwork = {
+  nickserv : "nickserv",
+  password : "testpass",
+  channels : ["#test"]
+};
+autonetwork.prototype = network;
+
+
 var mocksocket;
 var nrc;
 
@@ -19,12 +29,12 @@ describe('basics', function () {
     mocksocket = new MockSocket();
     nrc = new NRC(network, {socket : mocksocket});
   });
-  
+
   it('wraps an IRC socket', function () {
     nrc.connect();
     nrc.disconnect();
   });
-  
+
   it('says when it is ready', function () {
     var handler;
     runs(function () {
@@ -33,9 +43,9 @@ describe('basics', function () {
       nrc.on('ready', handler.handler);
       nrc.connect();
     });
-    
+
     waits(500);
-    
+
     runs(function () {
       nrc.disconnect();
       expect(handler.handler).toHaveBeenCalled();
@@ -47,7 +57,7 @@ describe('the nrc api', function () {
   mocksocket = new MockSocket();
   nrc = new NRC(network, {socket : mocksocket});
   nrc.connect();
-  
+
   beforeEach(function () {
     spyOn(mocksocket, "write").andCallFake(function (message) {
       switch (message) {
@@ -63,83 +73,115 @@ describe('the nrc api', function () {
       }
     });
   });
-  
+
   waits(500);
-  
+
   it('can join channels', function () {
-    nrc.join("#test");    
+    nrc.join("#test");
     expect(mocksocket.write).toHaveBeenCalledWith("JOIN #test\n", 'ascii');
   });
-  
+
   it('can send messages to channels', function () {
-    nrc.say("#test", "It's over 9000!");    
+    nrc.say("#test", "It's over 9000!");
     expect(mocksocket.write).toHaveBeenCalledWith("PRIVMSG #test :It's over 9000!\n", 'ascii');
   });
-  
+
   it('can part channels with a reason', function () {
-    nrc.part("#test", "Told to leave.");    
+    nrc.part("#test", "Told to leave.");
     expect(mocksocket.write).toHaveBeenCalledWith("PART #test :Told to leave.\n", 'ascii');
   });
-  
+
   it('can part channels without a reason', function () {
     nrc.once('join', function (event) {
       nrc.part(event.channel);
     });
     nrc.join("#test");
-    
+
     waits(100);
-  
+
     expect(mocksocket.write).toHaveBeenCalledWith("PART #test\n", 'ascii');
   });
-  
+
   it('can quit', function () {
     nrc.quit();
-    
+
     expect(mocksocket.write).toHaveBeenCalledWith("QUIT\n", 'ascii');
   });
 });
 
 describe('state-tracking', function () {
   it('knows when its nick changes', function () {
-    mocksocket = new MockSocket();
-    nrc = new NRC(network, {socket : mocksocket});
     nrc.connect();
-    
+
     expect(nrc.getNick()).toBe('testbot');
-    
+
     runs(function () {
       nrc.nick('newNick');
-    });    
-    
+    });
+
     waits(100);
-    
+
     runs(function () {
       expect(nrc.getNick()).toBe('newNick');
-    });    
+    });
   });
 });
 
-// TODO Move to commander.spec.js
 describe("listening to user commands", function () {
-  mocksocket = new MockSocket();
-  nrc = new NRC(network, {socket : mocksocket});
-  nrc.connect();
-  nrc.join("#test");
-  
+  beforeEach(function () {
+    mocksocket = new MockSocket();
+    nrc = new NRC(network, {socket : mocksocket});
+    nrc.connect();
+    nrc.join("#test");
+  });
+
   it('emits user commands', function () {
-    var on = {testcommand : function (event) {} };    
+    var on = {testcommand : function (event) {} };
     spyOn(on, 'testcommand');
-    
+
     nrc.getCommandEmitter().on("testcommand", on.testcommand);
-    
-    mocksocket.sendFakeMessage(":sender!user@localhost PRIVMSG #test :!testcommand")
-    var util = require('util');
+
+    mocksocket.sendMessage(":sender!user@localhost PRIVMSG #test :!testcommand")
     expect(on.testcommand.callCount).toBe(1);
-    
-    mocksocket.sendFakeMessage(":sender!user@localhost PRIVMSG #test :testbot: testcommand");
+
+    mocksocket.sendMessage(":sender!user@localhost PRIVMSG #test :!testcommand")
     expect(on.testcommand.callCount).toBe(2);
-    
-    mocksocket.sendFakeMessage(":sender!user@localhost PRIVMSG testbot :testcommand");
+
+    mocksocket.sendMessage(":sender!user@localhost PRIVMSG #test :testbot: testcommand");
     expect(on.testcommand.callCount).toBe(3);
+
+    mocksocket.sendMessage(":sender!user@localhost PRIVMSG testbot :testcommand");
+    expect(on.testcommand.callCount).toBe(4);
   });
 });
+
+/*
+describe("autojoin and autoidentify", function () {
+  beforeEach(function () {
+    mocksocket = new MockSocket();
+    nrc = new NRC(autonetwork, {socket : mocksocket});
+
+    spyOn(mocksocket, "write").andCallFake(function (message) {
+      switch (message) {
+        case "JOIN #test\n":
+          this.emit('data', ":testbot!testuser@localhost JOIN :#test\r\n:irc.localhost.net 353 testbot = #test :@testbot\r\n:irc.localhost.net 366 testbot #test :End of /NAMES list.");
+          break;
+	case "PRIVMSG nickserv :identify testpass\n":
+          this.emit('data', ":nickserv!services@test.net NOTICE :heartless Password accepted - you are now recognized.");
+        default:
+          void 0;
+      }
+    });
+  });
+
+  it('automatically joins specified channels.', function () {
+    waits(500);
+
+    expect(mocksocket.write).toHaveBeenCalledWith("JOIN #test\n", 'ascii');
+  });
+
+  it('automatically identifies to services.', function () {
+    expect(mocksocket.write).toHaveBeenCalledWith("PRIVMSG nickserv :identify testpass\n", 'ascii');
+  });
+});
+*/

@@ -17,24 +17,24 @@ Socket.prototype.connect = function () {
     this.emit("data", ":irc.test.net 001 testbot :Welcome to the Test IRC Network testbot!testuser@localhost\r\n");
     }).bind(this), 200);
 };
-  
+
 Socket.prototype.end = function () {
     this.emit("close");
 };
-  
+
 Socket.prototype.write = function (message) {
   void 0;
 };
-  
+
 Socket.prototype.setNoDelay = function () {
   void 0;
 };
-  
+
 Socket.prototype.setEncoding = function () {
   void 0;
 };
 
-Socket.prototype.sendFakeMessage = function (message) {
+Socket.prototype.sendMessage = function (message) {
   this.emit("data", message + "\r\n");
 }
 
