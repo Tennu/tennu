@@ -1,6 +1,6 @@
 {
-  "name": "Node Relay Chat",
-  "version": "1.1",
+  "name": "nrc",
+  "version": "0.1.1",
   "description": "Node.js IRC API",
   "maintainers": [{
     "name": "Ryan Scheel",
@@ -18,5 +18,7 @@
     "node": ">=0.6.7"
   },
   "keywords": ["irc"],
-  "comments": "dependencies not included in here yet."
+  "dependencies": {
+    "protocols": "git://github.com/Gozala/protocol.git#91c76addd8bfc5cfc73c5fe1d7e7543197c582fe"
+  }
 }
