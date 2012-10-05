@@ -155,7 +155,6 @@ describe("listening to user commands", function () {
   });
 });
 
-/*
 describe("autojoin and autoidentify", function () {
   beforeEach(function () {
     mocksocket = new MockSocket();
@@ -164,9 +163,11 @@ describe("autojoin and autoidentify", function () {
     spyOn(mocksocket, "write").andCallFake(function (message) {
       switch (message) {
         case "JOIN #test\n":
-          this.emit('data', ":testbot!testuser@localhost JOIN :#test\r\n:irc.localhost.net 353 testbot = #test :@testbot\r\n:irc.localhost.net 366 testbot #test :End of /NAMES list.");
+          this.emit('data', [":testbot!testuser@localhost JOIN :#test",
+            ":irc.localhost.net 353 testbot = #test :@testbot",
+            ":irc.localhost.net 366 testbot #test :End of /NAMES list."].join("\r\n"));
           break;
-	case "PRIVMSG nickserv :identify testpass\n":
+	      case "PRIVMSG nickserv :identify testpass\n":
           this.emit('data', ":nickserv!services@test.net NOTICE :heartless Password accepted - you are now recognized.");
         default:
           void 0;
@@ -175,13 +176,18 @@ describe("autojoin and autoidentify", function () {
   });
 
   it('automatically joins specified channels.', function () {
-    waits(500);
+    waits(100);
 
-    expect(mocksocket.write).toHaveBeenCalledWith("JOIN #test\n", 'ascii');
+    runs(function () {
+      expect(mocksocket.write).toHaveBeenCalledWith("JOIN #test\n", 'ascii');
+    });
   });
 
   it('automatically identifies to services.', function () {
-    expect(mocksocket.write).toHaveBeenCalledWith("PRIVMSG nickserv :identify testpass\n", 'ascii');
+    waits(100);
+
+    runs(function () {
+      expect(mocksocket.write).toHaveBeenCalledWith("PRIVMSG nickserv :identify testpass\n", 'ascii');
+    });
   });
 });
-*/
