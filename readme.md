@@ -144,6 +144,7 @@ nrc.say('#example', "This is a message!");
 (botnick) Bye there.
 */
 nrc.say('#example', ["Hi there.", "Bye there."]);
+```
 
 ### act(channel, message) ###
 
