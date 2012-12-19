@@ -20,7 +20,7 @@ var removeUserChannel = function (user, channel) {
 };
 
 var isSelf = function (nrc, nick) {
-    return nrc.getNick() === nick;
+    return nrc.nick() === nick;
 };
 
 var selfPart = function (channel) {
@@ -46,7 +46,7 @@ var namesHandler = function (msg) {
     });
 };
 
-var onleave = function () {
+var onLeave = function () {
     var self = {
         part: selfPart,
         quit: function () {},
