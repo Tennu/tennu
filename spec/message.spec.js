@@ -17,12 +17,12 @@ describe('requiring files', function requiringFiles () {
 });
 
 describe('static methods', function staticMethods () {
-  it('determines if a message has a prefix', function itDeterminesIfAMessageHasAPrefix () {
+  it('determines if a message has a prefix', function hasAPrefix () {
     expect(typeof Message.hasPrefix).toEqual('function');
     expect(Message.hasPrefix(privmsg)).toBeTruthy();
   });
   
-  it('determines the type of prefixes', function itDeterminesTheTypeOfPrefixes () {
+  it('determines the type of prefixes', function typeOfPrefixes () {
     expect(typeof Message.getPrefixType).toEqual('function');
     expect(Message.getPrefixType('irc.mozilla.org')).toEqual('server');
     expect(Message.getPrefixType('sender')).toEqual('nick');
@@ -31,14 +31,14 @@ describe('static methods', function staticMethods () {
 });
 
 describe('creating event objects', function creatingEventObjects () {
-  it('structurally stores an IRC message', function () {    
+  it('structurally stores an IRC message', function () {
     var message = new Message(privmsg, self);
     
     expect(message.sender.equals(new Hostmask(sender))).toBeTruthy();
     expect(message.receiver).toBe(self);
   });
 
-  it('structurally stores the message type', function itStructurallyStoresTheMessageType () {
+  it('structurally stores the message type', function storeMessageType () {
     var message = new Message(privmsg, self);
     
     expect(message.type).toEqual("privmsg");

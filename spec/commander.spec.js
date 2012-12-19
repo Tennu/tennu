@@ -9,7 +9,7 @@ var mockMessage = Object.freeze({
 
 describe("binding", function () {
   it('binds callbacks to its context', function () {
-    var ctx = new EE;
+    var ctx = new EE();
     var commander = new Commander(ctx, {}, {});
 
     runs(function () {

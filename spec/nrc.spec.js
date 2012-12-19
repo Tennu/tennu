@@ -10,7 +10,7 @@ var util = require('util');
 var network = Object.freeze({
   nick : 'testbot',
   user : 'testuser',
-  server : 'irc.test.net',
+  server : 'irc.test.net'
 });
 
 autonetwork = {
@@ -49,7 +49,7 @@ describe('basics', function () {
     runs(function () {
       nrc.disconnect();
       expect(handler.handler).toHaveBeenCalled();
-    })
+    });
   });
 });
 
@@ -66,8 +66,10 @@ describe('the nrc api', function () {
           break;
         case "QUIT\n":
           this.emit('data', "ERROR :Closing Link: testbot[localhost] (Quit: testbot)\r\n");
+          break;
         case "NICK newNick\n":
-          this.emit('data', ":testbot!testuser@localhost NICK :newNick\r\n")
+          this.emit('data', ":testbot!testuser@localhost NICK :newNick\r\n");
+          break;
         default:
           void 0;
       }
@@ -92,8 +94,8 @@ describe('the nrc api', function () {
   });
 
   it('can part channels without a reason', function () {
-    nrc.once('join', function (event) {
-      nrc.part(event.channel);
+    nrc.once('join', function onJoin (msg) {
+      nrc.part(msg.channel);
     });
     nrc.join("#test");
 
@@ -113,7 +115,7 @@ describe('state-tracking', function () {
   it('knows when its nick changes', function () {
     nrc.connect();
 
-    expect(nrc.getNick()).toBe('testbot');
+    expect(nrc.nick()).toBe('testbot');
 
     runs(function () {
       nrc.nick('newNick');
@@ -122,7 +124,7 @@ describe('state-tracking', function () {
     waits(100);
 
     runs(function () {
-      expect(nrc.getNick()).toBe('newNick');
+      expect(nrc.nick()).toBe('newNick');
     });
   });
 });
@@ -130,21 +132,19 @@ describe('state-tracking', function () {
 describe("listening to user commands", function () {
   beforeEach(function () {
     mocksocket = new MockSocket();
-    nrc = new NRC(network, {socket : mocksocket});
-    nrc.connect();
-    nrc.join("#test");
+    nrc = new NRC(network, {socket : mocksocket}).connect().join("#test");
   });
 
   it('emits user commands', function () {
     var on = {testcommand : function (event) {} };
     spyOn(on, 'testcommand');
 
-    nrc.getCommandEmitter().on("testcommand", on.testcommand);
+    nrc.on("!testcommand", on.testcommand);
 
-    mocksocket.sendMessage(":sender!user@localhost PRIVMSG #test :!testcommand")
+    mocksocket.sendMessage(":sender!user@localhost PRIVMSG #test :!testcommand");
     expect(on.testcommand.callCount).toBe(1);
 
-    mocksocket.sendMessage(":sender!user@localhost PRIVMSG #test :!testcommand")
+    mocksocket.sendMessage(":sender!user@localhost PRIVMSG #test :!testcommand");
     expect(on.testcommand.callCount).toBe(2);
 
     mocksocket.sendMessage(":sender!user@localhost PRIVMSG #test :testbot: testcommand");
@@ -152,6 +152,9 @@ describe("listening to user commands", function () {
 
     mocksocket.sendMessage(":sender!user@localhost PRIVMSG testbot :testcommand");
     expect(on.testcommand.callCount).toBe(4);
+
+    mocksocket.sendMessage(":sender!user@localhost PRIVMSG testbot :!testcommand");
+    expect(on.testcommand.callCount).toBe(5);
   });
 });
 
@@ -167,8 +170,9 @@ describe("autojoin and autoidentify", function () {
             ":irc.localhost.net 353 testbot = #test :@testbot",
             ":irc.localhost.net 366 testbot #test :End of /NAMES list."].join("\r\n"));
           break;
-	      case "PRIVMSG nickserv :identify testpass\n":
+        case "PRIVMSG nickserv :identify testpass\n":
           this.emit('data', ":nickserv!services@test.net NOTICE :heartless Password accepted - you are now recognized.");
+          break;
         default:
           void 0;
       }
