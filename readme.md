@@ -155,6 +155,7 @@ As per say, but as an action (/me)
 botnick does something!
 */
 nrc.act('#example', "does something!");
+```
 
 ### quit(reason) ###
 
