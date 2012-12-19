@@ -1,6 +1,6 @@
 {
   "name": "nrc",
-  "version": "0.2.0pre",
+  "version": "0.2.0",
   "description": "Node.js IRC API",
   "maintainers": [{
     "name": "Ryan Scheel",

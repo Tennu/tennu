@@ -246,8 +246,14 @@ Assume the module's name is 'example'. Then these will all work and return
 
 #### channels ####
 
+___Unofficial:___ This module will be official in 0.3.
+
 This module handles keeping track of channel-specific data.
 
 #### users ####
+
+___Unofficial:___ This module will be official in 0.3.
+
+Though unofficial, and untested, this module should hopefully work.
 
 This module handles keeping track of user-specific data.
