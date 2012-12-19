@@ -238,15 +238,10 @@ Here is an example of a help object.
 
 Assume the module's name is 'example'. Then these will all work and return
 
-* help example
-** I'm an example module.
-* help sub1
-** I'm the sub1 multi-command.
-* help sub1 x
-** I'm the sub1 x command
-* help sub2
-** I'm the sub2 command.
-** My help is longer than the others.
+* help example >> I'm an example module.
+* help sub1 >> I'm the sub1 multi-command.
+* help sub1 x >> I'm the sub1 x command
+* help sub2 >> I'm the sub2 command. >> My help is longer than the others.
 
 #### channels ####
 
