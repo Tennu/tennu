@@ -29,6 +29,11 @@ var selfPart = function (channel) {
     });
 };
 
+var userQuit = function (user) {
+    // Clean out the channels list of the user.
+    while (users[user].channels.pop() !== null);
+};
+
 /**
  * Responds to the 353 raw numeric, which is sent when joining a channel.
  * The Message object handles adding users and channel automatically, so
