@@ -48,11 +48,11 @@ var userQuit = function (user) {
  * The Message object handles adding users and channel automatically, so
  * there really isn't any work that has to be done here other than actually
  * adding the channels to the users.
- *
- * The numeric will add status messages to nicks, so we need to prune those.
  */
 var namesHandler = function (msg) {
     msg.users.forEach(function (user) {
+        // The numeric will add status messages (~, @, ect.) to nicks,
+        // so they need to pruned.
         if (server.capabilities.STATUSMSG.indexOf(user[0]) !== -1) {
             user = user.substring(1);
         }
