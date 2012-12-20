@@ -53,7 +53,7 @@ module.exports = {
     name: "help",
     handlers: {
         "!help" : function (command) {
-            if (command.parameters.length === 0) {
+            if (command.params.length === 0) {
                 showModuleList(this, command);
             } else {
                 showHelp(this, command);
