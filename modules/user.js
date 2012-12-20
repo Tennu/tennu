@@ -14,7 +14,6 @@ var User = function (name, channel) {
 };
 
 var addUserChannel = function (user, channel) {
-    console.log("Adding user " + user + " to channel " + channel);
 
     if (users[user]) {
         users[user].channels.add(channel);
@@ -24,7 +23,6 @@ var addUserChannel = function (user, channel) {
 };
 
 var removeUserChannel = function (user, channel) {
-    console.log("Removing user " + user + " from channel " + channel);
     users[user].channels.remove(channel);
 };
 
@@ -39,7 +37,6 @@ var selfPart = function (channel) {
 };
 
 var userQuit = function (user) {
-    console.log("User " + user + " is quitting.");
     // Clean out the channels list of the user.
     while (users[user].channels.pop() !== null);
 };
@@ -85,7 +82,6 @@ var onLeave = function () {
 }();
 
 var onNick = function (msg) {
-    console.log("Changing user " + msg.actor + " to " + msg.newNick);
     users[msg.newNick] = users[msg.actor];
     users[msg.newNick].name = msg.newNick;
     delete users[msg.actor];
