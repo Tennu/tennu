@@ -1,4 +1,9 @@
 var SSet = require("simplesets").Set;
+var server;
+
+var onLoad = function () {
+    server = this.use("server");
+};
 
 var users = {};
 
@@ -8,6 +13,8 @@ var User = function (name, channel) {
 };
 
 var addUserChannel = function (user, channel) {
+    console.log("Adding user " + user + " to channel " + channel);
+
     if (users[user]) {
         users[user].channels.add(channel);
     } else {
@@ -16,6 +23,7 @@ var addUserChannel = function (user, channel) {
 };
 
 var removeUserChannel = function (user, channel) {
+    console.log("Removing user " + user + " from channel " + channel);
     users[user].channels.remove(channel);
 };
 
@@ -30,6 +38,7 @@ var selfPart = function (channel) {
 };
 
 var userQuit = function (user) {
+    console.log("User " + user + " is quitting.");
     // Clean out the channels list of the user.
     while (users[user].channels.pop() !== null);
 };
@@ -39,9 +48,15 @@ var userQuit = function (user) {
  * The Message object handles adding users and channel automatically, so
  * there really isn't any work that has to be done here other than actually
  * adding the channels to the users.
+ *
+ * The numeric will add status messages to nicks, so we need to prune those.
  */
 var namesHandler = function (msg) {
     msg.users.forEach(function (user) {
+        if (server.capabilities.STATUSMSG.indexOf(user[0]) !== -1) {
+            user = user.substring(1);
+        }
+
         addUserChannel(user, msg.channel);
     });
 };
@@ -79,6 +94,7 @@ module.exports = {
         users : users
     },
     handlers: {
+        "load" : onLoad,
         "join part quit" : onLeave,
         "nick" : onNick,
         "353" : namesHandler
