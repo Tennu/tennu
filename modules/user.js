@@ -5,6 +5,7 @@ var onLoad = function () {
     server = this.use("server");
 };
 
+// TODO: Convert these values to lowercase. Keep the name case sensitive.
 var users = {};
 
 var User = function (name, channel) {
@@ -84,7 +85,9 @@ var onLeave = function () {
 }();
 
 var onNick = function (msg) {
+    console.log("Changing user " + msg.actor + " to " + msg.newNick);
     users[msg.newNick] = users[msg.actor];
+    users[msg.newNick].name = msg.newNick;
     delete users[msg.actor];
 };
 
