@@ -26,7 +26,7 @@ myNetwork.on('join', function (message) {
 });
 
 // Do something when a user emits a command, in this case, hello.
-myNetwork..on('!hello', function (command) {
+myNetwork.on('!hello', function (command) {
 	this.say(command.channel, 'world');
 });
 
