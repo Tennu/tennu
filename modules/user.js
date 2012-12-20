@@ -42,7 +42,7 @@ var userQuit = function (user) {
  */
 var namesHandler = function (msg) {
     msg.users.forEach(function (user) {
-        addChannelToUser(msg.channel, user);
+        addUserChannel(user, msg.channel);
     });
 };
 
@@ -76,7 +76,7 @@ var onNick = function (msg) {
 module.exports = {
     name: "users",
     exports: {
-        users:users
+        users : users
     },
     handlers: {
         "join part quit" : onLeave,
