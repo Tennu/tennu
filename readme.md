@@ -51,7 +51,7 @@ A network configuration object has the following properties:
 * password - Password for identifying to services. Useless without nickserv option.
 * nickserv - Nickname for nickserv service. Useless without password option.
 * trigger  - Command character to trigger commands with. By default, '!'.
-
+* channels - Array of channels to autojoin. _Example:_ ["#help", "#nrc"]
 Other modules may require more options.
 
 -------------
