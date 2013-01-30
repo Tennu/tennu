@@ -45,14 +45,16 @@ It is suggested that your static network configuration objects go in _/config/%N
 A network configuration object has the following properties:
 
 * server   - IRC server to connect to. _Example:_ _irc.mibbit.net_
-* nick     - Nickname the bot will use. *Required*
-* user     - Username the bot will use. *Required*
+* nick     - Nickname the bot will use. Defaults to "nrcbot"
+* user     - Username the bot will use. Defaults to "user"
+* realname - Realname for the bot. Defaults to "nrc v0.3"
 * port     - Port to connect to. Defaults to 6667.
-* password - Password for identifying to services. Useless without nickserv option.
-* nickserv - Nickname for nickserv service. Useless without password option.
+* password - Password for identifying to services.
+* nickserv - Nickname for nickserv service. Defaults to "nickserv".
 * trigger  - Command character to trigger commands with. By default, '!'.
 * channels - Array of channels to autojoin. _Example:_ ["#help", "#nrc"]
-Other modules may require more options.
+
+Other modules may require or use more options.
 
 -------------
 

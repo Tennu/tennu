@@ -1,5 +1,20 @@
+// TODO: XXX: Make this work with multiple NRC instances!
+
+var util = require('util');
+
 var SSet = require("simplesets").Set;
 var server;
+
+var filterStatusSymbol = function (nickname) {
+    // We have bigger problems if server isn't there...
+    if (server && server.capabilities && server.capabilities.STATUSMSG) {
+        if (server.capabilities.STATUSMSG.indexOf(nickname[0]) !== -1) {
+            return nickname.substring(1);
+        }
+    }
+
+    return nickname;
+};
 
 var onLoad = function () {
     server = this.use("server");
@@ -14,7 +29,6 @@ var User = function (name, channel) {
 };
 
 var addUserChannel = function (user, channel) {
-
     if (users[user]) {
         users[user].channels.add(channel);
     } else {
@@ -31,9 +45,11 @@ var isSelf = function (nrc, nick) {
 };
 
 var selfPart = function (channel) {
-    users.forEach(function (user) {
-        removeUserChannel(user, channel);
-    });
+    for (var user in users) {
+        if (Object.hasOwnProperty(users, user)) {
+            removeUserChannel(user, channel);
+        }
+    }
 };
 
 var userQuit = function (user) {
@@ -49,11 +65,8 @@ var userQuit = function (user) {
  */
 var namesHandler = function (msg) {
     msg.users.forEach(function (user) {
-        // The numeric will add status messages (~, @, ect.) to nicks,
-        // so they need to pruned.
-        if (server.capabilities.STATUSMSG.indexOf(user[0]) !== -1) {
-            user = user.substring(1);
-        }
+        // The numeric will add status messages (~, @, ect.) to nicks.
+        user = filterStatusSymbol(user);
 
         addUserChannel(user, msg.channel);
     });

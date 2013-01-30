@@ -1,6 +1,6 @@
 var Socket = require('../lib/socket');
 var winston = require('winston');
-var Log = require('../lib/protocols/log')
+var Log = require('../lib/protocols/log');
 
 var ioed = {
   levels: {
@@ -35,7 +35,7 @@ Log(winston.Logger, {
   }
 });
 
-var logger = new (winston.Logger)({ 
+var logger = new (winston.Logger)({
   levels: ioed.levels,
   transports : [new (winston.transports.Console)({colorize : true, level: 'debug'})]
 });

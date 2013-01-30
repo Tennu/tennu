@@ -1,3 +1,5 @@
+var util = require('util');
+
 var capabilities = {};
 
 var _005Handler = function (e) {
@@ -5,7 +7,6 @@ var _005Handler = function (e) {
     // Last parameter is plain text.
     for (var ix = 1; ix < e.parameters.length - 1; ix++) {
         var param = e.parameters[ix].split("=");
-
         switch (param.length) {
             case 1:
                 capabilities[param[0]] = true;

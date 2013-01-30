@@ -1,8 +1,7 @@
 /**
  * @author havvy
  * This document does not respect the 80 char length limit.
- * Waits total: 1.1 seconds. :(
- *  Wanted:  Less than 0.2 seconds.
+ * Waits total max: 1.1 seconds.
  */
 
 /*
@@ -12,14 +11,17 @@
  */
 var MockSocket = require('./mocksocket');
 var IRCSocket = require('../lib/socket.js');
-var socket, mocksocket;
+
 var network = Object.freeze({
   nick : 'testbot',
   user : 'testuser',
   server : 'irc.test.net',
+  realname: 'realbot'
 });
 
 describe("connecting to a network", function connectingToANetwork () {
+  var mocksocket, socket;
+
   it('knows whether or not it is connected.', function () {
     mocksocket = new MockSocket();
     socket = new IRCSocket(network, {socket : mocksocket});
@@ -27,25 +29,24 @@ describe("connecting to a network", function connectingToANetwork () {
     expect(socket.isConnected()).toBeFalsy();
   });
   
-  it('can connect to a network', function () {    
+  it('can connect to a network', function () {
     socket.connect();
     expect(socket.isConnected()).toBeTruthy();
   });
   
-  it('can then disconnect', function () {    
-    socket.disconnect();
+  it('can then disconnect', function () {
+    socket.end();
     expect(socket.isConnected()).toBeFalsy();
   });
   
   it('declares NICK and USER to the server on connection', function () {
     mocksocket = new MockSocket();
-    spyOn(mocksocket, 'write');
     socket = new IRCSocket(network, {socket : mocksocket});
     socket.connect();
-    socket.disconnect();
+    socket.end();
     expect(mocksocket.write).toHaveBeenCalledWith('NICK testbot\n', 'ascii');
     expect(mocksocket.write).toHaveBeenCalledWith('USER testuser 8 * :' + //-
-      socket.getRealName() + '\n', 'ascii');
+      'realbot\n', 'ascii');
   });
   
   it('declares when ready to send commands', function () {
@@ -59,46 +60,56 @@ describe("connecting to a network", function connectingToANetwork () {
       socket.connect();
     });
       
-    waits(300);
+    waitsFor(function () {
+      return readyIsCalled;
+    }, "ready is emitted", 300);
     
     runs(function () {
-      socket.disconnect();
+      socket.end();
       expect(readyIsCalled).toBeTruthy();
     });
   });
 });
 
 describe('maintaining connection to a server', function () {
+  var mocksocket, socket;
+
+  beforeEach(function () {
+    mocksocket = new MockSocket();
+    socket = new IRCSocket(network, {socket : mocksocket});
+  });
+
+  afterEach(function () {
+    socket.end();
+  });
+
   it('responds to pings', function () {
     runs(function () {
-      mocksocket = new MockSocket();
-      spyOn(mocksocket, 'write');
-      socket = new IRCSocket(network, {socket : mocksocket});
       socket.connect();
     });
     
-    waits(400);  
+    waitsFor(function () {
+      return mocksocket.isConnected;
+    }, "socket to connect", 400);
     
-    runs(function () {  
+    runs(function () {
       expect(mocksocket.write).toHaveBeenCalledWith('PONG :PINGMESSAGE\n', 'ascii');
     });
   });
   
   it("emits each IRC line in a 'data' event", function () {
-    var handler = {handler : function () {}};
+    var spy = jasmine.createSpy();
     runs(function () {
-      mocksocket = new MockSocket();
-      socket = new IRCSocket(network, {socket : mocksocket});
-      spyOn(handler, 'handler');
-      socket.on('data', handler.handler)
+      socket.on('data', spy);
       socket.connect();
     });
     
-    waits(400);
+    waitsFor(function () {
+      return mocksocket.isConnected;
+    }, "socket to connect", 400);
     
     runs(function () {
-      socket.disconnect();
-      expect(handler.handler).toHaveBeenCalledWith(':irc.test.net 001 testbot :Welcome to the Test IRC Network testbot!testuser@localhost');
+      expect(spy).toHaveBeenCalledWith(':irc.test.net 001 testbot :Welcome to the Test IRC Network testbot!testuser@localhost');
     });
-  })
+  });
 });

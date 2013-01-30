@@ -26,7 +26,7 @@ describe("bisubscribers subscribe events to two event emitters", function () {
             primary.emit("event");
         });
 
-        waitsFor(function() { 
+        waitsFor(function() {
             return spy1.wasCalled;
         }, "spy1 was called", 200);
 
@@ -88,6 +88,137 @@ describe("bisubscribers subscribe events to two event emitters", function () {
         runs(function () {
             expect(spy3).not.toHaveBeenCalled();
             expect(spy4).toHaveBeenCalled(); // redundant
-        });     
+        });
+    });
+});
+
+describe("dealing with context", function () {
+    var ctx, primary, secondary, capture, done;
+
+    beforeEach(function () {
+        ctx = {};
+        primary = new events.EventEmitter();
+        secondary = new events.EventEmitter();
+        capture = undefined;
+        done = false;
+    });
+
+    it("can take an optional context in the constructor", function () {
+        var subscriber = new BiSubscriber(primary, secondary, ctx);
+
+        runs(function() {
+            subscriber.on("data", function () {
+                capture = this;
+                done = true;
+            });
+
+            primary.emit("data");
+        });
+
+        waitsFor(function () { return done; }, "done", 200);
+
+        runs(function () {
+            expect(capture).toBe(ctx);
+        });
+    });
+
+    it("can change the context after creation", function () {
+        var subscriber = new BiSubscriber(primary, secondary);
+        subscriber.setContext(ctx);
+
+        runs(function() {
+            subscriber.on("data", function () {
+                capture = this;
+                done = true;
+            });
+
+            primary.emit("data");
+        });
+
+        waitsFor(function () { return done; }, "done", 200);
+
+        runs(function () {
+            expect(capture).toBe(ctx);
+        });
+    });
+});
+
+describe("quantification (on vs. once)", function () {
+    var subscriber, primary, secondary, spy, eventCount, isDone;
+
+    isDone = function () {
+        return eventCount == 2;
+    };
+
+    beforeEach(function () {
+        primary = new events.EventEmitter();
+        secondary = new events.EventEmitter();
+        subscriber = new BiSubscriber(primary, secondary, null);
+        spy = jasmine.createSpy();
+        eventCount = 0;
+
+        subscriber.on("event !event", function () {
+            eventCount += 1;
+        });
+    });
+
+    it("handles once one time (primary)", function () {
+        runs(function () {
+            subscriber.once("event", spy);
+
+            primary.emit("event");
+            primary.emit("event");
+        });
+
+        waitsFor(isDone, "event fired twice", 200);
+
+        runs(function () {
+            expect(spy.calls.length).toEqual(1);
+        });
+    });
+
+    it("handles once one time (secondary)", function () {
+        runs(function () {
+            subscriber.once("!event", spy);
+
+            secondary.emit("event");
+            secondary.emit("event");
+        });
+
+        waitsFor(isDone, "event fired twice", 200);
+
+        runs(function () {
+            expect(spy.calls.length).toEqual(1);
+        });
+    });
+
+    it("handles on multiple times", function () {
+        runs(function () {
+            subscriber.on("event", spy);
+
+            primary.emit("event");
+            primary.emit("event");
+        });
+
+        waitsFor(isDone, "event fired twice", 200);
+
+        runs(function () {
+            expect(spy.calls.length).toEqual(2);
+        });
+    });
+
+    it("handles once one time", function () {
+        runs(function () {
+            subscriber.on("!event", spy);
+
+            secondary.emit("event");
+            secondary.emit("event");
+        });
+
+        waitsFor(isDone, "event fired twice", 200);
+
+        runs(function () {
+            expect(spy.calls.length).toEqual(2);
+        });
     });
 });

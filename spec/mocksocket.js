@@ -6,36 +6,26 @@ var EE = require('events').EventEmitter;
 
 var Socket = function () {
   EE.call(this);
-};
 
-Socket.prototype = new EE;
+  this.connect = jasmine.createSpy("connect").andCallFake(function () {
+    this.emit("connect");
+    setTimeout((function () {
+      this.emit("data", 'PING :PINGMESSAGE\r\n');
+      this.emit("data", ":irc.test.net 001 testbot :Welcome to the Test IRC Network testbot!testuser@localhost\r\n");
+      this.emit("data", ":irc.test.net 005 testbot STATUSMSG=@&~ :are supported by this server");
+      this.isConnected = true;
+      }).bind(this), 0);
+  });
 
-Socket.prototype.connect = function () {
-  this.emit("connect");
-  setTimeout((function () {
-    this.emit("data", 'PING :PINGMESSAGE\r\n');
-    this.emit("data", ":irc.test.net 001 testbot :Welcome to the Test IRC Network testbot!testuser@localhost\r\n");
-    }).bind(this), 200);
-};
-
-Socket.prototype.end = function () {
+  this.end = function () {
     this.emit("close");
+  };
+
+  this.write = jasmine.createSpy();
+  this.setNoDelay = jasmine.createSpy();
+  this.setEncoding = jasmine.createSpy();
 };
 
-Socket.prototype.write = function (message) {
-  void 0;
-};
-
-Socket.prototype.setNoDelay = function () {
-  void 0;
-};
-
-Socket.prototype.setEncoding = function () {
-  void 0;
-};
-
-Socket.prototype.sendMessage = function (message) {
-  this.emit("data", message + "\r\n");
-}
+Socket.prototype = new EE();
 
 module.exports = Socket;

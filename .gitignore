@@ -3,3 +3,4 @@ node_modules/*
 .project
 .buildpath
 npm-debug.log
+*sublime*

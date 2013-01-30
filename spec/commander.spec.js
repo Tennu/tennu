@@ -1,3 +1,5 @@
+var util = require('util');
+
 var Commander = require('../lib/commander');
 var EE = require('events').EventEmitter;
 var mockMessage = Object.freeze({
@@ -7,7 +9,9 @@ var mockMessage = Object.freeze({
   message : 'event'
 });
 
-describe("binding", function () {
+// Does not work this way anymore. Commander doesn't listen to the ctx
+// anymore. Instead, it's up to the ctx to set this up.
+xdescribe("binding", function () {
   it('binds callbacks to its context', function () {
     var ctx = new EE();
     var commander = new Commander(ctx, {}, {});
