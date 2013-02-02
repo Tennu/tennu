@@ -1,4 +1,6 @@
-// TODO: XXX: Make this work with multiple NRC instances!
+// XXX: Make sure to fix all the broken names to use `this`
+// This is because before, this module had a global called users.
+// But that doesn't scale to multiple NRC connections.
 
 var util = require('util');
 
@@ -16,45 +18,45 @@ var filterStatusSymbol = function (nickname) {
     return nickname;
 };
 
-var onLoad = function () {
-    server = this.use("server");
+var isSelf = function (nrc, nick) {
+    return nrc.nick() === nick;
 };
-
-// TODO: Convert these values to lowercase. Keep the name case sensitive.
-var users = {};
 
 var User = function (name, channel) {
     this.name = name;
     this.channels = new SSet([channel]);
 };
 
-var addUserChannel = function (user, channel) {
-    if (users[user]) {
-        users[user].channels.add(channel);
-    } else {
-        users[user] = new User(user, channel);
-    }
+/**
+ * Fields
+ *   _server
+ */
+var UserModule = function (nrc) {
+    this._nrc = nrc;
+    this._server = null;
+    this.users = {};
 };
 
-var removeUserChannel = function (user, channel) {
-    users[user].channels.remove(channel);
-};
-
-var isSelf = function (nrc, nick) {
-    return nrc.nick() === nick;
-};
-
-var selfPart = function (channel) {
-    for (var user in users) {
-        if (Object.hasOwnProperty(users, user)) {
-            removeUserChannel(user, channel);
+// Keep the actual Module seperate from the UserModule class. If the
+// interface changes in the future, we are prepared!
+UserModule.prototype.getModule = function () {
+    return {
+        name: "users",
+        exports: {
+            users : this.users
+        },
+        handlers: {
+            "load" : this.onLoad.bind(this),
+            "join part quit" : this.onLeave.bind(this),
+            "nick" : this.onNick.bind(this),
+            "353" : this.namesHandler.bind(this)
         }
-    }
+    };
 };
 
-var userQuit = function (user) {
-    // Clean out the channels list of the user.
-    while (users[user].channels.pop() !== null);
+UserModule.prototype.onLoad =  function () {
+    // Should be a dependency...
+    this._server = this._nrc.use("server");
 };
 
 /**
@@ -63,7 +65,7 @@ var userQuit = function (user) {
  * there really isn't any work that has to be done here other than actually
  * adding the channels to the users.
  */
-var namesHandler = function (msg) {
+UserModule.prototype.namesHandler = function (msg) {
     msg.users.forEach(function (user) {
         // The numeric will add status messages (~, @, ect.) to nicks.
         user = filterStatusSymbol(user);
@@ -72,7 +74,7 @@ var namesHandler = function (msg) {
     });
 };
 
-var onLeave = function () {
+UserModule.prototype.onLeave = function () {
     var self = {
         part: selfPart,
         quit: function () {},
@@ -94,21 +96,37 @@ var onLeave = function () {
     };
 }();
 
-var onNick = function (msg) {
+UserModule.prototype.onNick = function (msg) {
     users[msg.newNick] = users[msg.actor];
     users[msg.newNick].name = msg.newNick;
     delete users[msg.actor];
 };
 
-module.exports = {
-    name: "users",
-    exports: {
-        users : users
-    },
-    handlers: {
-        "load" : onLoad,
-        "join part quit" : onLeave,
-        "nick" : onNick,
-        "353" : namesHandler
+UserModule.prototype._addUserChannel = function (user, channel) {
+    if (users[user]) {
+        users[user].channels.add(channel);
+    } else {
+        users[user] = new User(user, channel);
     }
+};
+
+UserModule.prototype._removeUserChannel = function (user, channel) {
+    users[user].channels.remove(channel);
+};
+
+UserModule.prototype._selfPart = function (channel) {
+    for (var user in users) {
+        if (Object.hasOwnProperty(users, user)) {
+            removeUserChannel(user, channel);
+        }
+    }
+};
+
+UserModule.prototype._userQuit = function (user) {
+    // Clean out the channels list of the user.
+    while (users[user].channels.pop() !== null);
+};
+
+module.exports = function (nrc) {
+    return new UserModule(nrc).getModule();
 };

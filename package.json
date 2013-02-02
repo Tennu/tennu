@@ -1,6 +1,6 @@
 {
   "name": "nrc",
-  "version": "0.2.13",
+  "version": "0.3.0",
   "description": "Node.js IRC API",
   "maintainers": [{
     "name": "Ryan Scheel",
@@ -19,7 +19,6 @@
   },
   "keywords": ["irc"],
   "dependencies": {
-    "protocols": "git://github.com/Gozala/protocol.git#91c76addd8bfc5cfc73c5fe1d7e7543197c582fe",
     "simplesets": ">=0.1.2"
   }
 }
