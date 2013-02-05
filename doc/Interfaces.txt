@@ -1,0 +1,86 @@
+Interfaces
+
+IRCCommandHandler implements EventSubscriber, EventEmitter
+    parseMessage(IRCMessage)
+    emits(single-arbitrary-word, IRCCommand, NRC)
+
+IRCCommand
+    get sender
+    get args
+    get channel
+    get name
+    get isQuery
+
+IRCMessage
+    get receiver:NRC
+       Receiver of the message. The NRC object in most cases.
+    get prefix
+      If an IRC message starts with a :, the first word is called the prefix.
+    get sender
+      Sender of the message. Usually a Hostmask.
+    get type
+      Type of message. For example, 'privmsg' or 'quit'.
+    get name
+      Alias for type.
+    get args
+      Array of sent parameters.
+
+Actor
+    get actor: String
+        User performing the action.
+
+Channel
+    get channel: String
+
+IRCUserMessage implements IRCMessage, Actor
+IRCChannelUserMessage implements IRCMessage, Channel, Actor
+IRCChannelMessage implements IRCMessage, Channel
+IRCJoinPartMessage implements IRCChannelUserMessage
+
+IRCPrivMsgMessage implements IRCChannelUserMessage
+    get isQuery: boolean
+        True if message sent in a query.
+
+IRCQuitMessage implements IRCUserMessage
+    get reason: String
+
+IRCNickMessage implements IRCUserMessage
+    get newNick: String
+        New nick for the user changing nick.
+
+IRCChannelNamesMessage implements IRCChannelMessage
+    get users: List[String]
+        List of users in channel.
+
+NRC implements ModuleSubscriber, ModuleStorage, BiEventSubscriber, ConfigurationStorage, IRCClient
+
+ModuleSubscriber
+    require(Module)
+
+ModuleStorage
+    use(String): ModuleExports
+    isModule(String): boolean
+    getAllModuleNames(): List[String]
+    getAllModuleExports(): List[ModuleExports]
+
+ModuleExports
+    (Marker)
+
+BiEventSubscriber
+    on()
+    once()
+
+SimpleReadSocket extends EventSubscriber, EventEmitter
+    connect()
+    end()
+    emits('data', String)
+
+IRCSocket extends SimpleReadSocket
+    raw(String)
+    onConnect(Callback[])
+    onDisconnect(Callback[])
+
+Logger
+    input
+    output
+    error

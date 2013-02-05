@@ -1,0 +1,34 @@
+Changelog
+
+0.1.0:
+    * Rewrite of original nrc module.
+
+0.2.0:
+    * Module system added.
+
+0.3.0:
+    * Removal of the Protocols dependency. There's no logging at the moment.
+    * Modules are moved to their own object.
+    * BiSubscriber handlers the subscribing of events to either the
+      IRCMessageEmitter or the IRCCommandEmitter.
+    * Default NRC Modules are disabled (until the next version)
+
+0.4.0:
+    * Event listeners are no longer bound to 'nrc'.
+    * Message and Command objects use 'args' instead of 'params/parameters'.
+      This follows the same naming convention that node-irc uses.
+    * Default NRC Modules are refactored so that they return a function that
+      returns a module.
+    * ModuleSubscriber.requires() interface contract changed so that it takes
+      a one-arg constructor (that arg being the NRC object for the server the
+      module will be on) that returns a module.
+    * Module contract gains additional optional field for dependencies:
+        + dependencies(undefined U ModuleExports): List[String] U undefined
+
+Future:
+    * Executable tool to start a new NRC bot.
+      Ex:  nrc ./my-server-config.json
+    * Examples of building a module and building a quick bot.
+    * Configuration Object passed to NRC constructor gains
+      optional 'modules' field. Absolute or relative URLs to modules that
+      are required.
