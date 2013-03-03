@@ -1,22 +1,7 @@
-// XXX: Make sure to fix all the broken names to use `this`
-// This is because before, this module had a global called users.
-// But that doesn't scale to multiple NRC connections.
-
 var util = require('util');
 
 var SSet = require("simplesets").Set;
 var server;
-
-var filterStatusSymbol = function (nickname) {
-    // We have bigger problems if server isn't there...
-    if (server && server.capabilities && server.capabilities.STATUSMSG) {
-        if (server.capabilities.STATUSMSG.indexOf(nickname[0]) !== -1) {
-            return nickname.substring(1);
-        }
-    }
-
-    return nickname;
-};
 
 var isSelf = function (nrc, nick) {
     return nrc.nick() === nick;
@@ -27,10 +12,6 @@ var User = function (name, channel) {
     this.channels = new SSet([channel]);
 };
 
-/**
- * Fields
- *   _server
- */
 var UserModule = function (nrc) {
     this._nrc = nrc;
     this._server = null;
@@ -68,7 +49,7 @@ UserModule.prototype.onLoad =  function () {
 UserModule.prototype.namesHandler = function (msg) {
     msg.users.forEach(function (user) {
         // The numeric will add status messages (~, @, ect.) to nicks.
-        user = filterStatusSymbol(user);
+        user = this._stripStatusSymbol(user);
 
         addUserChannel(user, msg.channel);
     });
@@ -76,55 +57,69 @@ UserModule.prototype.namesHandler = function (msg) {
 
 UserModule.prototype.onLeave = function () {
     var self = {
-        part: selfPart,
+        part: this._selfPart,
         quit: function () {},
         join: function () {}
     };
 
     var user = {
-        part: removeUserChannel,
-        quit: userQuit,
-        join: addUserChannel
+        part: this._removeUserChannel,
+        quit: this._userQuit,
+        join: this._addUserChannel
     };
 
     return function (msg) {
         if (isSelf(this, msg.actor)) {
-            self[msg.type](msg.channel);
+            self[msg.type].call(this, msg.channel);
         } else {
-            user[msg.type](msg.actor, msg.channel);
+            user[msg.type].call(this, msg.actor, msg.channel);
         }
     };
 }();
 
 UserModule.prototype.onNick = function (msg) {
-    users[msg.newNick] = users[msg.actor];
-    users[msg.newNick].name = msg.newNick;
-    delete users[msg.actor];
+    this.users[msg.newNick] = this.users[msg.actor];
+    this.users[msg.newNick].name = msg.newNick;
+    delete this.users[msg.actor];
 };
 
 UserModule.prototype._addUserChannel = function (user, channel) {
-    if (users[user]) {
-        users[user].channels.add(channel);
+    if (this.users[user]) {
+        this.users[user].channels.add(channel);
     } else {
-        users[user] = new User(user, channel);
+        this.users[user] = new User(user, channel);
     }
 };
 
 UserModule.prototype._removeUserChannel = function (user, channel) {
-    users[user].channels.remove(channel);
+    this.users[user].channels.remove(channel);
 };
 
 UserModule.prototype._selfPart = function (channel) {
     for (var user in users) {
         if (Object.hasOwnProperty(users, user)) {
-            removeUserChannel(user, channel);
+            this._removeUserChannel(user, channel);
         }
     }
 };
 
 UserModule.prototype._userQuit = function (user) {
     // Clean out the channels list of the user.
-    while (users[user].channels.pop() !== null);
+    while (this.users[user].channels.pop() !== null);
+};
+
+// If the username starts with a mode character (such as @, strip it)
+UserModule.prototype._stripStatusSymbol = function (nickname) {
+    // We have bigger problems if server isn't there...
+    if (this._server && this._server.capabilities &&
+        this._server.capabilities.STATUSMSG)
+    {
+        if (this._server.capabilities.STATUSMSG.indexOf(nickname[0]) !== -1) {
+            return nickname.substring(1);
+        }
+    }
+
+    return nickname;
 };
 
 module.exports = function (nrc) {

@@ -12,7 +12,7 @@ var Socket = function () {
     setTimeout((function () {
       this.emit("data", 'PING :PINGMESSAGE\r\n');
       this.emit("data", ":irc.test.net 001 testbot :Welcome to the Test IRC Network testbot!testuser@localhost\r\n");
-      this.emit("data", ":irc.test.net 005 testbot STATUSMSG=@&~ :are supported by this server");
+      this.emit("data", ":irc.test.net 005 testbot STATUSMSG=@&~ :are supported by this server\r\n");
       this.isConnected = true;
       }).bind(this), 0);
   });

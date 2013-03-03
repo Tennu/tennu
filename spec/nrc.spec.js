@@ -1,8 +1,3 @@
-/**
- * @author havvy
- * Waits Total: 1.1 seconds. :(
- */
-
 var util = require('util');
 
 var NRC = require('../lib/nrc');
@@ -46,7 +41,7 @@ var fakeWrite = function (message) {
   }
 };
 
-describe('basics', function () {
+describe('nrc', function () {
   var mocksocket, nrc;
 
   beforeEach(function () {
@@ -58,7 +53,7 @@ describe('basics', function () {
     nrc.disconnect();
   });
 
-  it('wraps an IRC socket', function () {
+  it('connects to an IRC socket', function () {
     nrc.connect();
   });
 
@@ -123,17 +118,17 @@ describe('the nrc api', function () {
 
     runs(function () {
       nrc.once('join', function onJoin (msg) {
-        this.part(msg.channel);
+        nrc.part(msg.channel);
       });
 
-      nrc.once('part', function (msg) {
+      nrc.once('part', function onPart (msg) {
         done = true;
       });
 
       nrc.join("#test");
     });
 
-    waitsFor(function () { return done; }, "nrc parted", 1000);
+    waitsFor(function () { return done; }, "nrc parted");
 
     runs(function () {
       expect(mocksocket.write).toHaveBeenCalledWith("PART #test\n", 'ascii');

@@ -92,57 +92,6 @@ describe("bisubscribers subscribe events to two event emitters", function () {
     });
 });
 
-describe("dealing with context", function () {
-    var ctx, primary, secondary, capture, done;
-
-    beforeEach(function () {
-        ctx = {};
-        primary = new events.EventEmitter();
-        secondary = new events.EventEmitter();
-        capture = undefined;
-        done = false;
-    });
-
-    it("can take an optional context in the constructor", function () {
-        var subscriber = new BiSubscriber(primary, secondary, ctx);
-
-        runs(function() {
-            subscriber.on("data", function () {
-                capture = this;
-                done = true;
-            });
-
-            primary.emit("data");
-        });
-
-        waitsFor(function () { return done; }, "done", 200);
-
-        runs(function () {
-            expect(capture).toBe(ctx);
-        });
-    });
-
-    it("can change the context after creation", function () {
-        var subscriber = new BiSubscriber(primary, secondary);
-        subscriber.setContext(ctx);
-
-        runs(function() {
-            subscriber.on("data", function () {
-                capture = this;
-                done = true;
-            });
-
-            primary.emit("data");
-        });
-
-        waitsFor(function () { return done; }, "done", 200);
-
-        runs(function () {
-            expect(capture).toBe(ctx);
-        });
-    });
-});
-
 describe("quantification (on vs. once)", function () {
     var subscriber, primary, secondary, spy, eventCount, isDone;
 

@@ -1,28 +1,37 @@
 var util = require('util');
 
-var capabilities = {};
+var ServerModule = function () {
+    this.capabilities = {};
+};
 
-var _005Handler = function (e) {
+ServerModule.prototype.getModule = function () {
+    return {
+        name: "server",
+        exports: {
+            "capabilities" : this.capabilities
+        },
+        handlers: {
+            "005" : this.isupportHandler.bind(this)
+        },
+        help: "Internal module. Right now only grabs the isupport info."
+    };
+};
+
+ServerModule.prototype.isupportHandler = function (e) {
     // First parameter is my nickname!
     // Last parameter is plain text.
-    for (var ix = 1; ix < e.parameters.length - 1; ix++) {
-        var param = e.parameters[ix].split("=");
-        switch (param.length) {
+    for (var ix = 1; ix < e.args.length - 1; ix++) {
+        var capability = e.args[ix].split("=");
+        switch (capability.length) {
             case 1:
-                capabilities[param[0]] = true;
+                this.capabilities[capability[0]] = true;
                 break;
             case 2:
-                capabilities[param[0]] = param[1];
+                this.capabilities[capability[0]] = capability[1];
         }
     }
 };
 
-module.exports = {
-    name: "server",
-    exports: {
-        "capabilities" : capabilities
-    },
-    handlers: {
-        "005" : _005Handler
-    }
+module.exports = function (nrc) {
+    return (new ServerModule()).getModule();
 };

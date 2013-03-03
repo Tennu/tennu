@@ -24,6 +24,7 @@ Changelog
       module will be on) that returns a module.
     * Module contract gains additional optional field for dependencies:
         + dependencies(undefined U ModuleExports): List[String] U undefined
+    * Only the server module works.
 
 Future:
     * Executable tool to start a new NRC bot.
@@ -32,3 +33,6 @@ Future:
     * Configuration Object passed to NRC constructor gains
       optional 'modules' field. Absolute or relative URLs to modules that
       are required.
+    * Get modules rewritten properly.
+    * Move startup code out of Message Handler. [Why did I put it there?]
+    ** Refactor the IRC Socket to be multi-stage.

@@ -93,7 +93,7 @@ only set by messages of that type.
 * sender     - Sender of the message. Usually a Hostmask.
 * type       - Type of message. For example, 'privmsg' or 'quit'.
 * name       - Alias for type.
-* parameters - Array of sent parameters.
+* args       - Array of sent parameters.
 * actor      - [join, part, privmsg, quit, nick] User performing the action.
 * channel    - [join, part, privmsg, 353] Channel the action is performed in.
 * isQuery    - [privmsg] True if message sent in a query.
@@ -108,7 +108,7 @@ Commands are passed for user commands.
 Commands have the following fields.
 
 * sender  - Sender of the command.
-* params  - Parameters of the command.
+* args    - Parameters of the command.
 * channel - Channel the command was sent through.
 * name    - Name of the command.
 * isQuery - True if message sent in a query.
