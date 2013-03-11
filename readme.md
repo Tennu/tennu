@@ -11,12 +11,11 @@ API documenation will be here at some point.
 ```javascript
 var nrc = require('nrc');
 var network = require('../config/myNetwork.json');
-var myLogger = new (require('myLogger').Logger)()
-var myNetwork = new nrc.NRC(network, {log: myLogger});
+var myNetwork = new nrc.Client(network);
 myNetwork.connect();
 ```
 
-Before connecting, add listeners to events from irc & users, or load a module.
+Before connecting, add listeners to events from irc & users, or load modules.
 
 ```javascript
 
@@ -44,17 +43,24 @@ It is suggested that your static network configuration objects go in _/config/%N
 
 A network configuration object has the following properties:
 
-* server   - IRC server to connect to. _Example:_ _irc.mibbit.net_
-* nick     - Nickname the bot will use. Defaults to "nrcbot"
-* user     - Username the bot will use. Defaults to "user"
-* realname - Realname for the bot. Defaults to "nrc v0.3"
-* port     - Port to connect to. Defaults to 6667.
-* password - Password for identifying to services.
-* nickserv - Nickname for nickserv service. Defaults to "nickserv".
-* trigger  - Command character to trigger commands with. By default, '!'.
-* channels - Array of channels to autojoin. _Example:_ ["#help", "#nrc"]
+* server      - IRC server to connect to. _Example:_ _irc.mibbit.net_
+* nick        - Nickname the bot will use. Defaults to "nrcbot"
+* user        - Username the bot will use. Defaults to "user"
+* realname    - Realname for the bot. Defaults to "nrc v0.3"
+* port        - Port to connect to. Defaults to 6667.
+* password    - Password for identifying to services.
+* nickserv    - Nickname for nickserv service. Defaults to "nickserv".
+* trigger     - Command character to trigger commands with. By default, '!'.
+* channels    - Array of channels to autojoin. _Example:_ ["#help", "#nrc"]
+* modules     - An array of strings or objects.
+** string     - The file location of the Node module that exports an NRC module.
+** object     - Has the following fields. All optional other than 'file'
+*** file      - The file location of the Node module that exports an NRC module.
+*** config    - Configuration object for the module. Defaults to {}.
+*** usepath   - Boolean whether to append module-path to file. Defaults to true.
+* module-path - Prefix added to module file locations.
 
-Other modules may require or use more options.
+Other modules may require or use more options. Such options will be in
 
 -------------
 
@@ -163,12 +169,30 @@ nrc.act('#example', "does something!");
 
 Quits the server with the given reason.
 
+
+### whois(users, server) ###
+
+Server is optional, and you'll probably not need it. Look at RFC 1459 for
+what benefit it gives you.
+
+users is either a string or an array of strings.
+
+### userhost(users) ###
+
+Retrieves the userhost of the user. 
+
+### _raw(message) ###
+
+Our IrcOutputSocket class does not have all commands. If you need to use one
+that is not listed here, you can use the internal _raw method, which takes
+the entire message as is as a string.
+
 --------
 
 ## Modules ##
 
-NRC has its own module system, loosely based off of Node's. Modules are implemented
-using the following object structure:
+NRC has its own module system, loosely based off of Node's. Modules are
+implemented using the following object structure:
 
 ```javascript
 {
@@ -248,15 +272,17 @@ Assume the module's name is 'example'. Then these will all work and return
 
 #### channels ####
 
-___Unofficial:___ This module will be official in 0.3.
+___Unofficial:___ This module will be official before the 1.0.0 release.
+
+This module is currently disabed.
 
 This module handles keeping track of channel-specific data.
 
 #### users ####
 
-___Unofficial:___ This module will be official in 0.3.
+___Unofficial:___ This module will be official before the 1.0.0 release.
 
-Though unofficial, and untested, this module should hopefully work.
+This module is currently disabled.
 
 This module handles keeping track of user-specific data.
 
@@ -306,3 +332,43 @@ The capabilities object looks like this for the Mibbit network.
   INVEX: true
 }
 ```
+
+## Contributions ##
+
+There's a lot of work that can be done.
+
+### Module System ###
+
+The parameters for the modules in the config don't actually do anything. They
+need to be implemented.
+
+### Startup ###
+
+As part of an IrcSocket, I want them to take a Startup object (an object that
+implements the startup interface, whatever that may be). Right now startup
+code is all over the place, and this sucks.
+
+I want this to be able to change (say we have one that implements IRC 3's
+CAPABILITIES protocol or one that does WEBIRC) pretty easily.
+
+### Testing ###
+
+I would like to be testing each class in isolation.
+
+With exception to the Client class, which should be tested as integration.
+
+### Built In Modules ###
+
+I don't want to write these, so I've been putting them off. If you want to,
+please feel free to write them.
+
+### ChunkedIrcMessageHandler ###
+
+Listens to the IrcMessageHandler, it chunks together list-like replies such
+as whois and isupport numerics. For messages that aren't chunked, just pass
+them through normally.
+
+### IrcOutputSocket Commands ###
+
+I'm missing most of the commands from IRC. If you want to add them, please
+do so. Just make sure to also add the method wrapper to the client class.

@@ -41,12 +41,16 @@ var fakeWrite = function (message) {
   }
 };
 
+var closure = function (value) {
+  return function () { return value; };
+};
+
 describe('nrc', function () {
   var mocksocket, nrc;
 
   beforeEach(function () {
     mocksocket = new MockSocket();
-    nrc = new NRC(network, {socket : mocksocket});
+    nrc = new NRC(network, {Socket : closure(mocksocket)});
   });
 
   afterEach(function () {
@@ -55,23 +59,6 @@ describe('nrc', function () {
 
   it('connects to an IRC socket', function () {
     nrc.connect();
-  });
-
-  it('says when it is ready', function () {
-    var handler = jasmine.createSpy("handler");
-
-    runs(function () {
-      nrc.on('ready', handler);
-      nrc.connect();
-    });
-
-    waitsFor(function () {
-      return handler.wasCalled;
-    }, "handler was called", 500);
-
-    runs(function () {
-      expect(handler).toHaveBeenCalled();
-    });
   });
 });
 
@@ -85,9 +72,9 @@ describe('the nrc api', function () {
     mocksocket = new MockSocket();
     mocksocket.write.andCallFake(fakeWrite);
 
-    nrc = new NRC(network, {socket : mocksocket});
+    nrc = new NRC(network, {Socket : closure(mocksocket)});
 
-    nrc.on("ready", function () {
+    nrc._socket.on("ready", function () {
       ready = true;
     });
 
@@ -128,13 +115,14 @@ describe('the nrc api', function () {
       nrc.join("#test");
     });
 
-    waitsFor(function () { return done; }, "nrc parted");
+    waitsFor(function () { return done; }, "nrc parted", 200);
 
     runs(function () {
       expect(mocksocket.write).toHaveBeenCalledWith("PART #test\n", 'ascii');
     });
   });
 
+  // Failing with no discerable reason.
   it('can quit', function () {
     nrc.quit();
 
@@ -143,7 +131,7 @@ describe('the nrc api', function () {
 });
 
 describe('state-tracking', function () {
-  var nrc = new NRC(network, {socket: new MockSocket()});
+  var nrc = new NRC(network, {Socket: MockSocket});
 
   it('knows when its nick changes', function () {
     runs(function () {
@@ -165,7 +153,7 @@ describe('state-tracking', function () {
 });
 
 // This is more an integration test...
-// Should have this test for the Commander spec too.
+// Should have this test for the CommandHander iface spec too.
 describe("listening to user commands", function () {
   var nrc, mocksocket, called;
 
@@ -174,7 +162,7 @@ describe("listening to user commands", function () {
 
     mocksocket = new MockSocket();
     mocksocket.write.andCallFake(fakeWrite);
-    nrc = new NRC(network, {socket : mocksocket});
+    nrc = new NRC(network, {Socket : closure(mocksocket)});
 
     nrc.on("!testcommand", function () {
       called = true;
@@ -239,7 +227,7 @@ describe("autojoin and autoidentify", function () {
 
     mocksocket = new MockSocket();
     mocksocket.write.andCallFake(fakeWrite);
-    nrc = new NRC(autonetwork, {socket : mocksocket});
+    nrc = new NRC(autonetwork, {Socket : closure(mocksocket)});
 
     nrc.on("join", function () {
       hasJoined = true;

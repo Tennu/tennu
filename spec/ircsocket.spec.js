@@ -1,14 +1,9 @@
-/**
- * @author havvy
- * This document does not respect the 80 char length limit.
- * Waits total max: 1.1 seconds.
- */
-
 /*
- * The MockSocket mocks a net.socket. The IRC socket is the socket type found
- * in nrc. socket is a variable to hold the IRCSocket. mocksocket is a variable
- * for holding mock sockets.
- */
+The MockSocket mocks a net.socket. The IRC socket is the socket type found
+in nrc. socket is a variable to hold the IRCSocket. mocksocket is a variable
+for holding mock sockets.
+  */
+
 var MockSocket = require('./mocksocket');
 var IRCSocket = require('../lib/socket.js');
 
@@ -19,12 +14,17 @@ var network = Object.freeze({
   realname: 'realbot'
 });
 
+var closure = function (value) {
+  return function () {
+    return value;
+  };
+};
+
 describe("connecting to a network", function connectingToANetwork () {
   var mocksocket, socket;
 
   it('knows whether or not it is connected.', function () {
-    mocksocket = new MockSocket();
-    socket = new IRCSocket(network, {socket : mocksocket});
+    socket = new IRCSocket(network, {Socket : MockSocket});
 
     expect(socket.isConnected()).toBeFalsy();
   });
@@ -40,8 +40,8 @@ describe("connecting to a network", function connectingToANetwork () {
   });
 
   it('declares NICK and USER to the server on connection', function () {
-    mocksocket = new MockSocket();
-    socket = new IRCSocket(network, {socket : mocksocket});
+    var mocksocket = new MockSocket();
+    socket = new IRCSocket(network, {Socket : closure(mocksocket)});
     socket.connect();
     socket.end();
     expect(mocksocket.write).toHaveBeenCalledWith('NICK testbot\n', 'ascii');
@@ -52,8 +52,7 @@ describe("connecting to a network", function connectingToANetwork () {
   it('declares when ready to send commands', function () {
     var readyIsCalled = false;
     runs(function () {
-      mocksocket = new MockSocket();
-      socket = new IRCSocket(network, {socket : mocksocket});
+      socket = new IRCSocket(network, {Socket : MockSocket});
       socket.on('ready', function () {
         readyIsCalled = true;
       });
@@ -76,7 +75,7 @@ describe('maintaining connection to a server', function () {
 
   beforeEach(function () {
     mocksocket = new MockSocket();
-    socket = new IRCSocket(network, {socket : mocksocket});
+    socket = new IRCSocket(network, {Socket : closure(mocksocket)});
   });
 
   afterEach(function () {

@@ -1,21 +1,21 @@
 Interfaces
 
-IRCCommandHandler implements EventSubscriber, EventEmitter
-    parseMessage(IRCMessage)
-    emits(single-arbitrary-word, IRCCommand, NRC)
+IrcCommandHandler implements EventSubscriber, EventEmitter
+    parseMessage(IrcMessage)
+    emits(single-arbitrary-word, IrcCommand, NRC)
 
-IRCCommand
+IrcCommand
     get sender
     get args
     get channel
     get name
     get isQuery
 
-IRCMessage
+IrcMessage
     get receiver:NRC
        Receiver of the message. The NRC object in most cases.
     get prefix
-      If an IRC message starts with a :, the first word is called the prefix.
+      If an Irc message starts with a :, the first word is called the prefix.
     get sender
       Sender of the message. Usually a Hostmask.
     get type
@@ -32,27 +32,27 @@ Actor
 Channel
     get channel: String
 
-IRCUserMessage implements IRCMessage, Actor
-IRCChannelUserMessage implements IRCMessage, Channel, Actor
-IRCChannelMessage implements IRCMessage, Channel
-IRCJoinPartMessage implements IRCChannelUserMessage
+IrcUserMessage implements IrcMessage, Actor
+IrcChannelUserMessage implements IrcMessage, Channel, Actor
+IrcChannelMessage implements IrcMessage, Channel
+IrcJoinPartMessage implements IrcChannelUserMessage
 
-IRCPrivMsgMessage implements IRCChannelUserMessage
+IrcPrivMsgMessage implements IrcChannelUserMessage
     get isQuery: boolean
         True if message sent in a query.
 
-IRCQuitMessage implements IRCUserMessage
+IrcQuitMessage implements IrcUserMessage
     get reason: String
 
-IRCNickMessage implements IRCUserMessage
+IrcNickMessage implements IrcUserMessage
     get newNick: String
         New nick for the user changing nick.
 
-IRCChannelNamesMessage implements IRCChannelMessage
+IrcChannelNamesMessage implements IrcChannelMessage
     get users: List[String]
         List of users in channel.
 
-NRC implements ModuleSubscriber, ModuleStorage, BiEventSubscriber, ConfigurationStorage, IRCClient
+NRC implements ModuleSubscriber, ModuleStorage, BiEventSubscriber, ConfigurationStorage, IrcOutputClient
 
 ModuleSubscriber
     require(Module)
@@ -75,8 +75,10 @@ SimpleReadSocket extends EventSubscriber, EventEmitter
     end()
     emits('data', String)
 
-IRCSocket extends SimpleReadSocket
+IrcSocket extends SimpleReadSocket
     raw(String)
+    start aliases connect
+    disconnect aliases end
     onConnect(Callback[])
     onDisconnect(Callback[])
 
@@ -84,3 +86,4 @@ Logger
     input
     output
     error
+    debug

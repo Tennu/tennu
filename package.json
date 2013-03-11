@@ -1,6 +1,6 @@
 {
   "name": "nrc",
-  "version": "0.4.1",
+  "version": "0.4.3",
   "description": "Node.js IRC API",
   "maintainers": [{
     "name": "Ryan Scheel",
@@ -15,7 +15,7 @@
   "main": "lib",
   "directories": ["lib", "config"],
   "engines": {
-    "node": ">=0.6.7"
+    "node": ">=0.6.0"
   },
   "keywords": ["irc"],
   "dependencies": {
