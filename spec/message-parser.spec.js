@@ -1,56 +1,99 @@
 var events = require('events');
+var util = require('util');
+var id = require('./id');
 
-var MessageHandler = require('../lib/message-parser');
+var MessageParser = require('../lib/message-parser');
+var ChunkedMessageParser = require('../lib/chunked-message-parser');
 var Message = require('../lib/structures/message');
 
-describe('Message Handlers', function () {
-    var emitter, mh, receiver;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 500; //ms
+
+describe('Message Parsers', function () {
+    var mp, receiver;
+    var input = ':concrete.mozilla.org 432 Havvy :Erroneous Nickname: Illegal characters';
+
+    describe("parse messages", function () {
+        beforeEach(function () {
+            receiver = {_id: id()};
+            mp = new MessageParser(receiver);
+        });
+
+        it('and returns them', function () {
+            var msg = mp.parse(input);
+            expect(msg).toEqual(new Message(input, receiver));
+        });
+
+        it('and emit them by their name', function () {
+            var msg, done = false;
+
+            runs(function () {
+                mp.on('432', function (m) {
+                    done = true;
+                    msg = m;
+                });
+
+                mp.parse(input);
+            });
+
+            waitsFor(function () { return done; }, "432 message is parsed.");
+
+            runs(function () {
+                expect(msg instanceof Message).toBeTruthy();
+                expect(msg.name).toBe('432');
+                expect(msg.args[0]).toBe('Havvy');
+                expect(msg.args[1]).toBe('Erroneous Nickname: Illegal characters');
+                expect(msg.receiver).toBe(receiver);
+            });
+        });
+
+        it('and emits all messages under _message', function () {
+            var count = 0;
+
+            runs(function () {
+                mp.on("_message", function (message) {
+                    count++;
+                });
+
+                mp.parse(input);
+                mp.parse(input);
+            });
+
+            waitsFor(function () { return count === 2; }, "events captures", 2);
+
+            runs(function () {
+                expect(count).toBe(2);
+            });
+        });
+    });
+});
+
+describe('ChunkedMessageParsers', function () {
+    var msg, mp, cmp, rcvr;
 
     beforeEach(function () {
-        emitter = new events.EventEmitter();
-        receiver = {_:1};
-        mh = new MessageHandler(receiver, emitter);
+        rcvr = {_id: id()};
+        mp = new MessageParser(rcvr);
+        cmp = new ChunkedMessageParser(mp);
     });
 
-    it('convert IRC to Messages', function () {
-        var msg, done = false;
+    it('relay unknown messages as a message handler', function () {
+        var msg, done;
 
         runs(function () {
-            mh.on('432', function (m) {
+            cmp.on('unknown', function (m) {
                 done = true;
                 msg = m;
             });
 
-            emitter.emit('data', ':concrete.mozilla.org 432 Havvy[telnet] :Erroneous Nickname: Illegal characters');
+            mp.parse(':server.network.net UNKNOWN testbot :An unknown message');
         });
 
-        waitsFor(function () { return done; }, "432 message is parsed.");
+        waitsFor(function () { return done; }, "unkown message received");
 
         runs(function () {
-            expect(msg instanceof Message).toBeTruthy();
-            expect(msg.name).toBe('432');
-            expect(msg.args[0]).toBe('Havvy[telnet]');
-            expect(msg.args[1]).toBe('Erroneous Nickname: Illegal characters');
-            expect(msg.receiver).toBe(receiver);
-        });
-    });
-
-    it('emits all messages under _message', function () {
-        var msg, count = 0;
-
-        runs(function () {
-            mh.on("_message", function (message) {
-                count++;
-            });
-
-            emitter.emit('data', ':concrete.mozilla.org 432 Havvy[telnet] :Erroneous Nickname: Illegal characters');
-            emitter.emit('data', ':concrete.mozilla.org 432 Havvy[telnet] :Erroneous Nickname: Illegal characters');
-        });
-
-        waitsFor(function () { return count === 2; }, "events captures", 2);
-
-        runs(function () {
-            expect(count).toBe(2);
+            expect(msg.name).toBe("unknown");
+            expect(msg.receiver).toBe(rcvr);
+            expect(msg.args[0]).toBe('testbot');
         });
     });
 });

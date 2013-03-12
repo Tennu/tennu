@@ -1,60 +1,33 @@
-/**
- * @author havvy
- * This document does not respect the 80 char length limit.
- */
-
 var Hostmask = require('../lib/structures/hostmask');
-var stringHostmaskOfSender = "sender!friendly@test.suite.net";
-var stringHostmaskOfMiddleman = "middleman!malicious@test.suite.evil.net";
+var sampleHostmask = "sender!friendly@test.suite.net";
+var differentHostmask = "havvy!kvirc@mib-6AB72C.wa.qwest.net";
 
-describe('requiring files', function requiringFiles () {
-  it('is a constructor', function itIsAConstructor () {
-    expect(typeof Hostmask).toEqual('function');
-  });
-});
+describe("Hostmasks", function () {
+  it('break a hostmask into nick, user, and host', function () {
+    var hm = new Hostmask(sampleHostmask);
 
-describe('creating hostmasks', function creatingHostmasks () {
-  it('returns a null hostmask when given no input', function returnsANullHostmaskWhenGivenNoInput () {
-    var nullHostmask = new Hostmask();
-    expect(nullHostmask).toBeDefined();
-    expect(nullHostmask.nick).toEqual('');
-    expect(nullHostmask.user).toEqual('');
-    expect(nullHostmask.host).toEqual('');
-  });
-  
-  it('breaks a hostmask into nick, user, and host', function breaksAHostmaskIntoNickUserAndHost () {
-    var hostmaskOfSender = new Hostmask(stringHostmaskOfSender);
-    expect(hostmaskOfSender).toBeDefined();
-    expect(hostmaskOfSender.nick).toEqual('sender');
-    expect(hostmaskOfSender.user).toEqual('friendly');
-    expect(hostmaskOfSender.host).toEqual('test.suite.net');
-  });
-});
-
-describe('the immutability of hostmasks', function theImmutabilityOfHostmasks () {
-  it('cannot have values change', function cannotHaveValuesChange () {
-    var hostmaskOfSender = new Hostmask(stringHostmaskOfSender);
-    
-    hostmaskOfSender.nick = 'middleman';
-    expect(hostmaskOfSender.nick).toEqual('sender');
-    
-    hostmaskOfSender.user = 'malicous';
-    expect(hostmaskOfSender.user).toEqual('friendly');
-    
-    hostmaskOfSender.host = 'test.suite.evil.net';
-    expect(hostmaskOfSender.host).toEqual('test.suite.net');
-  });
-});
-
-describe('standard interfaces', function standardInterfaces() {
-  it('supports value equality', function itSupportsValueEquality() {
-    var hostmaskOfSender_1 = new Hostmask(stringHostmaskOfSender);
-    var hostmaskOfSender_2 = new Hostmask(stringHostmaskOfSender);
-    
-    expect(hostmaskOfSender_1.equals(hostmaskOfSender_2)).toBeTruthy();
+    expect(hm.nick).toEqual('sender');
+    expect(hm.user).toEqual('friendly');
+    expect(hm.host).toEqual('test.suite.net');
   });
 
-  it('is idempotent for String->Hostmask->String', function isIdempotentWithString () {
-    expect((new Hostmask(stringHostmaskOfSender)).toString()).toEqual(stringHostmaskOfSender);
+  it('are immutable', function () {
+    var hm = new Hostmask(sampleHostmask);
+
+    expect(Object.isFrozen(hm)).toBeTruthy();
+  });
+
+  it('support value equality', function () {
+    var hm = new Hostmask(sampleHostmask);
+    var same = new Hostmask(sampleHostmask);
+    var diff = new Hostmask(differentHostmask);
+
+    expect(hm.equals(same)).toBeTruthy();
+    expect(hm.equals(diff)).not.toBeTruthy();
+  });
+
+  it('are idempotent for String->Hostmask->String', function () {
+    expect(new Hostmask(sampleHostmask).toString()).toEqual(sampleHostmask);
+    expect(new Hostmask(differentHostmask).toString()).toEqual(differentHostmask);
   });
 });

@@ -1,9 +1,3 @@
-/*
-The MockSocket mocks a net.socket. The IRC socket is the socket type found
-in nrc. socket is a variable to hold the IRCSocket. mocksocket is a variable
-for holding mock sockets.
-  */
-
 var MockSocket = require('./mocksocket');
 var IRCSocket = require('../lib/socket.js');
 
@@ -20,55 +14,56 @@ var closure = function (value) {
   };
 };
 
-describe("connecting to a network", function connectingToANetwork () {
-  var mocksocket, socket;
+describe("IRC Sockets", function () {
+  describe("connecting to a network", function () {
+    var mocksocket, socket;
 
-  it('knows whether or not it is connected.', function () {
-    socket = new IRCSocket(network, {Socket : MockSocket});
+    it('knows whether or not it is connected.', function () {
+      socket = new IRCSocket(network, {Socket : MockSocket});
 
-    expect(socket.isConnected()).toBeFalsy();
-  });
+      expect(socket.isConnected()).toBeFalsy();
+    });
 
-  it('can connect to a network', function () {
-    socket.connect();
-    expect(socket.isConnected()).toBeTruthy();
-  });
+    it('can connect to a network', function () {
+      socket.connect();
+      expect(socket.isConnected()).toBeTruthy();
+    });
 
-  it('can then disconnect', function () {
-    socket.end();
-    expect(socket.isConnected()).toBeFalsy();
-  });
+    it('can then disconnect', function () {
+      socket.end();
+      expect(socket.isConnected()).toBeFalsy();
+    });
 
-  it('declares NICK and USER to the server on connection', function () {
-    var mocksocket = new MockSocket();
-    socket = new IRCSocket(network, {Socket : closure(mocksocket)});
-    socket.connect();
-    socket.end();
-    expect(mocksocket.write).toHaveBeenCalledWith('NICK testbot\n', 'ascii');
+    it('declares NICK and USER to the server on connection', function () {
+      var mocksocket = new MockSocket();
+      socket = new IRCSocket(network, {Socket : closure(mocksocket)});
+      socket.connect();
+      socket.end();
+      expect(mocksocket.write).toHaveBeenCalledWith('NICK testbot\n', 'ascii');
     expect(mocksocket.write).toHaveBeenCalledWith('USER testuser 8 * :' + //-
       'realbot\n', 'ascii');
   });
 
-  it('declares when ready to send commands', function () {
-    var readyIsCalled = false;
-    runs(function () {
-      socket = new IRCSocket(network, {Socket : MockSocket});
-      socket.on('ready', function () {
-        readyIsCalled = true;
+    it('declares when ready to send commands', function () {
+      var readyIsCalled = false;
+      runs(function () {
+        socket = new IRCSocket(network, {Socket : MockSocket});
+        socket.on('ready', function () {
+          readyIsCalled = true;
+        });
+        socket.connect();
       });
-      socket.connect();
-    });
 
-    waitsFor(function () {
-      return readyIsCalled;
-    }, "ready is emitted", 300);
+      waitsFor(function () {
+        return readyIsCalled;
+      }, "ready is emitted", 300);
 
-    runs(function () {
-      socket.end();
-      expect(readyIsCalled).toBeTruthy();
+      runs(function () {
+        socket.end();
+        expect(readyIsCalled).toBeTruthy();
+      });
     });
   });
-});
 
 describe('maintaining connection to a server', function () {
   var mocksocket, socket;
@@ -111,4 +106,5 @@ describe('maintaining connection to a server', function () {
       expect(spy).toHaveBeenCalledWith(':irc.test.net 001 testbot :Welcome to the Test IRC Network testbot!testuser@localhost');
     });
   });
+});
 });
