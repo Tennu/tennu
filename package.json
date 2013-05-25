@@ -1,24 +1,43 @@
 {
   "name": "nrc",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Node.js IRC API",
-  "maintainers": [{
-    "name": "Ryan Scheel",
-    "email": "ryan.havvy@gmail.com",
-    "web": "http://widget.mibbit.com/?channel=%23havvy&server=irc.mibbit.net"
-  }],
-  "contributors": [{
-    "name": "Ryan Scheel",
-    "email": "ryan.havvy@gmail.com",
-    "web": "http://widget.mibbit.com/?channel=%23havvy&server=irc.mibbit.net"
-  }],
+  "maintainers": [
+    {
+      "name": "Ryan Scheel",
+      "email": "ryan.havvy@gmail.com",
+      "web": "http://widget.mibbit.com/?channel=%23havvy&server=irc.mibbit.net"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Ryan Scheel",
+      "email": "ryan.havvy@gmail.com",
+      "web": "http://widget.mibbit.com/?channel=%23havvy&server=irc.mibbit.net"
+    }
+  ],
   "main": "lib",
-  "directories": ["lib", "config"],
+  "directories": [
+    "lib",
+    "config"
+  ],
   "engines": {
     "node": ">=0.6.0"
   },
-  "keywords": ["irc"],
+  "keywords": [
+    "irc",
+    "bot"
+  ],
   "dependencies": {
-    "simplesets": ">=0.1.2"
+    "simplesets": ">=0.1.2",
+    "mout": "~0.5.0",
+    "simple-irc-socket" : "~1.0.0"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jasmine-node": "~0.1.0"
+  },
+  "scripts": {
+    "test": "grunt test"
   }
 }

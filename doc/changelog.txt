@@ -44,6 +44,12 @@ Changelog
     * Testing of 'say', 'part', and 'quit' of the IrcOutputSocket.
     ** Feel free to add more tests!
 
+0.4.4:
+    * Made dependency injection argument of Client optional.
+    * Started the ChunkedMessageParser.
+    ** Currently only deals with MOTD.
+    * Added a sanity test to check if 
+
 Future:
     * Executable tool to start a new NRC bot.
       Ex:  nrc ./my-server-config.json
