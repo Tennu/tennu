@@ -56,7 +56,7 @@ BiEventSubscriber.prototype = {
             } else {
                 this._primary.on(event, this._wrap(listener));
             }
-        }.bind(this));
+        });
     },
 
     _onMap : function (map) {
@@ -72,7 +72,7 @@ BiEventSubscriber.prototype = {
             } else {
                 this._primary.once(event, this._wrap(listener));
             }
-        }.bind(this));
+        });
     },
 
     _onceMap : function (ee, map) {
