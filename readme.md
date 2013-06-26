@@ -286,11 +286,6 @@ The capabilities object looks like this for the Mibbit network.
 
 There's a lot of work that can be done.
 
-### Module System ###
-
-The parameters for the modules in the config don't actually do anything. They
-need to be implemented.
-
 ### Startup ###
 
 As part of an IrcSocket, I want them to take a Startup object (an object that

@@ -46,18 +46,21 @@ Changelog
 
 0.4.4:
     * Made dependency injection argument of Client optional.
-    * Started the ChunkedMessageParser.
+    * Started the ChunkedMessageParser. Not working.
     ** Currently only deals with MOTD.
-    * Added a sanity test to check if 
+
+0.5.0-alpha-r1:
+    * Moved module system to its own project.
+    ** Module system completely revamped.
+    * Module loading via name and tennu_modules directory-tree climb.
+    * Moved IRC socket to its own project.
+    * Got the project building again.
+    * Renamed from NRC to Tennu
 
 Future:
-    * Executable tool to start a new NRC bot.
-      Ex:  nrc ./my-server-config.json
+    * Executable tool to start a new Tennu bot.
+      Ex:  tennu ./my-server-config.json
     * Examples of building a module and building a quick bot.
-    * Configuration Object passed to NRC constructor gains
-      optional 'modules' field. Absolute or relative URLs to modules that
-      are required.
-    * Get modules rewritten properly.
     * Refactor the IRC Socket to have a Startup class.
     * ChunkedMessageParser to chunk MessageParser parsed messagse when
       applicable.
