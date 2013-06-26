@@ -1,17 +1,14 @@
-nrc, or Node Relay Chat, is am implementation of an IRC bot using Node.js.
-
-To use, add nrc to your node_modules directory and then require it.
-
-Current Status: Broken. Ask me, and I'll give you a working version.
+Tennu is an IRC bot framework written in Node.js
+Current Status: Fixing and renaming from NRC to Tennu.
 
 ----------
 
 ## Basic Usage ##
 
 ```javascript
-var nrc = require('nrc');
+var tennu = require('tennu');
 var network = require('../config/myNetwork.json');
-var myNetwork = new nrc.Client(network);
+var myNetwork = new tennu.Client(network);
 myNetwork.connect();
 ```
 
@@ -44,29 +41,21 @@ It is suggested that your static network configuration objects go in _/config/%N
 A network configuration object has the following properties:
 
 * server      - IRC server to connect to. _Example:_ _irc.mibbit.net_
-* nick        - Nickname the bot will use. Defaults to "nrcbot"
+* nick        - Nickname the bot will use. Defaults to "tennubot"
 * user        - Username the bot will use. Defaults to "user"
-* realname    - Realname for the bot. Defaults to "nrc v0.3"
+* realname    - Realname for the bot. Defaults to "tennu v0.3"
 * port        - Port to connect to. Defaults to 6667.
 * password    - Password for identifying to services.
 * nickserv    - Nickname for nickserv service. Defaults to "nickserv".
 * trigger     - Command character to trigger commands with. By default, '!'.
-* channels    - Array of channels to autojoin. _Example:_ ["#help", "#nrc"]
-* modules     - An array of strings or objects.
-** string     - The file location of the Node module that exports an NRC module.
-** object     - Has the following fields. All optional other than 'file'
-*** file      - The file location of the Node module that exports an NRC module.
-*** config    - Configuration object for the module. Defaults to {}.
-*** usepath   - Boolean whether to append module-path to file. Defaults to true.
-* module-path - Prefix added to module file locations.
-
-Other modules may require or use more options. Such options will be in
+* channels    - Array of channels to autojoin. _Example:_ ["#help", "#tennu"]
+* modules     - An array of module names that the bot requires.
 
 -------------
 
 ## Listeners ##
 
-NRC's event listeners (on and once) take listeners in a multitude of ways.
+Tennu's event listeners (on and once) take listeners in a multitude of ways.
 
 ```javascript
 on("irc_event", listener)
@@ -84,7 +73,7 @@ listener, you can seperate them with a space. If you have multiple listeners
 you want to listen to, you can pass an object where the property names are the
 events to listen to and the property values are the listeners.
 
-Listeners have their 'this' value set to the NRC object, and are passed either
+Listeners have their 'this' value set to the Tennu object, and are passed either
 a message or command object.
 
 ### Message ###
@@ -94,13 +83,11 @@ Messages are passed by irc events.
 Messages have the following fields. Those that have a list of event types are
 only set by messages of that type.
 
-* receiver   - Receiver of the message. The NRC object in most cases.
+* receiver   - Receiver of the message. The Tennu object in most cases.
 * prefix     - If an IRC message starts with a :, the first word is called the prefix.
 * sender     - Sender of the message. Usually a Hostmask.
-* type       - Type of message. For example, 'privmsg' or 'quit'.
-* name       - Alias for type.
+* name       - Message type.
 * args       - Array of sent parameters.
-* actor      - [join, part, privmsg, quit, nick] User performing the action.
 * channel    - [join, part, privmsg, 353] Channel the action is performed in.
 * isQuery    - [privmsg] True if message sent in a query.
 * reason     - [quit] Quit reason.
@@ -123,7 +110,7 @@ Commands have the following fields.
 
 ## Actions ##
 
-All of the following are methods on NRC for doing things once connected.
+All of the following are methods on Tennu for doing things once connected.
 
 ### join(channel) ###
 
@@ -145,13 +132,13 @@ Has the bot say the message(s) to the specific channel/user.
 /* Output (IRC)
 (botnick) This is a message!
 */
-nrc.say('#example', "This is a message!");
+tennu.say('#example', "This is a message!");
 
 /* Output (IRC)
 (botnick) Hi there.
 (botnick) Bye there.
 */
-nrc.say('#example', ["Hi there.", "Bye there."]);
+tennu.say('#example', ["Hi there.", "Bye there."]);
 ```
 
 ### act(channel, message) ###
@@ -162,7 +149,7 @@ As per say, but as an action (/me)
 /* Output (IRC)
 botnick does something!
 */
-nrc.act('#example', "does something!");
+tennu.act('#example', "does something!");
 ```
 
 ### quit(reason) ###
@@ -191,46 +178,16 @@ the entire message as is as a string.
 
 ## Modules ##
 
-NRC has its own module system, loosely based off of Node's. Modules are
-implemented using the following object structure:
+Tennu has its own module system, loosely based off of Node's. You can read
+about it at https://github.com/havvy/nark-modules/.
 
-```javascript
-{
-    name: string,
-    dependencies: [string],
-    exports: object,
-    handlers: {
-        "event": function
-    }
-}
-```
-
-* name: Name of module.
-* dependencies: Modules that the module requires. The module will not load
-if not all the dependencies are met.
-* exports: The data accessible to other modules created by this module.
-* handlers: Listeners, both for irc events and user events.
-
-For each property in the handlers object, we call nrc.on(name, value).
-
-The exports object is automatically created if not defined or not an object.
-The name property of the exports is automatically set to the name of the
-module, overwriting any value it otherwise had.
-
-Handler boolean properties are optional, and assumed false if undefined.
-
-### Module Methods ###
-
-NRC has the following methods related to modules.
-
-* require(module) - Loads a module into the bot.
-* isModule(name) - True if module with name is loaded.
-* use(name) - Returns the exports object of the module with that name or
-undefined if the module is not loaded.
-* getAllModuleExports() - Returns all the export objects of all loaded modules.
-* getAllModuleNames() - Returns all the names of all loaded modules.
+The main thing to note is that this is completely different than pre-0.5
+modules. Throw your non-generic modules into nark_modules of your project,
+and note that you export a function that creates the module.
 
 ### Built-In Modules ###
+
+None of the modules are currently implemented.
 
 #### help ####
 
@@ -272,17 +229,9 @@ Assume the module's name is 'example'. Then these will all work and return
 
 #### channels ####
 
-___Unofficial:___ This module will be official before the 1.0.0 release.
-
-This module is currently disabed.
-
 This module handles keeping track of channel-specific data.
 
 #### users ####
-
-___Unofficial:___ This module will be official before the 1.0.0 release.
-
-This module is currently disabled.
 
 This module handles keeping track of user-specific data.
 
@@ -293,7 +242,7 @@ capabilities map listing the information from the 005 raw numeric.
 
 ```javascript
 
-var server = nrc.use("server");
+var server = tennu.use("server");
 console.log(util.inspect(server.capabilities));
 ```
 

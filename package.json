@@ -1,7 +1,7 @@
 {
-  "name": "nrc",
-  "version": "0.4.4-alpha-4",
-  "description": "Node.js IRC API",
+  "name": "tennu",
+  "version": "0.5.0-alpha-r1",
+  "description": "Tennu Node.js IRC Framework",
   "maintainers": [
     {
       "name": "Ryan Scheel",
@@ -22,16 +22,18 @@
     "config"
   ],
   "engines": {
-    "node": ">=0.6.0"
+    "node": ">=0.10.0"
   },
   "keywords": [
     "irc",
-    "bot"
+    "bot",
+    "tennu"
   ],
   "dependencies": {
     "simplesets": ">=0.1.2",
     "mout": "~0.5.0",
-    "simple-irc-socket" : "~1.0.0"
+    "simple-irc-socket" : "~1.0.0",
+    "tennu-modules" : "~0.9.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
