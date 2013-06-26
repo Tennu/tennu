@@ -1,3 +1,5 @@
+/*
+
 var isArray = require('util').isArray;
 var copyArray = function (array) {
     return array.slice();
@@ -60,4 +62,9 @@ module.exports = {
             }
         }
     }
+};
+*/
+
+module.exports = function (tennu) {
+    return {};
 };
