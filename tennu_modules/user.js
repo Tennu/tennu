@@ -1,3 +1,4 @@
+/*
 var util = require('util');
 
 var SSet = require("simplesets").Set;
@@ -45,7 +46,7 @@ UserModule.prototype.onLoad =  function () {
  * The Message object handles adding users and channel automatically, so
  * there really isn't any work that has to be done here other than actually
  * adding the channels to the users.
- */
+ *//*
 UserModule.prototype.namesHandler = function (msg) {
     msg.users.forEach(function (user) {
         // The numeric will add status messages (~, @, ect.) to nicks.
@@ -124,4 +125,10 @@ UserModule.prototype._stripStatusSymbol = function (nickname) {
 
 module.exports = function (nrc) {
     return new UserModule(nrc).getModule();
+};
+
+*/
+
+module.exports = function (tennu) {
+    return {};
 };

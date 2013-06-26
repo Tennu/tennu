@@ -1,3 +1,5 @@
+/*
+
 var SSet = require("simplesets").Set;
 
 var isSelf = function (nrc, nick) {
@@ -36,7 +38,7 @@ var selfJoin = function (channel) {
  * The Message object handles adding users and channel automatically, so
  * there really isn't any work that has to be done here other than actually
  * adding the channels to the users.
- */
+ *//*
 var namesHandler = function (msg) {
     msg.users.forEach(function (user) {
         addChannelToUser(msg.channel, user);
@@ -84,4 +86,10 @@ module.exports = {
         "nick" : onNick,
         "353" : namesHandler
     }
+};
+
+*/
+
+module.exports = function (tennu) {
+    return {};
 };

@@ -1,3 +1,5 @@
+/*
+
 var util = require('util');
 
 var ServerModule = function () {
@@ -34,4 +36,10 @@ ServerModule.prototype.isupportHandler = function (e) {
 
 module.exports = function (nrc) {
     return (new ServerModule()).getModule();
+};
+
+*/
+
+module.exports = function (tennu) {
+    return {};
 };
