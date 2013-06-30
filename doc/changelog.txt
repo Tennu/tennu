@@ -60,6 +60,12 @@ Changelog
 0.5.1:
     * Fixed OutputSocket.ctcp and OutputSocket.act
 
+0.5.2:
+    * Require 1.0.1 of simple-irc-socket for logging.
+
+0.5.3:
+    * Fix this._name() doesn't exist in CommandParser
+
 Future:
     * Executable tool to start a new Tennu bot.
       Ex:  tennu ./my-server-config.json
