@@ -57,6 +57,9 @@ Changelog
     * Got the project building again.
     * Renamed from NRC to Tennu
 
+0.5.1:
+    * Fixed OutputSocket.ctcp and OutputSocket.act
+
 Future:
     * Executable tool to start a new Tennu bot.
       Ex:  tennu ./my-server-config.json
