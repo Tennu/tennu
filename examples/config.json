@@ -1,0 +1,11 @@
+{
+    "server" : "irc.example.net",
+    "nick" : "tennu",
+    "user" : "tennu",
+    "port" : 6667,
+    "password" : "password",
+    "nickserv" : "nickserv",
+    "trigger" : "!",
+    "channels" : ["#test", "#example"],
+    "modules" : []
+}
