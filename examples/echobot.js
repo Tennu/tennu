@@ -17,9 +17,13 @@ tennu.on('privmsg', function (privmsg) {
         return;
     }
 
+    // The first argument is the channel the message is from.
+    // Since the privmsg object already has this, we can just shift it out.
+    args.shift();
+
     var said = privmsg.args.join(' ');
     var chan = privmsg.channel;
     tennu.say(chan, said);
-}
+});
 
 tennu.connect();
