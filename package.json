@@ -1,21 +1,25 @@
 {
   "name": "tennu",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Tennu Node.js IRC Framework",
   "maintainers": [
     {
       "name": "Ryan Scheel",
       "email": "ryan.havvy@gmail.com",
-      "web": "http://widget.mibbit.com/?channel=%23havvy&server=irc.mibbit.net"
+      "web": "http://havvy.net"
     }
   ],
   "contributors": [
     {
       "name": "Ryan Scheel",
       "email": "ryan.havvy@gmail.com",
-      "web": "http://widget.mibbit.com/?channel=%23havvy&server=irc.mibbit.net"
+      "web": "http://havvy.net"
     }
   ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Havvy/tennu.git"
+  },
   "main": "lib",
   "directories": [
     "lib",
