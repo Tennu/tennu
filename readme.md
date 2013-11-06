@@ -179,10 +179,10 @@ the entire message as is as a string.
 ## Modules ##
 
 Tennu has its own module system, loosely based off of Node's. You can read
-about it at https://github.com/havvy/nark-modules/.
+about it at https://github.com/havvy/tennu-modules/.
 
 The main thing to note is that this is completely different than pre-0.5
-modules. Throw your non-generic modules into nark_modules of your project,
+modules. Throw your non-generic modules into tennu_modules of your project,
 and note that you export a function that creates the module.
 
 ### Built-In Modules ###
