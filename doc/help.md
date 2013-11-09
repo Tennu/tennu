@@ -20,7 +20,8 @@ The general form of the value is a dictionary of topics that take a
 dictionary of subtopics along with an '*' property for the help message
 for that topic itself.
 
-The help message may either be a string or an array of strings.
+The help message may either be a string or an array of strings for
+multiline messages.
 
 For example, here is the help object for a time module:
 
@@ -44,7 +45,7 @@ For example, here is the help object for a time module:
 }
 ```
 
-### Simple Represenations
+### Simple Represenations ###
 
 Should your topic not have any subtopics, you may use a string or array
 directly.
@@ -54,3 +55,8 @@ Thus, the 'zone' property in the preceding example is equivalent to
 
 Should your module only need to respond to the query that is the module's
 name, the help value may be just a string or array.
+
+### Tip ###
+
+If your help object is getting unwieldy, shove it into another file, and
+require it.
