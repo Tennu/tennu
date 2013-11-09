@@ -1,15 +1,18 @@
 Tennu is an IRC bot framework written in Node.js
-Current Status: Fixing and renaming from NRC to Tennu.
+Current Status: Interface tweaks; deep freezing structs.
 
 ----------
 
 ## Basic Usage ##
 
+With Tennu, you create an irc client, inject your logic into it 
+with modules or basic event listeners, and then connect.
+
 ```javascript
 var tennu = require('tennu');
-var network = require('../config/myNetwork.json');
-var myNetwork = new tennu.Client(network);
-myNetwork.connect();
+var network = require('../config/myNetwork.json'); // See next section
+var myClient = tennu.Client(network);
+myClient.connect();
 ```
 
 Before connecting, add listeners to events from irc & users, or load modules.
@@ -27,6 +30,7 @@ myNetwork.on('!hello', function (command) {
 });
 
 // Load a moudle.
+// The require function is from node, and the method is from Tennu.
 myNetwork.require(require('./yourModule'));
 
 myNetwork.connect();
@@ -35,8 +39,6 @@ myNetwork.connect();
 ----------
 
 ## Network Configuration ##
-
-It is suggested that your static network configuration objects go in _/config/%NETWORK%.json_.
 
 A network configuration object has the following properties:
 
@@ -50,6 +52,9 @@ A network configuration object has the following properties:
 * trigger     - Command character to trigger commands with. By default, '!'.
 * channels    - Array of channels to autojoin. _Example:_ ["#help", "#tennu"]
 * modules     - An array of module names that the bot requires.
+
+Static network configuration objects can go in _./config/%NETWORK%.json_
+(relative to your project) and then required in via node.
 
 -------------
 
@@ -67,18 +72,20 @@ on({
     "!hi !bye": talk_listener
 })
 ```
-If the first character is an '!', then the event is a user command. Otherwise,
+
+If the first character of the event is an '!', then is is a user command. Otherwise,
 it is an irc event being listened too. If multiple events share the same
-listener, you can seperate them with a space. If you have multiple listeners
+listener, you can seperate them with a space. If there are multiple listeners
 you want to listen to, you can pass an object where the property names are the
 events to listen to and the property values are the listeners.
 
-Listeners have their 'this' value set to the Tennu object, and are passed either
-a message or command object.
+Listeners are passed either a message or command object.
 
 ### Message ###
 
 Messages are passed by irc events.
+
+Messages are immutable, as are their args. Make sure to copy the args array before trying to manipulate it.
 
 Messages have the following fields. Those that have a list of event types are
 only set by messages of that type.
@@ -98,6 +105,8 @@ only set by messages of that type.
 
 Commands are passed for user commands.
 
+Commands are immutable, as are their args. Make sure to copy the args array before trying to manipulate it.
+
 Commands have the following fields.
 
 * sender  - Sender of the command.
@@ -111,6 +120,8 @@ Commands have the following fields.
 ## Actions ##
 
 All of the following are methods on Tennu for doing things once connected.
+
+These methods are also available on the client's 'out' property.
 
 ### join(channel) ###
 
@@ -172,7 +183,8 @@ Retrieves the userhost of the user.
 
 Our IrcOutputSocket class does not have all commands. If you need to use one
 that is not listed here, you can use the internal _raw method, which takes
-the entire message as is as a string.
+the entire message as is as a string, use your own IrcOutputSocket class, or
+send in a patch.
 
 --------
 
@@ -181,51 +193,27 @@ the entire message as is as a string.
 Tennu has its own module system, loosely based off of Node's. You can read
 about it at https://github.com/havvy/tennu-modules/.
 
-The main thing to note is that this is completely different than pre-0.5
-modules. Throw your non-generic modules into tennu_modules of your project,
+This is a completely different module system than versions before 0.5.0.
+Throw your non-generic modules into tennu_modules of your project,
 and note that you export a function that creates the module.
+
+You may access the module system's methods via the Client.modules property
+or by using one of the following methods:
+
+* client.require()
+* client.exports() [an alias of client.require()]
+* client.load()
+* client.loaded()
 
 ### Built-In Modules ###
 
-None of the modules are currently implemented.
+Only the help module is currently implemented.
 
 #### help ####
 
-Sets the user command *help*.
+Sets the command *!help*.
 
-You may add help content for you modules by setting the *help* key on your
-module's export. The value is an object, array of strings, or a string, which
-will be called a help value.
-
-The object is a map of subitems to more help values. Of special note, the help
-value for the item itself is called main.
-
-The array of strings is the lines of help to show the user. If there is only
-one line, you may just pass a single string.
-
-Here is an example of a help object.
-
-```javascript
-{
-    main: "I'm an example module."
-    sub1: {
-        main: "I'm the sub1 multi-command.",
-        x: "I'm the sub1 x command.",
-        y: "I'm the sub1 y command.",
-    },
-    sub2: [
-        "I'm the sub2 command.",
-        "My help is longer than the others."
-    ]
-}
-```
-
-Assume the module's name is 'example'. Then these will all work and return
-
-* help example >> I'm an example module.
-* help sub1 >> I'm the sub1 multi-command.
-* help sub1 x >> I'm the sub1 x command
-* help sub2 >> I'm the sub2 command. >> My help is longer than the others.
+See ./doc/help.md for more information.
 
 #### channels ####
 
@@ -281,38 +269,3 @@ The capabilities object looks like this for the Mibbit network.
   INVEX: true
 }
 ```
-
-## Contributions ##
-
-There's a lot of work that can be done.
-
-### Startup ###
-
-As part of an IrcSocket, I want them to take a Startup object (an object that
-implements the startup interface, whatever that may be). Right now startup
-code is all over the place, and this sucks.
-
-I want this to be able to change (say we have one that implements IRC 3's
-CAPABILITIES protocol or one that does WEBIRC) pretty easily.
-
-### Testing ###
-
-I would like to be testing each class in isolation.
-
-With exception to the Client class, which should be tested as integration.
-
-### Built In Modules ###
-
-I don't want to write these, so I've been putting them off. If you want to,
-please feel free to write them.
-
-### ChunkedIrcMessageHandler ###
-
-Listens to the IrcMessageHandler, it chunks together list-like replies such
-as whois and isupport numerics. For messages that aren't chunked, just pass
-them through normally.
-
-### IrcOutputSocket Commands ###
-
-I'm missing most of the commands from IRC. If you want to add them, please
-do so. Just make sure to also add the method wrapper to the client class.
