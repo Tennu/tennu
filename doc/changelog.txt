@@ -66,11 +66,8 @@ Changelog
 0.5.3:
     * Fix this._name() doesn't exist in CommandParser
 
-Future:
-    * Executable tool to start a new Tennu bot.
-      Ex:  tennu ./my-server-config.json
-    * Examples of building a module and building a quick bot.
-    * Add a Startup class for actions to do post-connection to the network.
-    * ChunkedMessageParser to chunk MessageParser parsed messagse when
-      applicable.
-    * Whatever is in the Contributors section of readme.md
+0.6.0:
+    * Add .out and .events to Client
+    * IMPORTANT! Froze .args on Command and Message
+      If you were mutating these without cloning, you'll need to change your code.
+    * Get the Help module working again. With tests this time.
