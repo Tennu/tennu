@@ -1,9 +1,0 @@
-{
-  "name": "ExampleNet",
-  "server": "irc.example.net",
-  "port": 6667,
-  "nick": "mybot",
-  "password": "super_secret",
-  "nickserv": "Nickserv",
-  "channels": ["#channel", "#other"]
-}
