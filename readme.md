@@ -20,20 +20,20 @@ Before connecting, add listeners to events from irc & users, or load modules.
 ```javascript
 
 // Do something when a nick, perhaps yourself, joins a channel
-myNetwork.on('join', function (message) {
+myClient.on('join', function (message) {
 	this.say(message.channel, message.actor + " joined!");
 });
 
 // Do something when a user emits a command, in this case, hello.
-myNetwork.on('!hello', function (command) {
+myClient.on('!hello', function (command) {
 	this.say(command.channel, 'world');
 });
 
 // Load a moudle.
 // The require function is from node, and the method is from Tennu.
-myNetwork.require(require('./yourModule'));
+myClient.require(require('./yourModule'));
 
-myNetwork.connect();
+myClient.connect();
 ```
 
 ----------
