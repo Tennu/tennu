@@ -26,8 +26,9 @@
 var HELP_NOT_FOUND = "Help file for selected topic does not exist.";
 
 var isArray = require('util').isArray;
-var map = require('mout/object/map');
-var values = require('mout/object/values');
+var lodash = require('lodash');
+var map = lodash.map;
+var values = lodash.values;
 
 var getModuleHelps = function (modules) {
     var exports = modules.loaded();
@@ -85,7 +86,7 @@ module.exports = function (tennu) {
         handlers: {
             "!help": function (command) {
                 // Default to showing the help for the help module if no args given.
-                var query = command.args.length === 0 ? ['help'] : command.args.slice();
+                var query = command.params.length === 0 ? ['help'] : command.params.slice();
 
                 showHelp(tennu, command.sender, query)
             }

@@ -1,131 +1,72 @@
-var events = require('events');
-var util = require('util');
-var id = require('./id');
+var id = require('./lib/id');
 
 var MessageParser = require('../lib/message-parser');
-var ChunkedMessageParser = require('../lib/chunked-message-parser');
-var Message = require('../lib/structures/message');
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 500; //ms
+// jasmine.DEFAULT_TIMEOUT_INTERVAL = 500; //ms
 
 describe('Message Parsers', function () {
-    var mp, receiver;
-    var input = ':concrete.mozilla.org 432 Havvy :Erroneous Nickname: Illegal characters';
+    var parser, receiver;
+    var input = ':irc.server.net 432 MyNick :Erroneous Nickname: Illegal characters';
 
-    describe("parse messages", function () {
-        beforeEach(function () {
+    it('has has EventEmitter methods', function () {
+        parser = MessageParser({_id: id()});
+
+        expect(parser.on).toBeDefined();
+        expect(parser.once).toBeDefined();
+        expect(parser.then).toBeDefined();
+        expect(parser.emit).toBeDefined();
+    });
+
+    describe(".parse Method", function () {
+        var ret, msg;
+
+        beforeEach(function (done) {
             receiver = {_id: id()};
-            mp = new MessageParser(receiver);
-        });
+            parser = new MessageParser(receiver);
 
-        it('and returns them', function () {
-            var msg = mp.parse(input);
-            expect(msg).toEqual(new Message(input, receiver));
-        });
-
-        it('and emit them by their name', function () {
-            var msg, done = false;
-
-            runs(function () {
-                mp.on('432', function (m) {
-                    done = true;
-                    msg = m;
-                });
-
-                mp.parse(input);
+            parser.on('432', function (_msg) {
+                msg = _msg;
+                done();
             });
 
-            waitsFor(function () { return done; }, "432 message is parsed.");
-
-            runs(function () {
-                expect(msg instanceof Message).toBeTruthy();
-                expect(msg.name).toBe('432');
-                expect(msg.args[0]).toBe('Havvy');
-                expect(msg.args[1]).toBe('Erroneous Nickname: Illegal characters');
-                expect(msg.receiver).toBe(receiver);
-            });
+            ret = parser.parse(input);
         });
 
-        it('and emits all messages under _message', function () {
+        afterEach(function () {
+            ret = undefined;
+            msg = undefined;
+        });
+
+        it('Return value', function () {
+            expect(msg.command).toBe('432');
+            expect(msg.params[0]).toBe('MyNick');
+            expect(msg.params[1]).toBe('Erroneous Nickname: Illegal characters');
+            expect(msg.receiver).toBe(receiver);
+        });
+
+        it('Emit Value', function () {
+            expect(msg.command).toBe('432');
+            expect(msg.params[0]).toBe('MyNick');
+            expect(msg.params[1]).toBe('Erroneous Nickname: Illegal characters');
+            expect(msg.receiver).toBe(receiver);
+        });
+
+        it('Emit and Return value are the same', function () {
+            expect(msg).toBe(ret);
+        });
+    });
+
+    describe('`*` event', function () {
+        it('is called with every function', function (done) {
             var count = 0;
 
-            runs(function () {
-                mp.on("_message", function (message) {
-                    count++;
-                });
-
-                mp.parse(input);
-                mp.parse(input);
+            parser.on('*', function (msg) {
+                count++;
+                if (count === 2) { done(); }
             });
 
-            waitsFor(function () { return count === 2; }, "events captures", 2);
-
-            runs(function () {
-                expect(count).toBe(2);
-            });
-        });
-    });
-});
-
-describe('ChunkedMessageParsers', function () {
-    var mp, cmp, rcvr;
-
-    beforeEach(function () {
-        rcvr = {_id: id()};
-        mp = new MessageParser(rcvr);
-        cmp = new ChunkedMessageParser(mp);
-    });
-
-    it('relay unknown messages as a message handler', function () {
-        var msg, done;
-
-        runs(function () {
-            cmp.on('unknown', function (m) {
-                done = true;
-                msg = m;
-            });
-
-            mp.parse(':server.network.net UNKNOWN testbot :An unknown message');
-        });
-
-        waitsFor(function () { return done; }, "unkown message received");
-
-        runs(function () {
-            expect(msg.name).toBe("unknown");
-            expect(msg.receiver).toBe(rcvr);
-            expect(msg.args[0]).toBe('testbot');
-        });
-    });
-
-    it('handles MOTD chunking', function () {
-        var msg, m;
-        var prefix = ":irc.testnet.net ";
-
-        runs(function () {
-            cmp.on('motd', function (motd) {
-                done = true;
-                msg = m;
-            });
-
-            mp.parse(prefix + "372 testbot :The first message.");
-            mp.parse(prefix + "372 testbot :The second message.");
-            mp.parse(prefix + "376 testbot :End of /MOTD command.");
-        });
-
-        waitsFor(function () { return done; }, "motd message received");
-
-        runs(function () {
-            expect(msg.name).toBe("motd");
-            expect(msg.receiver).toBe(rcvr);
-            expect(msg.args).toEqual([
-                "372", "testbot", "The first message.",
-                "372", "testbot", "The second message.",
-                "376", "testbot", "End of /MOTD command."
-                ]);
-            expect(msg.motd).toEqual([
-                "The first message.",
-                "The second message."
-                ]);
+            parser.parse(input);
+            parser.parse(input);
         });
     });
 });

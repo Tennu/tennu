@@ -33,8 +33,4 @@ describe('IRC Output Sockets', function () {
         os.quit('the reason');
         expect(socket.raw).toHaveBeenCalledWith("QUIT :the reason");
     });
-
-    // TODO: Write more tests for other methods. The tests that are here
-    // are here because there were failing tests in the integration suite
-    // and I needed to isolate them.
 });
