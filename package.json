@@ -37,13 +37,10 @@
     "simplesets": ">=0.1.2",
     "lodash": "2.4.x",
     "simple-irc-socket" : "~1.2.x",
-    "irc-message" : "0.1.x",
+    "irc-message" : "0.2.x",
     "tennu-modules" : "~1.0.0"
   },
-  "devDependencies": {
-    "grunt": "~0.4.1"
-  },
   "scripts": {
-    "test": "grunt test"
+    "test": "jasmine-node ./spec"
   }
 }
