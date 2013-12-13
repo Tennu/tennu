@@ -1,6 +1,6 @@
 {
   "name": "tennu",
-  "version": "0.6.0pre1",
+  "version": "0.6.0pre2",
   "description": "Tennu Node.js IRC Framework",
   "maintainers": [
     {
@@ -35,8 +35,9 @@
   ],
   "dependencies": {
     "simplesets": ">=0.1.2",
-    "mout": "~0.7.0",
-    "simple-irc-socket" : "~1.0.1",
+    "lodash": "2.4.x",
+    "simple-irc-socket" : "~1.2.x",
+    "irc-message" : "0.1.x",
     "tennu-modules" : "~1.0.0"
   },
   "devDependencies": {
