@@ -1,12 +1,12 @@
 Tennu is an IRC bot framework written in Node.js
-Current Status: Interface tweaks; deep freezing structs.
+
+Current Status: Using irc-message as the base for messages; Making responses easier by returning the response.
 
 ----------
 
 ## Basic Usage ##
 
-With Tennu, you create an irc client, inject your logic into it 
-with modules or basic event listeners, and then connect.
+With Tennu, you create an irc client, write some modules or basic event listeners, and then connect.
 
 ```javascript
 var tennu = require('tennu');
@@ -269,3 +269,7 @@ The capabilities object looks like this for the Mibbit network.
   INVEX: true
 }
 ```
+
+## See Also ##
+
+(IRC Specifications and other helpful tables)[https://www.alien.net.au/irc/)
