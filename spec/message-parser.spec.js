@@ -1,4 +1,4 @@
-var id = require('./id');
+var id = require('./lib/id');
 
 var MessageParser = require('../lib/message-parser');
 

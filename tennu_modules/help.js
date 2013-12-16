@@ -86,7 +86,7 @@ module.exports = function (tennu) {
         handlers: {
             "!help": function (command) {
                 // Default to showing the help for the help module if no args given.
-                var query = command.args.length === 0 ? ['help'] : command.args.slice();
+                var query = command.params.length === 0 ? ['help'] : command.params.slice();
 
                 showHelp(tennu, command.sender, query)
             }

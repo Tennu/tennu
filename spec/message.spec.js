@@ -1,5 +1,5 @@
 var Message = require('../lib/message');
-var receiver = {_id: require('./id')(), nick: function () { return "tnick"; }};
+var receiver = {_id: require('./lib/id')(), nick: function () { return "tnick"; }};
 
 var hostmask = "sender!malicious@test.suite.net";
 var nick = "buddy";
@@ -32,23 +32,22 @@ describe('Message', function () {
 
   describe("of type:", function () {
     describe("privmsg:", function () {
-      it("from a user in a channel", function () {
+      it("channel", function () {
         var message = Message(input.chanmsg, receiver);
 
         expect(message.command).toEqual("privmsg");
         expect(message.isQuery).not.toBeTruthy();
-        expect(message.actor).toEqual(message.sender.nickname);
+        expect(message.nickname).toEqual(message.hostmask.nickname);
         expect(message.channel).toEqual('#channel');
         expect(message.message).toEqual('somebody said something');
       });
 
-      it("from a query", function () {
+      it("query", function () {
         var message = Message(input.query, receiver);
 
         expect(message.command).toEqual("privmsg");
         expect(message.isQuery).toBeTruthy();
-        expect(message.channel).toEqual(message.actor);
-        expect(message.channel).toEqual(message.sender.nickname);
+        expect(message.channel).toEqual("sender");
         expect(message.message).toEqual("hi hi");
       });
     });
