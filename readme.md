@@ -120,7 +120,7 @@ person who sent the query, and isQuery will be set to true.
 
 The quit message has the property 'reason'. Eventually the part message will too.
 
-The nick message has the property 'newNick'. The 'nickname' property is the old nickname.
+The nick message has the properites 'old' and 'new'.
 
 Note: This is a weak part of the library. If you want to contribute to Tennu, this is an easy and helpful place
 to make the library more useful.

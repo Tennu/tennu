@@ -64,11 +64,27 @@ Changelog
     * Require 1.0.1 of simple-irc-socket for logging.
 
 0.5.3:
-    * Fix this._name() doesn't exist in CommandParser
+    * Hotfix: this._name() doesn't exist in CommandParser
 
 0.6.0:
-    * Add .out and .events to Client as aliases to the OutputSocket and BiSubscriber.
-    * Get the Help module working again. With tests this time.
     * BACKWARDS INCOMPATIBLE! Changed property names for Message and Command
       to align with IRC specification and the irc-message module.
-    * Return value of listeners that have a channel property is the response to the message.
+      See updating.txt for more information.
+    * BACKWARDS INCOMPATIBLE! Messages with command type of "nick" have the "newNick" property chaned to "new"
+    * BACKWARDS INCOMPATIBLE! Removed the extension for the 353 numeric. It wasn't actually doing anything useful.
+      It'll be readded in the future, but actually do some useful parsing. Use .params[0] to get it..
+    * Help Module reimplemented. See "help.md" for more information.
+    * "Respond" functionality. The return value for listeners that have a channel is said to the channel. No more doing tennu.say(message.channel, what_you_want_to_say). Just do `return what_you_want_to_say;`! In the future, we'll allow promises too.
+    * Add .out and .events to Client as aliases to the OutputSocket and BiSubscriber.
+    * Messages with the command type of "nick" have the property "old" added, which is an alias for the "nickname" property.
+    * Commands have a [[prototype]] of the Message that they are parsed from.
+    * Message have a tags property. (See: http://ircv3.org/specification/message-tags-3.2 and https://github.com/expr/irc-message)
+    * Removed all default logging.
+
+    * Use irc-message as the base Message parser.
+    * simple-irc-socket got renamed to irc-socket, plus is more functional.
+    * Replaced mout with lodash.
+    * Removed Grunt.js
+
+    * Bugfix: Multiple spaces between words will not mess up commands and message parsing. Thanks expr for reporting.
+    * Bugfix: Arbitrary events won't fire when passed incomplete messages from server (fixed in irc-socket)
