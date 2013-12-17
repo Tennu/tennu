@@ -44,6 +44,5 @@ tennu ./my-server-config.json
 ## Format ##
 
 * Two space indents
-* Don't make `new` required for your functions.
+* Don't make `new` required for your constructors.
 * function fnName (arg, list) {
-* Structs passed around should be fully immutable.
