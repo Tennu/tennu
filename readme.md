@@ -1,6 +1,6 @@
 Tennu is an IRC bot framework written in Node.js
 
-Current Status: Using irc-message as the base for messages; Making responses easier by returning the response.
+Current Status: Updating Documentation for v.0.6.0
 
 ----------
 
@@ -58,13 +58,34 @@ Static network configuration objects can go in _./config/%NETWORK%.json_
 
 -------------
 
-## Listeners ##
+## Event Handling ##
 
-Tennu's event listeners (on and once) take listeners in a multitude of ways.
+Tennu uses a custom event handler. Listeners are placed at the end of the event queue,
+insead of happening right away. Errors are currently logged to console, but otherwise
+swallowed.
+
+Commands and Messages that have a channel property take a return value. Currently, the
+return value must be a string or array that is then said to the channel the message
+originated in.
 
 ```javascript
+// Simple echobot.
+tennu.on('privmsg', function (privmsg) {
+    return privmsg.message;
+});
+```
+
+Subscribing to events in Tennu is more flexible than most event listeners.
+
+You register a single handler on multiple events at once by separating the events with a space,
+for example .on("x y", fn) is equivalent to .on('x', fn); .on('y', fn). Furthermore, an object
+can be passed, where each key is passed as the first parameter and its value, the second.
+
+```javascript
+// Examples
+
 on("irc_event", listener)
-on("!user_command", listener)
+on("!user-command", listener)
 on("join quit", listener)
 on({
     "part": part_listener,
@@ -72,12 +93,6 @@ on({
     "!hi !bye": talk_listener
 })
 ```
-
-If the first character of the event is an '!', then is is a user command. Otherwise,
-it is an irc event being listened too. If multiple events share the same
-listener, you can seperate them with a space. If there are multiple listeners
-you want to listen to, you can pass an object where the property names are the
-events to listen to and the property values are the listeners.
 
 Listeners are passed either a message or command object.
 
@@ -87,33 +102,40 @@ Messages are passed by irc events.
 
 Messages are immutable, as are their args. Make sure to copy the args array before trying to manipulate it.
 
-Messages have the following fields. Those that have a list of event types are
-only set by messages of that type.
+All messages have the following fields:
 
-* receiver   - Receiver of the message. The Tennu object in most cases.
-* prefix     - If an IRC message starts with a :, the first word is called the prefix.
-* sender     - Sender of the message. Usually a Hostmask.
-* name       - Message type.
-* args       - Array of sent parameters.
-* channel    - [join, part, privmsg, 353] Channel the action is performed in.
-* isQuery    - [privmsg] True if message sent in a query.
-* reason     - [quit] Quit reason.
-* newNick    - [nick] New nick for the user changing nick.
-* users      - [353] List of users in channel.
+* receiver   - Receiver of the message. A reference to the Tennu object.
+* prefix     - The prefix is either a hostmask of the format "nickname!username@hostname", or the server you are connected to.
+* hostmask   - If the prefix is a hostmask, this will be an object with properties {nickname, username, hostname}.
+* command    - Message command type. For example, 'privmsg' or 'nick'.
+* params     - Array of sent parameters.
+
+#### Extensions ####
+
+Note: Only the following message command types have extensions: join, notice, part, privmsg, nick, quit
+
+Messages that happen in a specific channel have the property "channel" with the contents of the channel.
+If the message was a query (either via notice or privmsg), the channel property is the nickname of the
+person who sent the query, and isQuery will be set to true.
+
+The quit message has the property 'reason'. Eventually the part message will too.
+
+The nick message has the property 'newNick'. The 'nickname' property is the old nickname.
+
+Note: This is a weak part of the library. If you want to contribute to Tennu, this is an easy and helpful place
+to make the library more useful.
 
 ### Command ###
 
 Commands are passed for user commands.
 
-Commands are immutable, as are their args. Make sure to copy the args array before trying to manipulate it.
+Commands are an extension of Messages with the command type of 'privmsg'.
+They have all properties, plus the following properties:
 
-Commands have the following fields.
+* args       - Array of words after the command name.
+* command    - The command name.
 
-* sender  - Sender of the command.
-* args    - Parameters of the command.
-* channel - Channel the command was sent through.
-* name    - Name of the command.
-* isQuery - True if message sent in a query.
+For example, a command of "!do-it ARG1 ARG2" will have args be ["ARG1", "ARG2"] and command be 'do-it'.
 
 --------
 
@@ -272,4 +294,4 @@ The capabilities object looks like this for the Mibbit network.
 
 ## See Also ##
 
-(IRC Specifications and other helpful tables)[https://www.alien.net.au/irc/)
+* (IRC Specifications and other helpful tables)[https://www.alien.net.au/irc/)

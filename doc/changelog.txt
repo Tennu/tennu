@@ -67,7 +67,8 @@ Changelog
     * Fix this._name() doesn't exist in CommandParser
 
 0.6.0:
-    * Add .out and .events to Client
-    * IMPORTANT! Froze .args on Command and Message
-      If you were mutating these without cloning, you'll need to change your code.
+    * Add .out and .events to Client as aliases to the OutputSocket and BiSubscriber.
     * Get the Help module working again. With tests this time.
+    * BACKWARDS INCOMPATIBLE! Changed property names for Message and Command
+      to align with IRC specification and the irc-message module.
+    * Return value of listeners that have a channel property is the response to the message.

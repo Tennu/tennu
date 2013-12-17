@@ -1,0 +1,24 @@
+1.0.0 Release Checklist
+
+Things not in this list are not considered critical for 1.0.0.
+
+TODO
+
+* Startup Object
+* Nickname tracking object
+* Respond functionality
+  * String (implemented)
+  * Promise
+* Default Modules
+  * Help (implemented)
+  * Server
+  * Channel
+  * User
+
+FINISHED
+
+* MessageParser basic functionality
+* CommandParser
+* Module System
+* On Method that delegates to CommandParser/MessageParser
+* OutputSocket basic functionality
