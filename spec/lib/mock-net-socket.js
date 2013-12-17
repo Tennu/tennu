@@ -10,13 +10,13 @@ var debug = function (msg) {
 
 var Socket = function () {
     debug("Creating a new one.");
-    var connected = true;
+    this.connected = true;
 
     this.connect = jasmine.createSpy("connect").andCallFake(function () {
         debug("Connecting");
         this.emit("connect");
         setImmediate((function () {
-            if (!connected) return;
+            if (!this.connected) return;
             debug("Emitting PING, 001, and 005");
             this.emit("data", 'PING :PINGMESSAGE\r\n');
             this.emit("data", ":irc.test.net 001 testbot :Welcome to the Test IRC Network testbot!testuser@localhost\r\n");
@@ -27,7 +27,7 @@ var Socket = function () {
 
     this.end = function () {
         debug("Closing");
-        connected = false;
+        this.connected = false;
         this.emit("close");
     };
 

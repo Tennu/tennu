@@ -13,28 +13,36 @@ var network = {
 };
 
 var fakeWrite = function (message) {
-    //console.log("Fakewrite called with message " + message.substring(0, message.length - 2));
-    switch (message) {
-        case "JOIN #test\r\n":
-        this.emit('data', [
-            ":testbot!testuser@localhost JOIN :#test",
-            ":irc.localhost.net 353 testbot = #test :@testbot",
-            ":irc.localhost.net 366 testbot #test :End of /NAMES list.\r\n"].join('\r\n'));
-        break;
-        case "QUIT\r\n":
-        this.emit('data', "ERROR :Closing Link: testbot[localhost] (Quit: testbot)\r\n");
-        break;
-        case "NICK newNick\r\n":
-        this.emit('data', ":testbot!testuser@localhost NICK :newNick\r\n");
-        break;
-        case "PART #test\r\n":
-        this.emit('data', ":testbot!testuser@localhost PART #test\r\n");
-        break;
-        case "PRIVMSG nickserv :identify testpass\r\n":
-        this.emit('data', ":nickserv!services@test.net NOTICE :testbot Password accepted - you are now recognized.\rn\n");
-        break;
-        default:
-        void 0;
+    message = message.substring(0, message.length - 2);
+    // console.log("Fakewrite called with message `" + message + "`");
+    try {
+        if (!this.connected) return;
+
+        switch (message) {
+            case "JOIN #test":
+            this.emit('data', [
+                ":testbot!testuser@localhost JOIN :#test",
+                ":irc.localhost.net 353 testbot = #test :@testbot",
+                ":irc.localhost.net 366 testbot #test :End of /NAMES list.\r\n"].join('\r\n'));
+            break;
+            case "QUIT":
+            this.emit('data', "ERROR :Closing Link: testbot[localhost] (Quit: testbot)\r\n");
+            break;
+            case "NICK newNick":
+            this.emit('data', ":testbot!testuser@localhost NICK :newNick\r\n");
+            break;
+            case "PART #test":
+            this.emit('data', ":testbot!testuser@localhost PART #test\r\n");
+            break;
+            case "PRIVMSG nickserv :identify testpass":
+            this.emit('data', ":nickserv!services@test.net NOTICE testbot :Password accepted - you are now recognized.\r\n");
+            break;
+            default:
+            void 0;
+        }
+    } catch (e) {
+        console.log("ERROR");
+        console.log(e.stack);
     }
 };
 
@@ -117,15 +125,15 @@ describe('Tennu Client', function () {
             tennu.disconnect();
         });
 
-        it('automatically joins specified channels.', function (done) {
-            expect(netsocket.write).toHaveBeenCalledWith("JOIN #test\n", 'ascii');
+        it('automatically joins specified channels.', function () {
+            expect(netsocket.write).toHaveBeenCalledWith("JOIN #test\r\n", 'utf-8');
         });
     });
 
     describe("autoidentify", function () {
         beforeEach(function (done) {
             tennu.on("notice", function(e) {
-                if (e.actor === "nickserv") {
+                if (e.nickname === "nickserv") {
                     done();
                 }
             });
@@ -142,73 +150,7 @@ describe('Tennu Client', function () {
         });
 
         it('automatically identifies to services.', function () {
-            expect(netsocket.write).toHaveBeenCalledWith("PRIVMSG nickserv :identify testpass\n", 'ascii');
+            expect(netsocket.write).toHaveBeenCalledWith("PRIVMSG nickserv :identify testpass\r\n", 'utf-8');
         });
     });
-});
-
-// This is more an integration test...
-// Should have this test for the CommandHander iface spec too.
-xdescribe("listening to user commands", function () {
-  var client, netsocket, called;
-
-  beforeEach(function () {
-    var done = false;
-
-    netsocket = new NetSocket();
-    netsocket.write.andCallFake(fakeWrite);
-    client = new client(network, {Socket : boxfn(netsocket)});
-
-    client.on("!testcommand", function () {
-      called = true;
-  });
-
-    client.on("join", function () {
-      done = true;
-  });
-
-    client.connect().join("#test");
-
-    waitsFor(function () { return done; }, "#test is joined.", 200);
-});
-
-  afterEach(function () {
-    client.disconnect();
-});
-
-  it('listens to commands starting with the trigger letter', function () {
-    runs(function() {
-      netsocket.emit("data", ":sender!user@localhost PRIVMSG #test :!testcommand\r\n");
-  });
-
-    waitsFor(function () { return called; }, "spy was called", 1000);
-    //expect(spy).toHaveBeenCalled();
-});
-
-  it('listens to commands directed to it', function () {
-    runs(function() {
-      netsocket.emit("data", ":sender!user@localhost PRIVMSG #test :testbot: testcommand\r\n");
-  });
-
-    waitsFor(function () { return called; }, "spy was called", 100);
-    //expect(spy).toHaveBeenCalled();
-});
-
-  it('listens to commands via private messages', function () {
-    runs(function() {
-      netsocket.emit("data", ":sender!user@localhost PRIVMSG testbot :testcommand\r\n");
-  });
-
-    waitsFor(function () { return called; }, "spy was called", 100);
-    //expect(spy).toHaveBeenCalled();
-});
-
-  it('event ignores the trigger charcter in private messages', function () {
-    runs(function() {
-      netsocket.emit("data", ":sender!user@localhost PRIVMSG testbot :!testcommand\r\n");
-  });
-
-    waitsFor(function () { return called; }, "spy was called", 100);
-    //expect(spy).toHaveBeenCalled();
-});
 });
