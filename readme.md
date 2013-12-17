@@ -6,7 +6,7 @@ Current Status: Using irc-message as the base for messages; Making responses eas
 
 ## Basic Usage ##
 
-With Tennu, you create an irc client, write some modules or basic event listeners, and then connect.
+With Tennu, you create an irc client, require your modules or subscribe to your event listeners, and then connect.
 
 ```javascript
 var tennu = require('tennu');
@@ -21,12 +21,12 @@ Before connecting, add listeners to events from irc & users, or load modules.
 
 // Do something when a nick, perhaps yourself, joins a channel
 myClient.on('join', function (message) {
-	this.say(message.channel, message.actor + " joined!");
+    this.say(message.channel, message.actor + " joined!");
 });
 
 // Do something when a user emits a command, in this case, hello.
 myClient.on('!hello', function (command) {
-	this.say(command.channel, 'world');
+    this.say(command.channel, 'world');
 });
 
 // Load a moudle.
