@@ -88,3 +88,9 @@ Changelog
 
     * Bugfix: Multiple spaces between words will not mess up commands and message parsing. Thanks expr for reporting.
     * Bugfix: Arbitrary events won't fire when passed incomplete messages from server (fixed in irc-socket)
+
+    * Bug: On command, the client will echo the raw message to the channel.
+
+0.6.1:
+    * Bugfix: Commands won't echo the raw message back to the originating channel.
+    * Commands return values are echoed to the originating channel (if they are strings).

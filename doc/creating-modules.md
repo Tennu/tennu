@@ -9,7 +9,7 @@ Start with this template.
 
 ```javascript
 
-return function (tennu) {
+module.exports = function (tennu) {
     return {
         dependencies: [],
         exports: {
