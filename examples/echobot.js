@@ -1,5 +1,6 @@
 // EXAMPLE MODULE
 // Shows how to use .on(), some properties of Message and privmsg, and one way of responding.
+// Does not run inside the Tennu module. Pull it to its own directory and `npm install tennu` first.
 
 var config = require('./config.json');
 var Client = require('tennu').Client;
