@@ -294,4 +294,4 @@ The capabilities object looks like this for the Mibbit network.
 
 ## See Also ##
 
-* (IRC Specifications and other helpful tables)[https://www.alien.net.au/irc/)
+* (IRC Specifications and other helpful tables)[https://www.alien.net.au/irc/]
