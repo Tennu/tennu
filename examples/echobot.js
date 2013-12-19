@@ -1,6 +1,8 @@
-// EXAMPLE FILE - config.json does not exist.
+// EXAMPLE MODULE
+// Shows how to use .on(), some properties of Message and privmsg, and one way of responding.
+// Does not run inside the Tennu module. Pull it to its own directory and `npm install tennu` first.
 
-var config = require('config.json');
+var config = require('./config.json');
 var Client = require('tennu').Client;
 
 var tennu = Client(config);
@@ -13,17 +15,11 @@ tennu.on('privmsg', function (privmsg) {
     }
 
     // Don't repeat yourself.
-    if (privmsg.sender === tennu.nick()) {
+    if (privmsg.nickname === tennu.nick()) {
         return;
     }
 
-    // The first argument is the channel the message is from.
-    // Since the privmsg object already has this, we can just shift it out.
-    privmsg.args.shift();
-
-    var said = privmsg.args.join(' ');
-    var chan = privmsg.channel;
-    tennu.say(chan, said);
+    return privmsg.message;
 });
 
 tennu.connect();

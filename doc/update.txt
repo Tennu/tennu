@@ -1,0 +1,23 @@
+From v.0.4.x to v.0.6.x:
+
+If you have any modules, you'll probably have to rewrite them completely. Sorry.
+
+From v.0.5.x to v.0.6.x:
+
+Message and Command objects have property name changes to align with the irc-message module.
+
+In Message, the following property changes occurred:
+
+* args -> params
+* sender -> hostmask
+** hostmask properties have "name" added to the end of it.
+* actor -> nickname
+* name -> command
+
+For Nickname Messages:
+
+* newNick -> new
+
+For Command objects
+
+* name -> command
