@@ -93,4 +93,5 @@ Changelog
 
 0.6.1:
     * Bugfix: Commands won't echo the raw message back to the originating channel.
+    * Bugfix: Unfreeze Messages parsed by MessageParser.
     * Commands return values are echoed to the originating channel (if they are strings).
