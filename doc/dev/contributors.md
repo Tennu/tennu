@@ -2,27 +2,31 @@
 
 There's a lot of work that can be done.
 
-"I" is Havvy.
+From most important to least important:
 
-### Startup ###
+### Message Extensions ###
 
-As part of an IrcSocket, I want them to take a Startup object (an object that
-implements the startup interface, whatever that may be). Right now startup
-code is all over the place, and this sucks.
+There's a lot of numerics and commands. Please add extensions, even partially complete
+extensions, for any numerics you deal with.
 
-I want this to be able to change (say we have one that implements IRC 3's
-CAPABILITIES protocol or one that does WEBIRC) pretty easily.
+### IrcOutputSocket Commands ###
 
-### Testing ###
+Tennu is missing most of the commands from IRC. If you want to add them, please
+do so. Just make sure to also add the method wrapper to the client class.
 
-I would like to be testing each class in isolation.
+### Tests ###
 
-With exception to the Client class, which should be tested as integration.
+Either help port tests to Mocha, or add new tests.
+
+(If you do port tests to Mocha, add Mocha to the devDependencies and place them in /test)
 
 ### Built In Modules ###
 
-I don't want to write these, so I've been putting them off. If you want to,
-please feel free to write them.
+Please feel free to write the Server, User, and/or Channel modules.
+
+### 1.0.0 Release Checklist ###
+
+Getting closer to 1.0.0 would be nice.
 
 ### ChunkedIrcMessageHandler ###
 
@@ -30,19 +34,13 @@ Listens to the IrcMessageHandler, it chunks together list-like replies such
 as whois and isupport numerics. For messages that aren't chunked, just pass
 them through normally.
 
-### IrcOutputSocket Commands ###
-
-I'm missing most of the commands from IRC. If you want to add them, please
-do so. Just make sure to also add the method wrapper to the client class.
-
-### Executable to Start Bots ###
-
-```
-tennu ./my-server-config.json
-```
+Not a goal for 1.0.0 though.
 
 ## Format ##
 
-* Two space indents
-* Don't make `new` required for your constructors.
-* function fnName (arg, list) {
+* Four space indents
+* Favor factories over constuctors. Where you do use a constructor, make
+  sure it works without being called in a `new` context.
+* `function fnName (arg, list) {`
+* Spaces around binary operators. Ex:  `2 + 2`, `(4 + 3) * 2`.
+* No harmony features.

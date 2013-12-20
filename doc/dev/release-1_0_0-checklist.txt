@@ -15,6 +15,10 @@ TODO
   * Channel
   * User
 * Logging (perhaps with Winston?)
+* Command Line Tool
+* Module Reloading (if possible)
+* Callbacks for known commands.
+* Callback for .connect().
 
 FINISHED
 
