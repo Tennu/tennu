@@ -52,6 +52,8 @@ A network configuration object has the following properties:
 * trigger     - Command character to trigger commands with. By default, '!'.
 * channels    - Array of channels to autojoin. _Example:_ ["#help", "#tennu"]
 * modules     - An array of module names that the bot requires.
+* capab       - IRC3 CAP support. (Untested)
+* secure      - Use a TLS socket (Makes the )
 
 Static network configuration objects can go in _./config/%NETWORK%.json_
 (relative to your project) and then required in via node.
@@ -60,7 +62,7 @@ Static network configuration objects can go in _./config/%NETWORK%.json_
 
 ## Event Handling ##
 
-Tennu uses a custom event handler. Listeners are placed at the end of the event queue,
+Note: Tennu uses a custom event handler. Listeners are placed at the end of the event queue,
 insead of happening right away. Errors are currently logged to console, but otherwise
 swallowed.
 
@@ -78,7 +80,7 @@ tennu.on('privmsg', function (privmsg) {
 Subscribing to events in Tennu is more flexible than most event listeners.
 
 You register a single handler on multiple events at once by separating the events with a space,
-for example .on("x y", fn) is equivalent to .on('x', fn); .on('y', fn). Furthermore, an object
+for example `.on("x y", fn)` is equivalent to `.on('x', fn); .on('y', fn)`. Furthermore, an object
 can be passed, where each key is passed as the first parameter and its value, the second.
 
 ```javascript
@@ -115,6 +117,7 @@ All messages have the following fields:
 Note: Only the following message command types have extensions: join, notice, part, privmsg, nick, quit
 
 Messages that happen in a specific channel have the property "channel" with the contents of the channel.
+
 If the message was a query (either via notice or privmsg), the channel property is the nickname of the
 person who sent the query, and isQuery will be set to true.
 
@@ -122,8 +125,8 @@ The quit message has the property 'reason'. Eventually the part message will too
 
 The nick message has the properites 'old' and 'new'.
 
-Note: This is a weak part of the library. If you want to contribute to Tennu, this is an easy and helpful place
-to make the library more useful.
+Note: This is a weak part of the framework. If you want to contribute to Tennu, 
+this is an easy and helpful place to make Tennu more useful.
 
 ### Command ###
 
@@ -215,10 +218,6 @@ send in a patch.
 Tennu has its own module system, loosely based off of Node's. You can read
 about it at https://github.com/havvy/tennu-modules/.
 
-This is a completely different module system than versions before 0.5.0.
-Throw your non-generic modules into tennu_modules of your project,
-and note that you export a function that creates the module.
-
 You may access the module system's methods via the Client.modules property
 or by using one of the following methods:
 
@@ -226,6 +225,10 @@ or by using one of the following methods:
 * client.exports() [an alias of client.require()]
 * client.load()
 * client.loaded()
+
+### Creating Your Own Modules ###
+
+See [Creating Your Own Modules](https://github.com/Havvy/tennu/blob/master/doc/creating-modules.md)
 
 ### Built-In Modules ###
 
@@ -292,6 +295,19 @@ The capabilities object looks like this for the Mibbit network.
 }
 ```
 
+## Other Objects ##
+
+The following other objects can be obtained from the Tennu module:
+
+* Message
+* OutputSocket
+* MessageParser
+* CommandParser
+* Bisubscriber
+
+Documentation for these objects in isolation is currently unavailable.
+
 ## See Also ##
 
-* (IRC Specifications and other helpful tables)[https://www.alien.net.au/irc/]
+* [IRC Specifications and other helpful tables](https://www.alien.net.au/irc/)
+* [IRC Wiki](http://www.irc-wiki.org/)
