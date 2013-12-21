@@ -14,7 +14,7 @@ TODO
   * Server
   * Channel
   * User
-* Logging (perhaps with Winston?)
+* Logging (implemented, untested, unreleased)
 * Command Line Tool
 * Module Reloading (if possible)
 * Callbacks for known commands.
