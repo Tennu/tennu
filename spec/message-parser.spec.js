@@ -1,6 +1,7 @@
-var id = require('./lib/id');
+var id = require('./lib/id.js');
 
-var MessageParser = require('../lib/message-parser');
+var MessageParser = require('../lib/message-parser.js');
+var NoLogger = require('../lib/null-logger.js');
 
 // jasmine.DEFAULT_TIMEOUT_INTERVAL = 500; //ms
 
@@ -8,12 +9,12 @@ describe('Message Parsers', function () {
     var parser, receiver;
     var input = ':irc.server.net 432 MyNick :Erroneous Nickname: Illegal characters';
 
-    it('has has EventEmitter methods', function () {
-        parser = MessageParser({_id: id()});
+    it('has EventEmitter methods', function () {
+        parser = MessageParser({_id: id()}, NoLogger(), undefined);
 
         expect(parser.on).toBeDefined();
         expect(parser.once).toBeDefined();
-        expect(parser.then).toBeDefined();
+        expect(parser.after).toBeDefined();
         expect(parser.emit).toBeDefined();
     });
 

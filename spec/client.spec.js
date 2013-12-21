@@ -14,12 +14,12 @@ var network = {
 
 var fakeWrite = function (message) {
     message = message.substring(0, message.length - 2);
-    // console.log("Fakewrite called with message `" + message + "`");
+    console.log("Fakewrite called with message `" + message + "`");
     try {
         if (!this.connected) return;
 
         switch (message) {
-            case "JOIN #test":
+            case "JOIN :#test":
             this.emit('data', [
                 ":testbot!testuser@localhost JOIN :#test",
                 ":irc.localhost.net 353 testbot = #test :@testbot",
@@ -126,7 +126,7 @@ describe('Tennu Client', function () {
         });
 
         it('automatically joins specified channels.', function () {
-            expect(netsocket.write).toHaveBeenCalledWith("JOIN #test\r\n", 'utf-8');
+            expect(netsocket.write).toHaveBeenCalledWith("JOIN :#test\r\n", 'utf-8');
         });
     });
 

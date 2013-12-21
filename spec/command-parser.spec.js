@@ -2,6 +2,7 @@
 
 var CommandParser = require('../lib/command-parser.js');
 var Message = require('../lib/message.js');
+var NoLogging = require('../lib/null-logger.js');
 
 var messages = {
     noncommand: ":sender!user@localhost PRIVMSG #test :Hello",
@@ -21,7 +22,7 @@ describe('CommandParser', function () {
     var nickname = function () { return 'testbot'; };
 
     beforeEach(function () {
-        parser = CommandParser(nickname, {});
+        parser = CommandParser({}, nickname, NoLogging());
     });
 
     describe("Ignoring non-commands", function () {

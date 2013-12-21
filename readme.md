@@ -41,22 +41,23 @@ myClient.connect();
 A network configuration object has the following properties:
 
 * server      - IRC server to connect to. _Example:_ _irc.mibbit.net_
+* port        - Port to connect to. Defaults to 6667.
+* capab       - IRC3 CAP support. (Untested)
+* secure      - Use a TLS socket (Throws away the NetSocket)
 * nick        - Nickname the bot will use. Defaults to "tennubot"
 * user        - Username the bot will use. Defaults to "user"
 * realname    - Realname for the bot. Defaults to "tennu v0.3"
-* port        - Port to connect to. Defaults to 6667.
 * password    - Password for identifying to services.
-* nickserv    - Nickname for nickserv service. Defaults to "nickserv".
+* nickserv    - Nickname of nickserv service. Defaults to "nickserv".
 * trigger     - Command character to trigger commands with. By default, '!'.
 * channels    - Array of channels to autojoin. _Example:_ ["#help", "#tennu"]
 * modules     - An array of module names that the bot requires.
-* capab       - IRC3 CAP support. (Untested)
-* secure      - Use a TLS socket (Throws away the NetSocket)
 
-Static network configuration objects can go in _./config/%NETWORK%.json_
-(relative to your project) and then required in via node.
+Other modules may use additional properties.
 
-## Dependency Injection ##
+Network configuration objects are JSON encodable.
+
+## Dependency Management ##
 
 The second (optional) parameter to tennu.Client is an object of factories to
 replace the factories that the Client uses by default.
@@ -91,6 +92,8 @@ Note: Tennu uses a custom event handler. Listeners are placed at the end of the 
 insead of happening right away. Errors are currently logged to console, but otherwise
 swallowed.
 
+### Respond Functionality ###
+
 Commands and Messages that have a channel property take a return value. Currently, the
 return value must be a string or array that is then said to the channel the message
 originated in.
@@ -100,7 +103,14 @@ originated in.
 tennu.on('privmsg', function (privmsg) {
     return privmsg.message;
 });
+
+// Equivalent to:
+tennu.on('privmsg', function (privmsg) {
+    tennu.say(privmsg.channel, privmsg.message);
+});
 ```
+
+### Subscribing Options ###
 
 Subscribing to events in Tennu is more flexible than most event listeners.
 
@@ -121,9 +131,11 @@ on({
 })
 ```
 
+### Listener Parameters ###
+
 Listeners are passed either a message or command object.
 
-### Message ###
+#### Message ####
 
 Messages are passed by irc events.
 
@@ -137,7 +149,7 @@ All messages have the following fields:
 * command    - Message command type. For example, 'privmsg' or 'nick'.
 * params     - Array of sent parameters.
 
-#### Extensions ####
+##### Extensions #####
 
 Note: Only the following message command types have extensions: join, kick, notice, part, privmsg, nick, quit
 
@@ -155,7 +167,7 @@ The kick message has the properties 'kicked' and 'kicker'.
 Note: This is a weak part of the framework. If you want to contribute to Tennu, 
 this is an easy and helpful place to make Tennu more useful.
 
-### Command ###
+#### Command ####
 
 Commands are passed for user commands.
 
@@ -174,14 +186,6 @@ For example, a command of "!do-it ARG1 ARG2" will have args be ["ARG1", "ARG2"] 
 All of the following are methods on Tennu for doing things once connected.
 
 These methods are also available on the client's 'out' property.
-
-### join(channel) ###
-
-Joins the specified channel.
-
-### part(channel, reason) ###
-
-Parts the specified channel with the given reason.
 
 ### say(channel, message) ###
 
@@ -215,10 +219,33 @@ botnick does something!
 tennu.act('#example', "does something!");
 ```
 
+### ctcp(channel, type, message) ###
+
+```javascript
+tennu.ctcp('havvy', 'ping', 'PINGMESSAGE');
+```
+
+### nick(newNick) ###
+
+Change the bots nickname.
+
+### join(channel) ###
+
+Joins the specified channel.
+
+```javascript
+tennu.join("#tennu");
+tennu.join("#keyed-channel channel-key");
+tennu.join("#chan1,#chan2");
+tennu.join("0"); // Part all channels.
+
+### part(channel, reason) ###
+
+Parts the specified channel with the given reason.
+
 ### quit(reason) ###
 
 Quits the server with the given reason.
-
 
 ### whois(users, server) ###
 
@@ -229,7 +256,7 @@ users is either a string or an array of strings.
 
 ### userhost(users) ###
 
-Retrieves the userhost of the user. 
+Retrieves the userhost of the user(s).
 
 ### _raw(message) ###
 
@@ -238,9 +265,15 @@ that is not listed here, you can use the internal _raw method, which takes
 the entire message as is as a string, use your own IrcOutputSocket class, or
 send in a patch.
 
+### _rawf(format, args...) ###
+
+[0.8.0]
+
+As _raw(message), but the arguments are passed through util.format() first.
+
 --------
 
-## Modules ##
+## Module System ##
 
 Tennu has its own module system, loosely based off of Node's. You can read
 about it at https://github.com/havvy/tennu-modules/.
@@ -336,9 +369,6 @@ node_modules/ tennu_modules/ config.json
 
 The tennu command takes one optional argument, -v (--verbose), for adding a Logger that logs to console.
 
-## Dependency Injection
-
-You can replace which object factories are called by using the second parameter of tennu.Client.
 
 ## Other Objects ##
 

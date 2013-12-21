@@ -1,4 +1,5 @@
-var OutputSocket = require('./../lib/output-socket');
+var OutputSocket = require('../lib/output-socket');
+var NoLogger = require('../lib/null-logger');
 var nick = 'testbot';
 
 describe('IRC Output Sockets', function () {
@@ -6,7 +7,7 @@ describe('IRC Output Sockets', function () {
 
     beforeEach(function () {
         socket = { raw: jasmine.createSpy("raw") };
-        os = new OutputSocket(socket, nick);
+        os = new OutputSocket(socket, NoLogger(), nick);
     });
 
     it('can send private messages', function () {
