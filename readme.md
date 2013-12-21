@@ -1,7 +1,5 @@
 Tennu is an IRC bot framework written in Node.js
 
-Current Status: Updating Documentation for v.0.6.0
-
 ----------
 
 ## Basic Usage ##
@@ -29,7 +27,7 @@ myClient.on('!hello', function (command) {
     this.say(command.channel, 'world');
 });
 
-// Load a moudle.
+// Load a module.
 // The require function is from node, and the method is from Tennu.
 myClient.require(require('./yourModule'));
 
@@ -53,10 +51,37 @@ A network configuration object has the following properties:
 * channels    - Array of channels to autojoin. _Example:_ ["#help", "#tennu"]
 * modules     - An array of module names that the bot requires.
 * capab       - IRC3 CAP support. (Untested)
-* secure      - Use a TLS socket (Makes the )
+* secure      - Use a TLS socket (Throws away the NetSocket)
 
 Static network configuration objects can go in _./config/%NETWORK%.json_
 (relative to your project) and then required in via node.
+
+## Dependency Injection ##
+
+The second (optional) parameter to tennu.Client is an object of factories to
+replace the factories that the Client uses by default.
+
+* NetSocket
+* IrcSocket
+* IrcOutputSocket
+* MessageParser
+* ChunkedMessageParser
+* CommandParser
+* Modules
+* BiSubscriber
+* Logger
+
+These functions will always be called as constructors (with `new`).
+
+### Logging ###
+
+Of these, the only one you will probably care about is Logger. The object
+returned by the Logger function must implement the following methods:
+
+`debug, info, notice, warn, error, crit, alert, emerg`
+
+Base Tennu will only use debug through error, but other modules and event
+emitters may use crit through emerg.
 
 -------------
 
@@ -114,16 +139,18 @@ All messages have the following fields:
 
 #### Extensions ####
 
-Note: Only the following message command types have extensions: join, notice, part, privmsg, nick, quit
+Note: Only the following message command types have extensions: join, kick, notice, part, privmsg, nick, quit
 
-Messages that happen in a specific channel have the property "channel" with the contents of the channel.
+Messages that happen in a specific channel have the property "channel" with the channel name.
 
 If the message was a query (either via notice or privmsg), the channel property is the nickname of the
 person who sent the query, and isQuery will be set to true.
 
 The quit message has the property 'reason'. Eventually the part message will too.
 
-The nick message has the properites 'old' and 'new'.
+The nick message has the properties 'old' and 'new'.
+
+The kick message has the properties 'kicked' and 'kicker'.
 
 Note: This is a weak part of the framework. If you want to contribute to Tennu, 
 this is an easy and helpful place to make Tennu more useful.
@@ -294,6 +321,24 @@ The capabilities object looks like this for the Mibbit network.
   INVEX: true
 }
 ```
+
+## Command Line Utility
+
+Install `Tennu` globally, and you'll gain access to the `tennu` command line tool.
+
+```bash
+> pwd
+/home/you/your-tennubot
+> ls
+node_modules/ tennu_modules/ config.json
+> tennu config.json
+```
+
+The tennu command takes one optional argument, -v (--verbose), for adding a Logger that logs to console.
+
+## Dependency Injection
+
+You can replace which object factories are called by using the second parameter of tennu.Client.
 
 ## Other Objects ##
 

@@ -2,7 +2,6 @@ var EventEmiter = require('../lib/event-emitter.js');
 
 describe("Tennu's event emitter", function () {
     var EE;
-    var called;
 
     beforeEach(function () {
         EE = EventEmiter();
@@ -17,10 +16,10 @@ describe("Tennu's event emitter", function () {
         expect(EE.emit.bind(EE, 'y')).not.toThrow();
     });
 
-    describe("#then", function () {
+    describe("#after", function () {
         it('takes a function, which it calls after the listener returns.', function (done) {
             EE.on('x', function () {return true;});
-            EE.then(function (err, res, emitted, arbitrary) {
+            EE.after(function (err, res, emitted, arbitrary) {
                 expect(err).toBe(undefined);
                 expect(res).toBe(true);
                 expect(emitted).toBe('x');
