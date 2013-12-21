@@ -1,6 +1,6 @@
 {
   "name": "tennu",
-  "version": "0.7.0pre1",
+  "version": "0.7.0",
   "description": "Tennu Node.js IRC Framework",
   "maintainers": [
     {
