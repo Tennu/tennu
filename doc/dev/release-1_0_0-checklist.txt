@@ -14,8 +14,6 @@ TODO
   * Server
   * Channel
   * User
-* Logging (implemented, untested, unreleased)
-* Command Line Tool (implemented, unreleased)
 * Module Reloading (if possible)
 * Callbacks for known commands.
 * Callback for .connect().
@@ -27,3 +25,5 @@ FINISHED
 * Module System
 * On Method that delegates to CommandParser/MessageParser
 * OutputSocket basic functionality
+* Logging
+* Command Line Tool

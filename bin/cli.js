@@ -59,5 +59,11 @@ if (program.verbose) {
     di.Logger = Logger;
 }
 
-var client = Client(config, di);
-client.connect();
+try {
+    var client = Client(config, di);
+    client.connect();
+} catch (e) {
+    console.log("Error occurred creating and connecting to Tennu instance.");
+    console.log(e);
+    process.exit(4);
+}

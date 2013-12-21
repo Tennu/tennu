@@ -30,4 +30,12 @@ From v.0.6.x to v.0.7.x:
     has been deprecated, and will be removed in v.0.8.x. Instead, use
     Client.nickname().
 
-    The unary version of Client.nick(newNick) will still be available.
+    The unary version of Client.nick(newNick) is unchanged.
+
+    The idea is that a method should do one thing, and this one currently does two.
+
+
+    You now have access to eight logging levels (debug, info, notice, warn, error, crit, alert, error).
+    Use them as needed.
+
+    You may need to pass a Logger to your Client. If so, I suggest using Winston.
