@@ -1,23 +1,33 @@
 From v.0.4.x to v.0.6.x:
 
-If you have any modules, you'll probably have to rewrite them completely. Sorry.
+    If you have any modules, you'll probably have to rewrite them completely.
+    Sorry.
 
 From v.0.5.x to v.0.6.x:
 
-Message and Command objects have property name changes to align with the irc-message module.
+    Message and Command objects have property name changes to align with the
+    irc-message module.
 
-In Message, the following property changes occurred:
+    In Message, the following property changes occurred:
 
-* args -> params
-* sender -> hostmask
-** hostmask properties have "name" added to the end of it.
-* actor -> nickname
-* name -> command
+    * args -> params
+    * sender -> hostmask
+    ** hostmask properties have "name" added to the end of it.
+    * actor -> nickname
+    * name -> command
 
-For Nickname Messages:
+    For Nickname Messages:
 
-* newNick -> new
+    * newNick -> new
 
-For Command objects
+    For Command objects
 
-* name -> command
+    * name -> command
+
+From v.0.6.x to v.0.7.x:
+
+    Client.nick()'s nullary functionality (of returning the current nickname)
+    has been deprecated, and will be removed in v.0.8.x. Instead, use
+    Client.nickname().
+
+    The unary version of Client.nick(newNick) will still be available.
