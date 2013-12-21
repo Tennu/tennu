@@ -103,3 +103,5 @@ Changelog
       * Logs to nothing by default, so you'll have to pass in a Logger.
     * .nick() nullary version deprecated. Use .nickname() instead.
     * KICK message extension added (channel, kicked, kicker)
+    * .then() changed to .after() in ./lib/event-emitter to avoid `thennable assimilation` in ES6.
+    * Command Line Tool added.
