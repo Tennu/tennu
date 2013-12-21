@@ -95,3 +95,11 @@ Changelog
     * Bugfix: Commands won't echo the raw message back to the originating channel.
     * Bugfix: Unfreeze Messages parsed by MessageParser.
     * Commands return values are echoed to the originating channel (if they are strings).
+
+0.7.0:
+    * Logging Interface:
+      * debug, info, notice, warn, error, crit, alert, emerg methods
+      * .log(one_of_above, ...log_message);
+      * Logs to nothing by default, so you'll have to pass in a Logger.
+    * .nick() nullary version deprecated. Use .nickname() instead.
+    * KICK message extension added.
