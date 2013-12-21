@@ -39,11 +39,15 @@
   "dependencies": {
     "simplesets": ">=0.1.2",
     "lodash": "2.4.x",
-    "irc-socket" : "~1.2.x",
-    "irc-message" : "1.0.x",
-    "tennu-modules" : "~1.0.0"
+    "irc-socket": "~1.2.x",
+    "irc-message": "1.0.x",
+    "tennu-modules": "~1.0.0",
+    "commander": "~2.1.0"
   },
   "scripts": {
     "test": "jasmine-node ./spec"
+  },
+  "bin": {
+    "tennu": "bin/cli.js"
   }
 }

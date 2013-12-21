@@ -15,7 +15,7 @@ TODO
   * Channel
   * User
 * Logging (implemented, untested, unreleased)
-* Command Line Tool
+* Command Line Tool (implemented, unreleased)
 * Module Reloading (if possible)
 * Callbacks for known commands.
 * Callback for .connect().

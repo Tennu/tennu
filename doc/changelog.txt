@@ -102,4 +102,4 @@ Changelog
       * .log(one_of_above, ...log_message);
       * Logs to nothing by default, so you'll have to pass in a Logger.
     * .nick() nullary version deprecated. Use .nickname() instead.
-    * KICK message extension added.
+    * KICK message extension added (channel, kicked, kicker)
