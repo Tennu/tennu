@@ -3,3 +3,4 @@
 These modules can be found on npm.
 
 * tennu-luck
+* tennu-admin
