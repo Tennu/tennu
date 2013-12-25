@@ -143,14 +143,14 @@ Messages are immutable, as are their args. Make sure to copy the args array befo
 
 All messages have the following fields:
 
-* receiver   - Receiver of the message. A reference to the Tennu object.
+* receiver   - Receiver of the message. A reference to the Client object.
 * prefix     - The prefix is either a hostmask of the format "nickname!username@hostname", or the server you are connected to.
-* hostmask   - If the prefix is a hostmask, this will be an object with properties {nickname, username, hostname}.
 * command    - Message command type. For example, 'privmsg' or 'nick'.
 * params     - Array of sent parameters.
+* tags       - IRC3 tags sent with message.
 
 Some messages have extended information. See
-[Extensions](https://github.com/Havvy/tennu/blob/master/doc/extensions.md).
+[Message Properties](https://github.com/Havvy/tennu/blob/master/doc/message-properties.md).
 
 #### Command ####
 
@@ -223,6 +223,7 @@ tennu.join("#tennu");
 tennu.join("#keyed-channel channel-key");
 tennu.join("#chan1,#chan2");
 tennu.join("0"); // Part all channels.
+```
 
 ### part(channel, reason) ###
 

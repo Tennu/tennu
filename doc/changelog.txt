@@ -104,4 +104,30 @@ Changelog
     * .nick() nullary version deprecated. Use .nickname() instead.
     * KICK message extension added (channel, kicked, kicker)
     * .then() changed to .after() in ./lib/event-emitter to avoid `thennable assimilation` in ES6.
-    * Command Line Tool added.
+    * Command Line Tool added. (Use via ./node_modules/tennu/bin/cli.js config.json -v)
+
+    * Bug: Command Line Tool doesn't work installed globally.
+    * Bug: MessageHandler gets logger and socket in wrong order.
+
+0.7.1:
+    * Command Line Improvements
+    ** -d flag for logging debug. Must be paired with -v.
+    ** Errors print the stack.
+    * OutputSocket#rawf(format, args...)
+    * MessageHandler and CommandHandler log to "error" the stack of the error.
+    * Bugfix: CommandHandler listener to MessageHandler no longer returns.
+    * Bugfix: Pass socket and logger to MessageHandler in correct order!
+
+0.7.2:
+    * Message Extensions for the following numerics:
+    ** 307 - RPL_WHOISREGNICK
+    ** 311 - RPL_WHOISUSER
+    ** 312 - RPL_WHOISSERVER
+    ** 317 - RPL_WHOISIDLE
+    ** 318 - RPL_ENDOFWHOIS
+    ** 319 - RPL_WHOISCHANNELS
+    ** 330 - RPL_WHOISLOGGEDIN
+    ** 378 - RPL_WHOISHOST
+    ** 401 - ERR_NOSUCHNICK
+    * Numerics with extensions will have the MessageHandler emit the replyname.
+    * User module exports isIdentifed(nickname, callback).
