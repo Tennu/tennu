@@ -130,5 +130,45 @@ module.exports = function (nrc) {
 */
 
 module.exports = function (tennu) {
-    return {};
+    isIdentifed = function(nickname, callback) {
+        tennu.whois(nickname);
+
+        var timeout = setTimeout(function () {
+            unregister();
+            callback(new Error("Request timed out."));
+        }, 1000 * 60 * 60);
+
+        var unregister = function () {
+            tennu.off("RPL_WHOISREGNICK", onTrue);
+            tennu.off("RPL_WHOISCHANNELS", onTrue);
+            tennu.off("RPL_ENDOFWHOIS", onFalse);
+            tennu.off("ERR_NOSUCHNICK", onFalse);
+            clearTimeout(timeout)
+        }
+
+        var onTrue = function (reply) {
+            if (reply.nickname.toLowerCase() === nickname.toLowerCase()) {
+                unregister();
+                callback(undefined, true);
+            }
+        };
+
+        var onFalse = function (reply) {
+            if (reply.nickname.toLowerCase() === nickname.toLowerCase()) {
+                unregister();
+                callback(undefined, false);
+            }
+        };
+
+        tennu.on({
+            "RPL_WHOISREGNICK RPL_WHOISLOGGEDIN": onTrue,
+            "RPL_ENDOFWHOIS ERR_NOSUCHNICK": onFalse
+        });
+    },
+
+    return {
+        exports: {
+            isIdentifed: isIdentifed
+        }
+    };
 };
