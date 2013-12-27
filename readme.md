@@ -253,7 +253,7 @@ send in a patch.
 
 ### _rawf(format, args...) ###
 
-[0.8.0]
+[0.7.1]
 
 As _raw(message), but the arguments are passed through util.format() first.
 
@@ -282,19 +282,29 @@ Only the help module is currently implemented.
 
 #### help ####
 
-Sets the command *!help*.
+[0.6.0+]
 
-See ./doc/help.md for more information.
+Sets the command `!help`.
+
+See [Help Module Documentation](https://github.com/Havvy/tennu/blob/master/doc/module/help.md).
 
 #### channels ####
 
-This module handles keeping track of channel-specific data.
+Unimplemented.
 
 #### users ####
 
-This module handles keeping track of user-specific data.
+[0.7.3+]
+
+This module has a single method exported: isIdentifedAs(nickname, nickname_identified, callback)
+
+See [User Module Documentation](https://github.com/Havvy/tennu/blob/master/doc/module/user.md).
 
 #### server ####
+
+Unimplemented.
+
+[0.4.x and below]
 
 Information about the server. For now, the only thing this module offers is a
 capabilities map listing the information from the 005 raw numeric.
@@ -343,6 +353,9 @@ The capabilities object looks like this for the Mibbit network.
 
 ## Command Line Utility
 
+Note: Don't listen to this. Instead, keep tennu in your bot's dependencies, and
+run `./node_modules/tennu/bin/cli.js`.
+
 Install `Tennu` globally, and you'll gain access to the `tennu` command line tool.
 
 ```bash
@@ -353,7 +366,8 @@ node_modules/ tennu_modules/ config.json
 > tennu config.json
 ```
 
-The tennu command takes one optional argument, -v (--verbose), for adding a Logger that logs to console.
+The tennu command takes two optional argument, -v (--verbose) and -d (--debug),
+for adding a Logger that logs to the console (info level and above without -d).
 
 
 ## Other Objects ##
@@ -367,6 +381,15 @@ The following other objects can be obtained from the Tennu module:
 * Bisubscriber
 
 Documentation for these objects in isolation is currently unavailable.
+
+## Testing ##
+
+Tests currently require both jasmine-node and mocha be installed globally, along
+with the devDependencies.
+
+Afterwards, `npm test` in the directory.
+
+Don't like having both as dependencies? Help move jasmine tests to mocha.
 
 ## See Also ##
 

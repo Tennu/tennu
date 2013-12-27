@@ -1,6 +1,6 @@
 {
   "name": "tennu",
-  "version": "0.7.2pre0",
+  "version": "0.7.2",
   "description": "Tennu Node.js IRC Framework",
   "maintainers": [
     {
@@ -42,10 +42,17 @@
     "irc-socket": "~1.2.x",
     "irc-message": "1.0.x",
     "tennu-modules": "~1.0.0",
-    "commander": "~2.1.0"
+    "commander": "~2.1.0",
+    "q": "~0.9.7",
+    "deep-eql": "~0.1.3"
+  },
+  "devDependencies": {
+    "sinon": "~1.7.3",
+    "deep-eql": "~0.1.3",
+    "better-assert": "~1.0.0"
   },
   "scripts": {
-    "test": "jasmine-node ./spec"
+    "test": "jasmine-node ./spec && mocha -R spec"
   },
   "bin": {
     "tennu": "bin/cli.js"

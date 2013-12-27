@@ -130,4 +130,8 @@ Changelog
     ** 378 - RPL_WHOISHOST
     ** 401 - ERR_NOSUCHNICK
     * Numerics with extensions will have the MessageHandler emit the replyname.
-    * User module exports isIdentifed(nickname, callback).
+    * User module exports isIdentifedAs(nickname, nickname_identified, callback).
+
+    * Added mocha, sinon, deep-eql, and better-assert to devDependencies
+    * /test directory
+    * Using mocha for new tests. Will bring old tests over from Jasmine over time.

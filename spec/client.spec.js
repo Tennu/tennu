@@ -14,7 +14,7 @@ var network = {
 
 var fakeWrite = function (message) {
     message = message.substring(0, message.length - 2);
-    console.log("Fakewrite called with message `" + message + "`");
+    // console.log("Fakewrite called with message `" + message + "`");
     try {
         if (!this.connected) return;
 

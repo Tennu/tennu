@@ -105,7 +105,7 @@ get them at message.params[2]. They have a format of:
 ### 330
 
 * replyname - RPL_WHOISLOGGEDIN
-* identifedas - Services nickname the user is identified to.
+* identifiedas - Services nickname the user is identified to.
 
 ### 378
 
