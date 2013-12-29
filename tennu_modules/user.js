@@ -1,10 +1,10 @@
 var Q = require('q');
 
 module.exports = function (tennu) {
-    var isIdentifiedAs = function(nickname, identified, callback) {
+    var isIdentifiedAs = function(nickname, accountname) {
         var deferred = Q.defer();
         nickname = nickname.toLowerCase();
-        identified = identified.toLowerCase();
+        accountname = accountname.toLowerCase();
 
         var timeout = setTimeout(function () {
             unregister();
@@ -30,14 +30,14 @@ module.exports = function (tennu) {
         var result = false; // Until proven otherwise.
 
         var onLoggedIn = fornick(function (reply) {
-            if (reply.identifiedas.toLowerCase() === identified) {
+            if (reply.identifiedas.toLowerCase() === accountname) {
                 tennu.debug("isIdentifiedAs found a match.");
                 result = true;
             }
         });
 
         var onRegNick = fornick(function (reply) {
-            if (nickname === identified) {
+            if (nickname === accountname) {
                 tennu.debug("isIdentifiedAs found a match.");
                 result = true;
             }
