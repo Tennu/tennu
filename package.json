@@ -43,8 +43,7 @@
     "irc-message": "1.0.x",
     "tennu-modules": "~1.0.0",
     "commander": "~2.1.0",
-    "q": "~0.9.7",
-    "deep-eql": "~0.1.3"
+    "q": "~0.9.7"
   },
   "devDependencies": {
     "sinon": "~1.7.3",
