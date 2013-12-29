@@ -39,3 +39,10 @@ From v.0.6.x to v.0.7.x:
     Use them as needed.
 
     You may need to pass a Logger to your Client. If so, I suggest using Winston.
+
+From v.0.7.x to v.0.8.x:
+
+    Change any nullary argument usage of Client#nick to Client#nickname
+
+
+    IrcOutputSocket methods (other than plain raws) return promises.
