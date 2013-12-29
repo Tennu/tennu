@@ -135,13 +135,97 @@ describe('Command Handler', function () {
         });
 
         it("no response", function (done) {
-            handler.on('commandname', function () {
+            const after = handler.getAfter;
+
+            handler.after(function () {
+                after.apply(handler, arguments);
+                setImmediate(function () {
+                    assert(!receiver.say.called);
+                    done();
+                });
+            });
+
+            handler.on(commandname, function () {
                 return undefined;
             });
 
             handler.parse(Message(messages.command));
+        });
 
-            // ???
+        it("string response", function (done) {
+            receiver.say = function (_sender, response) {
+                try {
+                    assert(sender === _sender);
+                    assert(response === 'response');
+                    assert(arguments.length === 2);
+                    done();   
+                } catch (e) {
+                    done(e);
+                }
+            };
+
+            handler.on(commandname, function () {
+                return 'response';
+            });
+
+            handler.parse(Message(messages.command, receiver));
+        });
+
+        it("[string] response", function (done) {
+            receiver.say = function (_sender, response) {
+                try {
+                    assert(sender === _sender);
+                    assert(equal(response, ['response']));
+                    assert(arguments.length === 2);
+                    done();   
+                } catch (e) {
+                    done(e);
+                }
+            };
+
+            handler.on(commandname, function () {
+                return ['response'];
+            });
+
+            handler.parse(Message(messages.command, receiver));
+        });
+
+        it("Promise<string> response", function (done) {
+            receiver.say = function (_sender, response) {
+                try {
+                    assert(sender === _sender);
+                    assert(response === 'response');
+                    assert(arguments.length === 2);
+                    done();   
+                } catch (e) {
+                    done(e);
+                }
+            };
+
+            handler.on(commandname, function () {
+                return Q('response');
+            });
+
+            handler.parse(Message(messages.command, receiver));
+        });
+
+        it("Promise<[string]> response", function (done) {
+            receiver.say = function (_sender, response) {
+                try {
+                    assert(sender === _sender);
+                    assert(equal(response, ['response']));
+                    assert(arguments.length === 2);
+                    done();   
+                } catch (e) {
+                    done(e);
+                }
+            };
+
+            handler.on(commandname, function () {
+                return Q(['response']);
+            });
+
+            handler.parse(Message(messages.command, receiver));
         });
     });
 });
