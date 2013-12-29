@@ -135,3 +135,6 @@ Changelog
     * Added mocha, sinon, deep-eql, and better-assert to devDependencies
     * /test directory
     * Using mocha for new tests. Will bring old tests over from Jasmine over time.
+
+    * User Module
+    ** isIdentifiedAs(nick_lhs: string, nick_rhs: string): Promise boolean
