@@ -90,7 +90,7 @@ describe('Tennu Client', function () {
         });
 
         it('tracks its initial nickname', function () {
-            expect(tennu.nick()).toBe('testbot');
+            expect(tennu.nickname()).toBe('testbot');
         });
 
         describe('changing nick', function () {
@@ -103,7 +103,7 @@ describe('Tennu Client', function () {
             });
 
             it('tracks its changed nick', function () {
-                expect(tennu.nick()).toBe('newNick');
+                expect(tennu.nickname()).toBe('newNick');
             });
         });
     });

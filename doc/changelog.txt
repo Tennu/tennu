@@ -13,7 +13,7 @@ Changelog
       IRCMessageEmitter or the IRCCommandEmitter.
     * Default NRC Modules are disabled (until the next version)
 
-0.4.0:
+0.4.0: The Module update.
     * Event listeners are no longer bound to 'nrc'.
     * Message and Command objects use 'args' instead of 'params/parameters'.
       This follows the same naming convention that node-irc uses.
@@ -48,7 +48,7 @@ Changelog
     * Made dependency injection argument of Client optional.
     * Started the ChunkedMessageParser. Not working.
 
-0.5.0:
+0.5.0: The Tennu update.
     * Moved module system to its own project.
     * Module system completely revamped.
     * Module loading via name and tennu_modules directory-tree climb.
@@ -66,7 +66,7 @@ Changelog
 0.5.3:
     * Hotfix: this._name() doesn't exist in CommandParser
 
-0.6.0:
+0.6.0: The irc-message update.
     * BACKWARDS INCOMPATIBLE! Changed property names for Message and Command
       to align with IRC specification and the irc-message module.
       See updating.txt for more information.
@@ -96,7 +96,7 @@ Changelog
     * Bugfix: Unfreeze Messages parsed by MessageParser.
     * Commands return values are echoed to the originating channel (if they are strings).
 
-0.7.0:
+0.7.0: The Logging and tennu command update.
     * Logging Interface:
       * debug, info, notice, warn, error, crit, alert, emerg methods
       * .log(one_of_above, ...log_message);
@@ -109,7 +109,7 @@ Changelog
     * Bug: Command Line Tool doesn't work installed globally.
     * Bug: MessageHandler gets logger and socket in wrong order.
 
-0.7.1:
+0.7.1: The I should really test my releases update.
     * Command Line Improvements
     ** -d flag for logging debug. Must be paired with -v.
     ** Errors print the stack.
@@ -118,7 +118,7 @@ Changelog
     * Bugfix: CommandHandler listener to MessageHandler no longer returns.
     * Bugfix: Pass socket and logger to MessageHandler in correct order!
 
-0.7.2:
+0.7.2: The I need this for tennu-admin update.
     * Message Extensions for the following numerics:
     ** 307 - RPL_WHOISREGNICK
     ** 311 - RPL_WHOISUSER
@@ -138,3 +138,6 @@ Changelog
 
     * User Module
     ** isIdentifiedAs(nick_lhs: string, nick_rhs: string): Promise boolean
+
+0.8.0: The promised update.
+    * Response can now be a promise of the other types (string, [string])

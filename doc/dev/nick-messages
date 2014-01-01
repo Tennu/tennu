@@ -1,0 +1,5 @@
+:concrete.mozilla.org 432 Havvy[telnet]          :Erroneous Nickname: Illegal characters
+:holmes.freenode.net 433 * Havvy :Nickname is already in use.
+
+On message not 432 or 433, the NICK command went in properly.
+Send USER before NICK upon startup.
