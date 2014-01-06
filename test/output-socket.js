@@ -8,15 +8,52 @@ var debug = false;
 var logfn = debug ? console.log.bind(console) : function () {};
 var logger = {debug: logfn, info: logfn, notice: logfn, warn: logfn, error: logfn};
 
-var OutputSocket = require('../lib/output-socket');
+var channel = "#test";
 var nickname = 'testbot';
 
-describe('IRC Output Sockets', function () {
-    var socket, out;
+var nicknamefn = function () { return nickname; };
+
+var OutputSocket = require('../lib/output-socket.js');
+var EventEmitter = require('../lib/event-emitter.js');
+
+describe('IRC Output Socket:', function () {
+    var socket, out, messageHandler;
 
     beforeEach(function () {
+        logfn(/* newline */);
+        messageHandler = new EventEmitter();
         socket = { raw: sinon.spy() };
-        out = new OutputSocket(socket, logger, nickname);
+        out = new OutputSocket(socket, messageHandler, nicknamefn, logger);
+    });
+
+    describe('Join:', function () {
+        it('Sends the command.', function () {
+            out.join(channel);
+            assert(socket.raw.calledWithExactly(format("JOIN :%s", channel)));
+        });
+
+        it('On Success', function (done) {
+            var joinmsg = {nickname: nickname, channel: channel};
+
+            socket.raw = function () {
+                messageHandler.emit('join', joinmsg);
+            };
+
+            /*
+            out.join(channel)
+            .then(function (join) {
+                try {
+                    assert(equal(join, joinmsg));
+                    done();
+                } catch (e) {
+                    done(e);
+                }
+            });
+            */
+
+            assert(out.join(channel) === undefined);
+            done();
+        });
     });
 
     it('can send private messages', function () {

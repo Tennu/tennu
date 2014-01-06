@@ -1,18 +1,18 @@
-var Q = require('q');
+const Q = require('q');
 
-module.exports = function (tennu) {
-    var isIdentifiedAs = function(nickname, accountname) {
-        var deferred = Q.defer();
+module.exports = function (tennu, imports) {
+    const isIdentifiedAs = function(nickname, accountname) {
+        const deferred = Q.defer();
         nickname = nickname.toLowerCase();
         accountname = accountname.toLowerCase();
 
-        var timeout = setTimeout(function () {
+        const timeout = setTimeout(function () {
             unregister();
             tennu.error("isIdentifiedAs request timed out after one hour.");
             deferred.reject(new Error("Request timed out."));
         }, 1000 * 60 * 60);
 
-        var fornick = function (fn) {
+        const fornick = function (fn) {
             return function (reply) {
                 if (reply.nickname.toLowerCase() === nickname) {
                     fn(reply);
@@ -22,40 +22,40 @@ module.exports = function (tennu) {
             }
         };
 
-        var unregister = function () {
+        const unregister = function () {
             tennu.off(handlers);
             clearTimeout(timeout)
         }
 
-        var result = false; // Until proven otherwise.
+        const result = false; // Until proven otherwise.
 
-        var onLoggedIn = fornick(function (reply) {
+        const onLoggedIn = fornick(function (reply) {
             if (reply.identifiedas.toLowerCase() === accountname) {
                 tennu.debug("isIdentifiedAs found a match.");
                 result = true;
             }
         });
 
-        var onRegNick = fornick(function (reply) {
+        const onRegNick = fornick(function (reply) {
             if (nickname === accountname) {
                 tennu.debug("isIdentifiedAs found a match.");
                 result = true;
             }
         });
 
-        var onWhoisEnd = fornick(function (reply) {
+        const onWhoisEnd = fornick(function (reply) {
             tennu.debug("isIdentifiedAs found end of whois.");
             unregister();
             tennu.debug("Resolving " + result);
             deferred.resolve(result)
         });
 
-        var onError = fornick(function (reply) {
+        const onError = fornick(function (reply) {
             unregister();
             deferred.resolve(false);
         });
 
-        var handlers = {
+        const handlers = {
             "RPL_WHOISREGNICK": onRegNick,
             "RPL_WHOISLOGGEDIN": onLoggedIn,
             "RPL_ENDOFWHOIS": onWhoisEnd,

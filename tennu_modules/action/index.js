@@ -2,7 +2,7 @@
  * The OutputSocket is a facade for the IrcSocket's `raw` method.
  *
  * This could really be in tennu_modules, except that it is integrated
- * into the client. It will be soon enough. First though, upgrade the modules.
+ * into the client.
  * 
  * It supports the following methods:
  *
@@ -24,77 +24,89 @@ var inspect = require('util').inspect;
 var format = require('util').format;
 var Q = require('q');
 
+function unary (fn) {
+    return function (arg) {
+        return fn(arg);
+    };
+}
+
+function autoliftEach (fn, arg) {
+    Array.isArray(arg) ? arg.forEach(unary(fn)) : fn(arg);
+}
+
+function autoliftEachSecondArg (fn) {
+    return function (first, second) {
+        return autoliftEach(fn.bind(null, first);
+    };
+}
+
 var partition = function (array, length) {
-    var partitions = [];
+    const partitions = [];
     for (var i = 0, len = array.length; i < len; i += length) {
         partitions.push(array.slice(i, i + length));
     }
     return partitions;
 };
 
-var OutputSocket = function (socket, messageHandler, nickname, logger) {
-    var raw = function (line) {
+var ActionModule = function (client) {
+    var socket = client._socket;
+
+    function raw (line) {
         if (Array.isArray(line)) { line = line.join(" "); }
         logger.info("->: " + String(line));
         socket.raw(line);
-    };
+    }
 
-    var rawf = function () {
+    function rawf () {
         raw(format.apply(null, arguments));
+    }
+
+    function say (target, message) {
+        rawf("PRIVMSG %s :%s", target, message);
+    }
+
+    function ctcp (target, type, message) {
+        say(target, format('\u0001%s %s\u0001', type, message));
+    }
+
+    function act (target, action) {
+        ctcp(target, "ACTION", action);
+    }
+
+    const join = require('./join.js')(client, action_module);
+    const part = require('./part.js')(client, action_module);
+    const quit = require('./quit.js')(client, action_module);
+    const nick = require('./nick.js')(client, action_module);
+    const mode = require('./mode.js')(client, action_module);
+    const userhost = require('./userhost.js')(client, action_module);
+    const whois = require('./whois.js')(client, action_module);
+
+    var action_module = {
+        dependencies: ['server'],
+        exports: {
+            raw: raw,
+            rawf: rawf,
+            say: autoliftEachSecondArg(say),
+            ctcp: autoliftEachSecondArg(say),
+            act: autoliftEachSecondArg(act),
+            join: join,
+            part: part,
+            nick: nick,
+            quit: quit,
+            mode: mode,
+            userhost: userhost,
+            whois: whois
+        }
     };
+};
+
+module.exports = action_module;
+
+/*
+var OutputSocket = function (socket, messageHandler, nickname, logger) {
+
 
     return {
-        say : function recur (location, message) {
-            if (Array.isArray(message)) {
-                message.forEach(function (msg) {
-                    recur.call(this, location, msg);
-                });
-
-                return;
-            }
-            rawf("PRIVMSG %s :%s", location, message);
-        },
-
-        ctcp : function recur (location, type, message) {
-            if (util.isArray(message)) {
-                message.forEach(function (msg) {
-                    recur.call(this, location, type, msg);
-                });
-
-                return;
-            }
-            this.say(location, format('\u0001%s %s\u0001', type, message));
-        },
-
-        act: function (location, message) {
-            this.ctcp(location, "ACTION", message);
-        },
-
-        join : function (channel) {
-            var deferred = Q.defer();
-
-            var unsubscribe = function () {
-                logger.debug("Join response or timeout occured.");
-                messageHandler.off('join', onJoin);
-            };
-
-            var onJoin = function (join) {
-                if (join.nickname !== nickname() || join.channel !== channel) {
-                    return;
-                }
-
-                unsubscribe();
-                logger.debug("Resolving with join message.");
-                deferred.resolve(join);
-            };
-
-            messageHandler.on('join', onJoin);
-
-            rawf("JOIN :%s", channel);
-
-            return undefined; // WIP Code.
-            return deferred.promise;
-        },
 
         part : function (channel, reason) {
             raw("PART " + channel + (reason ? " :" + reason : ""));
@@ -151,12 +163,8 @@ var OutputSocket = function (socket, messageHandler, nickname, logger) {
             } else {
                 throw new Error("Whois command takes either a string (a single nick) or an array (of string nicks)");
             }
-        },
-
-        raw : raw,
-        rawf : rawf,
-        toString : function () { return "[Object IrcOutputSocket]"; }
+        }
     };
 };
 
-module.exports = OutputSocket;
+*/

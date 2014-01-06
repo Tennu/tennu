@@ -1,105 +1,123 @@
-/**
- *
- * Help Module
- * !help <phase>
- * 
- */
+const HELP_NOT_FOUND = 'Help file for selected topic does not exist.';
 
-// Lookup algorithm:
-// 1. If no phrase, respond with the help module's help message.
-// 2. If phase is one word,
-//   1. If the phrase is the same as a loaded module, and the loaded module's
-//      help is simple, or an object with a "*", respond with that.
-//   2. If a module's help is an object that has the phase as a key, respond with that.
-// 3. If the phase is multiple words,
-//   1. Map [firstword] to the module's help objects.
-//   2. Filter out undefined values.
-//   3. Repeat with the next work, until at the final word.
-//   4. Do step 2 of the lookup using the values that are left.
-
-// We are currently querying every module and grabbing their help property with every query.
-// While this is theoretically bad performance, caching it would mean modules loaded after
-// the help command is called will fail to show up.
-// There are architectual changes that can be made to allow for this to work, but there
-// are more pressing features to work on at this time.
-
-var HELP_NOT_FOUND = "Help file for selected topic does not exist.";
-
-var isArray = require('util').isArray;
-var lodash = require('lodash');
-var map = lodash.map;
-var values = lodash.values;
-
-var getModuleHelps = function (modules) {
-    var exports = modules.loaded();
-
-    return values(map(exports, function (mod, modname) {
-        if (!mod.help) { return {}; }
-
-        if (typeof mod.help === "string" || isArray(mod.help)) {
-            var help = {};
-            help[modname] = {"*": mod.help};
-            return help;
-        }
-
-        return mod.help;
-    }));
-};
-
-var makeResponseList = function (helps) {
-    var response = [];
-
-    helps.forEach(function (help) {
-        if (typeof help === "string") {
-            response.push(help);
-        } else if (isArray(help)) {
-            response = response.concat(help);
-        } else if (help['*']) {
-            response.push(help['*']);
-        }
-    });
-
-    return response.length === 0 ? HELP_NOT_FOUND : response;
-};
-
-var getHelp = function (tennu, query) {
-    var helps = getModuleHelps(tennu.modules);
-
-    query.forEach(function (topic) {
-        helps = helps.map(function (help) {
-            return help[topic];
-        }).filter(function (help) { return help !== undefined; });
-    });
-
-    var response = makeResponseList(helps);
-    if (response.length === 0) { response = HELP_NOT_FOUND; }
-    return response;
-};
-
-var showHelp = function (tennu, sender, query) {
-    var toSay = getHelp(tennu, query);
-    tennu.say(sender, toSay);
-};
+const isArray = require('util').isArray;
+const format = require('util').format;
+const Set = require('simplesets').Set;
 
 module.exports = function (tennu) {
+    const registry = {};
+    const commandset = new Set();
+
+    function helpResponse (query) {
+        const cursor = query.reduce(function (cursor, topic) {
+            if (typeof cursor !== 'object') {
+                return undefined;
+            }
+
+            if (cursor.hasOwnProperty(topic)) {
+                return cursor[topic];
+            } else {
+                return undefined;
+            }
+        }, registry);
+
+        if (cursor === undefined) {
+            return HELP_NOT_FOUND;
+        }
+
+        if (typeof cursor === 'string' || Array.isArray(cursor)) {
+            return cursor;
+        }
+
+        if (typeof cursor['*'] === 'string' || Array.isArray(cursor['*'])) {
+            return cursor['*'];
+        }
+
+        return HELP_NOT_FOUND;
+    }
+
     return {
         handlers: {
-            "!help": function (command) {
+            '!help': function (command) {
                 // Default to showing the help for the help module if no args given.
-                var query = command.params.length === 0 ? ['help'] : command.params.slice();
+                const query = command.params.length === 0 ? ['help'] : command.params.slice();
 
-                showHelp(tennu, command.sender, query)
+                return helpResponse(query)
+            },
+
+            '!commands': function (command) {
+                const start = ["List of known commands: "];
+                return start.concat(commandset.array().map(function (command) {
+                    return format(" * %s", command);
+                }));
             }
         },
 
         exports: {
-            help: [
-                "Use !help <topic> to get more assistance on a topic.",
-                "Some topics may have subtopics to get assistance on."
-            ],
-
             getHelp: getHelp,
             HELP_NOT_FOUND: HELP_NOT_FOUND
-        }
+        },
+
+        hooks: {
+            help: function (module, help) {
+                if (typeof help === 'string') {
+                    registry[module] = {'*': [help]}
+                    return;
+                }
+
+                if (Array.isArray(help)) {
+                    registry[module] = {'*': help}
+                    return;
+                }
+
+                if (typeof help === 'object') {
+                    Object.keys(help).forEach(function (key) {
+                        if (key === '*') {
+                            registry[module] = help['*'];
+                        }
+
+                        registry[key] = help[key];
+                    });
+                    return;
+                }
+
+                throw new TypeError(format('Help property for module %s is invalid.', module));
+            },
+
+            commands: function (module, commands) {
+                if (!Array.isArray(commands)) {
+                    throw new TypeError(format('Commands property for module %s is invalid.', module));
+                }
+
+                commands.forEach(function (command) {
+                    if (typeof command !== 'string') {
+                        throw new TypeError(format('Commands property for module %s is invalid.', module));
+                    }
+
+                    comandset.add(command);
+                });
+            }
+        },
+
+        help: {
+            help: [
+                '!help <query>',
+                '',
+                'Display the help message for the topic located at the given query.',
+                'Query can be made of multiple subtopics',
+                'Without a query, shows this help message.',
+                '',
+                'Ex: !help commands',
+                'Ex: !help uno start'
+            ],
+
+            commands: [
+                '!commands',
+                '',
+                'Show the list of commands.'
+            ]
+        },
+
+        commands: ['help', 'commands']
     };
 };
