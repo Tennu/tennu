@@ -4,13 +4,13 @@ const equal = require('deep-eql');
 const inspect = require('util').inspect;
 const format = require('util').format;
 
-const CommandHandler = require('../lib/command-handler.js');
-const Message = require('../lib/message.js');
-const Q = require('q');
-
 const debug = false;
 const logfn = debug ? console.log.bind(console) : function () {};
 const logger = {debug: logfn, info: logfn, notice: logfn, warn: logfn, error: logfn};
+
+const CommandHandler = require('../lib/command-handler.js');
+const Message = require('../lib/message.js');
+const Q = require('q');
 
 const config = {
     trigger: '!'

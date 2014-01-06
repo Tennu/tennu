@@ -37,7 +37,7 @@
     "event-driven"
   ],
   "dependencies": {
-    "simplesets": "0.1.x",
+    "simplesets": "1.2.x",
     "lodash": "2.4.x",
     "irc-socket": "~1.2.x",
     "irc-message": "1.0.x",
@@ -51,7 +51,7 @@
     "better-assert": "~1.0.0"
   },
   "scripts": {
-    "test": "jasmine-node ./spec && mocha -R spec"
+    "test": "mocha -R spec"
   },
   "bin": {
     "tennu": "bin/cli.js"

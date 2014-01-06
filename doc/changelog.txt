@@ -143,3 +143,4 @@ Changelog
     * Response can now be a promise of the other types (string, [string])
     * Client.nickname is an instance of NicknameTracker (and still callable).
     * Tennu Modules 2.0.0 Integration.
+    ** This was supposed to be for 0.9.0, but meh.

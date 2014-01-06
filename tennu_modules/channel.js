@@ -90,6 +90,8 @@ module.exports = {
 
 */
 
-module.exports = function (tennu) {
-    return {};
+module.exports = {
+    init: function (tennu) {
+        return {};
+    }
 };

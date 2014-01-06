@@ -4,33 +4,40 @@ var equal = require('deep-eql');
 var inspect = require('util').inspect;
 var format = require('util').format;
 
-var user_module = require('../tennu_modules/user.js');
+const debug = false;
+const logfn = debug ? console.log.bind(console) : function () {};
+
+var UserModule = require('../tennu_modules/user.js');
 
 describe("User Module:", function () {
-    var user;
-    var tennu
+    var instance, client;
 
     beforeEach(function () {
-        tennu = {
-            debug: false ? console.log.bind(console) : function () {},
-            error: false ? console.log.bind(console) : function () {}
+        client = {
+            debug: logfn,
+            error: logfn
         };
-        user = user_module(tennu);
+
+        instance = UserModule.init(client, {});
     });
 
     describe("Utility Methods:", function () {
+        beforeEach(function () {
+            logfn(/* newline */);
+        });
+
         describe("isIdentifiedAs", function () {
             var isIdentifiedAs, clock;
             var off_spy, handlers;
 
             beforeEach(function () {
-                isIdentifiedAs = user.exports.isIdentifiedAs;
+                isIdentifiedAs = instance.exports.isIdentifiedAs;
                 clock = sinon.useFakeTimers();
 
-                tennu.off = off_spy = sinon.spy();
+                client.off = off_spy = sinon.spy();
 
                 var onRegNick, onLoggedIn, onWhoisEnd, onError;
-                tennu.on = function (_handlers) {
+                client.on = function (_handlers) {
                     handlers = _handlers;
 
                     onRegNick = handlers["RPL_WHOISREGNICK"];
@@ -40,7 +47,7 @@ describe("User Module:", function () {
                     off_spy.withArgs(handlers);
                 };
 
-                tennu.whois = function (nickname) {
+                client.whois = function (nickname) {
                     var message = {nickname: nickname};
 
                     switch (nickname) {
@@ -87,11 +94,11 @@ describe("User Module:", function () {
             });
 
             it("exists", function () {
-                assert(typeof user.exports.isIdentifiedAs === 'function');
+                assert(typeof instance.exports.isIdentifiedAs === 'function');
             });
 
             it("returns false for nonexistent nicks", function (done) {
-                user.exports.isIdentifiedAs('nonexistent', 'identified')
+                instance.exports.isIdentifiedAs('nonexistent', 'identified')
                 .then(function fulfilled (isIdentifiedAs) {
                     assert(isIdentifiedAs === false);
                     assert(off_spy.withArgs(handlers).calledOnce);
@@ -133,6 +140,7 @@ describe("User Module:", function () {
             it("returns true for identified nicks-307", function (done) {
                 isIdentifiedAs('identified-307', 'identified-307')
                 .then(function fulfilled (isIdentifiedAs) {
+                    logfn(isIdentifiedAs);
                     assert(isIdentifiedAs === true);
                     assert(off_spy.withArgs(handlers).calledOnce);
                 })

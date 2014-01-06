@@ -5,18 +5,23 @@ Things not in this list are not considered critical for 1.0.0.
 TODO
 
 * Startup Object
-* Nickname tracking object
 * Respond functionality
   * String (implemented)
-  * Promise
+  * Promise (implemented)
+  * Object
+    * query: boolean?
+    * intent: message | action
+    * target
+    * message
 * Default Modules
   * Help (implemented)
   * Server
   * Channel
   * User
+  * Actions (OutputSocket methods )
+    * Promises for known commands.
 * Module Reloading (if possible)
-* Callbacks for known commands.
-* Callback for .connect().
+* Promise for .connect().
 
 FINISHED
 
@@ -27,3 +32,4 @@ FINISHED
 * OutputSocket basic functionality
 * Logging
 * Command Line Tool
+* Nickname tracking object

@@ -40,6 +40,8 @@ module.exports = function (nrc) {
 
 */
 
-module.exports = function (tennu) {
-    return {};
+module.exports = {
+    init: function (tennu) {
+        return {};
+    }
 };
