@@ -41,7 +41,7 @@
     "lodash": "2.4.x",
     "irc-socket": "~1.2.x",
     "irc-message": "1.0.x",
-    "tennu-modules": "2.0.x",
+    "tennu-modules": "2.1.x",
     "commander": "~2.1.0",
     "q": "~0.9.7"
   },
