@@ -389,14 +389,14 @@ Documentation for these objects in isolation is currently unavailable.
 
 ## Testing ##
 
-Tests currently require both jasmine-node and mocha be installed globally, along
-with the devDependencies.
+Tests require mocha to be installed globally.
 
 Afterwards, `npm test` in the directory.
 
-Don't like having both as dependencies? Help move jasmine tests to mocha.
+Between all projects (tennu, tennu-modules, irc-socket), there are over 100 test cases.
 
 ## See Also ##
 
+* [Tennu's Website](https://tennu.github.io/)
 * [IRC Specifications and other helpful tables](https://www.alien.net.au/irc/)
 * [IRC Wiki](http://www.irc-wiki.org/)
