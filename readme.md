@@ -168,9 +168,11 @@ For example, a command of "!do-it ARG1 ARG2" will have args be ["ARG1", "ARG2"] 
 
 ## Actions ##
 
-All of the following are methods on Tennu for doing things once connected.
+All of the following are methods on Tennu that can be used once connected.
 
 These methods are also available on the client's 'out' property.
+In Tennu 0.9.0, the 'out' property will go away, and the 'actions' module
+will export these methods.
 
 ### say(channel, message) ###
 
@@ -244,18 +246,19 @@ users is either a string or an array of strings.
 
 Retrieves the userhost of the user(s).
 
-### _raw(message) ###
+### raw(message) ###
 
-Our IrcOutputSocket class does not have all commands. If you need to use one
-that is not listed here, you can use the internal _raw method, which takes
-the entire message as is as a string, use your own IrcOutputSocket class, or
-send in a patch.
+For actions that are lacking a command, you can use raw to perform them.
+You must either pass an array of arguments (and the multiword argument must
+be in a single index without the colon) or pass the full string.
 
-### _rawf(format, args...) ###
+If you find yourself using raw(), please file an issue.
+
+### rawf(format, args...) ###
 
 [0.7.1]
 
-As _raw(message), but the arguments are passed through util.format() first.
+As raw(message), but the arguments are passed through util.format() first.
 
 --------
 
@@ -268,9 +271,11 @@ You may access the module system's methods via the Client.modules property
 or by using one of the following methods:
 
 * client.require()
-* client.exports() [an alias of client.require()]
-* client.load()
-* client.loaded()
+* client.getModule()
+* client.getRole()
+* client.use()
+* client.initialize()
+* client.isInitializable()
 
 ### Creating Your Own Modules ###
 

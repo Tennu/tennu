@@ -138,6 +138,7 @@ describe('Command Handler', function () {
             const after = handler.getAfter;
 
             handler.after(function () {
+                logfn("After function called.");
                 after.apply(handler, arguments);
                 setImmediate(function () {
                     assert(!receiver.say.called);

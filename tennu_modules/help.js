@@ -2,6 +2,7 @@ const HELP_NOT_FOUND = 'Help file for selected topic does not exist.';
 
 const isArray = require('util').isArray;
 const format = require('util').format;
+const inspect = require('util').inspect;
 const Set = require('simplesets').Set;
 
 module.exports = {
@@ -40,13 +41,16 @@ module.exports = {
         return {
             handlers: {
                 '!help': function (command) {
+                    client.notice('ModHelp', '!help being handled.');
                     // Default to showing the help for the help module if no args given.
-                    const query = command.params.length === 0 ? ['help'] : command.params.slice();
-
-                    return helpResponse(query)
+                    const query = command.args.length === 0 ? ['help'] : command.args.slice();
+                    const response = helpResponse(query);
+                    return response;
                 },
 
                 '!commands': function (command) {
+                    client.notice('ModHelp', '!commands being handled.');
+
                     const start = ["List of known commands: "];
                     return start.concat(commandset.array().map(function (command) {
                         return format(" * %s", command);
@@ -104,7 +108,7 @@ module.exports = {
             help: {
                 help: [
                     '!help <query>',
-                    '',
+                    ' ',
                     'Display the help message for the topic located at the given query.',
                     'Query can be made of multiple subtopics',
                     'Without a query, shows this help message.',
@@ -115,7 +119,7 @@ module.exports = {
 
                 commands: [
                     '!commands',
-                    '',
+                    ' ',
                     'Show the list of commands.'
                 ]
             },

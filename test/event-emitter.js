@@ -7,7 +7,7 @@ const format = require('util').format;
 const debug = false;
 const logfn = debug ? console.log.bind(console) : function () {};
 
-var EventEmiter = require('../lib/event-emitter.js');
+const EventEmiter = require('../lib/event-emitter.js');
 
 describe('After Event Emitter', function () {
     var EE;
@@ -44,6 +44,17 @@ describe('After Event Emitter', function () {
                 done();
             });
             EE.emit('x', true, false);
+        });
+
+        it('passes the error to err if an error is thrown', function (done) {
+            const error = new Error();
+            EE.on('x', function () {throw error});
+            EE.after(function (err, res, emitted) {
+                assert(err === error);
+                assert(res === undefined);
+                done();
+            });
+            EE.emit('x');
         });
     });
 });
