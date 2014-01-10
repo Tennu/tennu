@@ -18,9 +18,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/Havvy/tennu.git"
+    "url": "git://github.com/Tennu/tennu.git"
   },
-  "main": "lib",
+  "homepage": "https://tennu.github.io/",
+  "main": "lib/index.js",
   "directories": [
     "lib",
     "config"
@@ -55,5 +56,6 @@
   },
   "bin": {
     "tennu": "bin/cli.js"
-  }
+  },
+  "license": "ISC"
 }
