@@ -143,4 +143,15 @@ Changelog
     * Response can now be a promise of the other types (string, [string])
     * Client.nickname is an instance of NicknameTracker (and still callable).
     * Tennu Modules 2.0.0 Integration.
-    ** This was supposed to be for 0.9.0, but meh.
+    ** This was supposed to be for 0.9.0, but was needed first.
+    ** Modules are now objects that have the following properties:
+    *** init: function (client, imports) => instance
+    *** requires: [string]          OPTIONAL, names of modules
+    *** requiresRoles: [string]     OPTIONAL, names of roles
+    *** role: string                OPTIONAL
+    *** name: string                Will be added for you unless you use client.initialize() directly.
+
+0.8.1:
+    * client.ctcp() and client.act() fixed.
+    * client.initialize() renamed to client.initializeModule()
+    * client.isInitializable() renamed to client.isModuleInitializable()
