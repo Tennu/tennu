@@ -9,7 +9,7 @@ const logfn = debug ? console.log.bind(console) : function () {};
 const logger = {debug: logfn, info: logfn, notice: logfn, warn: logfn, error: logfn};
 
 const Client = require('../lib/client.js');
-const NetSocket = require('./mock-net-socket.js');
+const NetSocket = require('../test-lib/mock-net-socket.js');
 
 const network = {
     nick: 'testbot',
@@ -60,10 +60,10 @@ const boxfn = function (value) {
     return function () { return value; };
 };
 
-describe('Tennu Client', function () {
+describe 'Tennu Client' {
     var netsocket, tennu;
 
-    beforeEach(function () {
+    beforeEach {
         logfn(/* newline */);
 
         fakeWrite.spy = sinon.spy();
@@ -75,83 +75,66 @@ describe('Tennu Client', function () {
             NetSocket: boxfn(netsocket),
             Logger: boxfn(logger)
         });
-    });
+    }
 
-    afterEach(function () {
+    afterEach {
         logfn('End of test.');
-    });
+    }
 
-    it('Basic Connecting and Disconnecting', function () {
+    it 'Basic Connecting and Disconnecting' {
         assert(tennu.connected === false);
         tennu.connect();
         assert(tennu.connected === true);
         tennu.disconnect();
         assert(tennu.connected === false);
-    });
+    }
 
     // Move this to its own file.
-    describe('Nickname Tracking', function () {
-        beforeEach(function (done) {
-            netsocket.on('connect', function () {
-                done();
-            });
-
+    describe 'Nickname Tracking' {
+        beforeEach (done) {
+            netsocket.on('connect', done);
             tennu.connect();
-        });
+        }
 
-        afterEach(function (done) {
-            netsocket.on('close', function () {
-                done();
-            });
-
+        afterEach (done) {
+            netsocket.on('close', done);
             tennu.disconnect();
-        });
+        }
 
-        it('tracks its initial nickname', function () {
+        it 'tracks its initial nickname' {
             assert(tennu.nickname() === 'testbot');
-        });
+        }
 
-        it('test', function () {});
-
-        describe('changing nick', function () {
-            beforeEach(function (done) {
-                tennu.on('nick', function () {
-                    done();
-                });
-
+        describe 'changing nick' {
+            beforeEach (done) {
+                tennu.on('nick', function () { done() });
                 tennu.nick('newNick');
-            });
+            }
 
-            it('tracks its changed nick', function () {
+            it 'tracks its changed nick' {
                 assert(tennu.nickname() === 'newNick');
-            });
-        });
-    });
+            }
+        }
+    }
 
-    describe('autojoin', function () {
-        beforeEach(function (done) {
-            tennu.on('join', function () {
-                done();
-            });
-
+    describe 'autojoin' {
+        beforeEach (done) {
+            tennu.on('join', function () { done() });
             tennu.connect();
-        });
+        }
 
-        afterEach(function (done) {
-            netsocket.on('close', function () {
-                done();
-            });
-
+        afterEach (done) {
+            netsocket.on('close', done);
             tennu.disconnect();
-        });
+        }
 
-        it('automatically joins specified channels.', function () {
+        it 'automatically joins specified channels.' {
             assert(fakeWrite.spy.calledWith('JOIN :#test\r\n', 'utf-8'));
-        });
-    });
+        }
+    }
 
-    describe('autoidentify', function () {
-        beforeEach(function (done) {
+    describe 'autoidentify' {
+        beforeEach (done) {
             tennu.on('notice', function(e) {
                 if (e.nickname === 'nickserv') {
                     done();
@@ -159,18 +142,15 @@ describe('Tennu Client', function () {
             });
 
             tennu.connect();
-        });
+        }
 
-        afterEach(function (done) {
-            netsocket.on('close', function () {
-                done();
-            });
-
+        afterEach (done) {
+            netsocket.on('close', done);
             tennu.disconnect();
-        });
+        }
 
-        it('automatically identifies to services.', function () {
+        it 'automatically identifies to services.' {
             assert(fakeWrite.spy.calledWith('PRIVMSG nickserv :identify testpass\r\n', 'utf-8'));
-        });
-    });
-});
+        }
+    }
+}

@@ -10,5 +10,6 @@
     "realname": "tennu 0.8.0",
     "trigger": "!",
     "capab": false,
-    "secure": false
+    "secure": false,
+    "disable-help": false
 }

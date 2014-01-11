@@ -293,6 +293,10 @@ Sets the command `!help`.
 
 See [Help Module Documentation](https://github.com/Havvy/tennu/blob/master/doc/module/help.md).
 
+[0.8.2+]
+
+If you don't want this functionality, set `disable-help` to `true` in your configuration object.
+
 #### channels ####
 
 Unimplemented.

@@ -10,40 +10,40 @@ const logfn = debug ? console.log.bind(console) : function () {};
 const BiSubscriber = require('../lib/bisubscriber');
 const EventEmitter = require('events').EventEmitter;
 
-describe('BiSubscribers', function () {
-    beforeEach(function () {
+describe 'BiSubscribers' {
+    beforeEach {
         logfn(/* newline */);
-    });
+    }
 
-    describe('subscribe events to two event emitters', function () {
+    describe 'subscribe events to two event emitters' {
         var subscriber, primary, secondary, primarySpy, secondarySpy;
 
-        beforeEach(function () {
+        beforeEach {
             primary = new EventEmitter();
             secondary = new EventEmitter();
             subscriber = new BiSubscriber(primary, secondary);
 
             primarySpy = sinon.spy();
             secondarySpy = sinon.spy();
-        });
+        }
 
-        it('treats most events as primary events', function () {
+        it 'treats most events as primary events' {
             subscriber.on('event', primarySpy);
             primary.emit('event');
 
             assert(primarySpy.called);
             assert(!secondarySpy.called);
-        });
+        }
 
-        it('treats events starting with "!" to be secondary', function () {
-                subscriber.on('!event', secondarySpy);
-                secondary.emit('event');
+        it 'treats events starting with "!" to be secondary' {
+            subscriber.on('!event', secondarySpy);
+            secondary.emit('event');
 
             assert(!primarySpy.called);
             assert(secondarySpy.called);
-        });
+        }
 
-        it('can subscribe multiple events', function () {
+        it 'can subscribe multiple events' {
             var primaryDataSpy, secondaryDataSpy;
 
             primaryDataSpy = sinon.spy();
@@ -65,13 +65,13 @@ describe('BiSubscribers', function () {
 
             assert(!primaryDataSpy.called);
             assert(secondaryDataSpy.called);
-        });
-    });
+        }
+    }
 
-    describe('quantification (on vs. once)', function () {
+    describe 'quantification (on vs. once)' {
         var subscriber, primary, secondary, spy, eventCount, isDone;
 
-        beforeEach(function () {
+        beforeEach {
             primary = new EventEmitter();
             secondary = new EventEmitter();
             subscriber = new BiSubscriber(primary, secondary, null);
@@ -81,42 +81,42 @@ describe('BiSubscribers', function () {
             subscriber.on('event !event', function () {
                 eventCount += 1;
             });
-        });
+        }
 
-        it('handles once one time (primary)', function () {
+        it 'handles once one time (primary)' {
             subscriber.once('event', spy);
 
             primary.emit('event');
             primary.emit('event');
 
             assert(spy.calledOnce);
-        });
+        }
 
-        it('handles once one time (secondary)', function () {
+        it 'handles once one time (secondary)' {
             subscriber.once('!event', spy);
 
             secondary.emit('event');
             secondary.emit('event');
 
             assert(spy.calledOnce);
-        });
+        }
 
-        it('handles on multiple times', function () {
+        it 'handles on multiple times' {
             subscriber.on('event', spy);
 
             primary.emit('event');
             primary.emit('event');
 
             assert(spy.calledTwice);
-        });
+        }
 
-        it('handles once one time', function () {
+        it 'handles once one time' {
             subscriber.on('!event', spy);
 
             secondary.emit('event');
             secondary.emit('event');
 
             assert(spy.calledTwice);
-        });
-    });
-});
+        }
+    }
+}

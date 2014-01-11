@@ -16,68 +16,56 @@ var nicknamefn = function () { return nickname; };
 var OutputSocket = require('../lib/output-socket.js');
 var EventEmitter = require('../lib/event-emitter.js');
 
-describe('IRC Output Socket:', function () {
+describe 'IRC Output Socket:' {
     var socket, out, messageHandler;
 
-    beforeEach(function () {
+    beforeEach {
         logfn(/* newline */);
         messageHandler = new EventEmitter();
         socket = { raw: sinon.spy() };
         out = new OutputSocket(socket, messageHandler, nicknamefn, logger);
-    });
+    }
 
-    describe('Join:', function () {
-        it('Sends the command.', function () {
+    describe 'Join:' {
+        it 'Sends the command.' {
             out.join(channel);
             assert(socket.raw.calledWithExactly(format("JOIN :%s", channel)));
-        });
+        }
 
-        it('On Success', function (done) {
+        it 'On Success', function (done) {
             var joinmsg = {nickname: nickname, channel: channel};
 
             socket.raw = function () {
-                messageHandler.emit('join', joinmsg);
+                messageHandler.emit 'join', joinmsg);
             };
-
-            /*
-            out.join(channel)
-            .then(function (join) {
-                try {
-                    assert(equal(join, joinmsg));
-                    done();
-                } catch (e) {
-                    done(e);
-                }
-            });
-            */
 
             assert(out.join(channel) === undefined);
             done();
-        });
-    });
+        }
+    }
 
-    it('can send private messages', function () {
+    it 'can send private messages' {
         out.say('#test', 'Hi');
         assert(socket.raw.calledWithExactly("PRIVMSG #test :Hi"));
-    });
+    }
 
-    it('can part without a reason', function () {
+    it 'can part without a reason' {
         out.part('#test');
         assert(socket.raw.calledWithExactly("PART #test"));
-    });
+    }
 
-    it('can part with a reason', function () {
+    it 'can part with a reason' {
         out.part('#test', 'the reason');
         assert(socket.raw.calledWithExactly("PART #test :the reason"));
-    });
+    }
 
-    it('can quit without a reason', function () {
-        out.quit();
+    it 'can quit without a reason' {
+        out.quit );
         assert(socket.raw.calledWithExactly("QUIT"));
-    });
+    }
 
-    it('can quit with a reason', function () {
-        out.quit('the reason');
+    it 'can quit with a reason' {
+        out.quit 'the reason');
         assert(socket.raw.calledWithExactly("QUIT :the reason"));
-    });
-});
+    }
+}

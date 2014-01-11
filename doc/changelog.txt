@@ -155,3 +155,13 @@ Changelog
     * client.ctcp() and client.act() fixed.
     * client.initialize() renamed to client.initializeModule()
     * client.isInitializable() renamed to client.isModuleInitializable()
+
+0.8.2:
+    * config['disable-help'] set to true will disable the help module.
+    * Response can now be an object with the following fields:
+      * message (string)        Required, message(s) to say.
+      * intent ('say' | 'act')  Defaults to 'say'.
+      * query (boolean)         Defaults to false. If true, responds in query.
+    * Added fez and sweet.js into the developer dependencies.
+      * Note that fez doesn't do anything yet. I (havvy) need to write fez-sweet.js first.
+      * Tests are now using sweet-bdd (also by havvy), but I haven't compiled them yet.

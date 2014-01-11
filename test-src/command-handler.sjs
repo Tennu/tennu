@@ -47,98 +47,98 @@ const messages = {
     args_oddspacing:          privmsg(format('%s  %s   %s  ', commandname, arg1, arg2)),
 };
 
-describe('Command Handler', function () {
+describe 'Command Handler' {
     var handler;
 
-    beforeEach(function () {
+    beforeEach {
         handler = CommandHandler(config, nicknamefn, logger);
-    });
+    }
 
-    describe('command detection:', function () {
-        it('ignores non-commands by returning undefined', function () {
+    describe 'command detection:' {
+        it 'ignores non-commands by returning undefined' {
             const message = Message(messages.noncommand);
             assert(handler.parse(message) === undefined);
-        });
+        }
 
-        describe('Recognition Types:', function () {
-            it('Trigger', function () {
+        describe 'Recognition Types:' {
+            it 'Trigger' {
                 const command = handler.parse(Message(messages.detect.trigger));
 
                 assert(command.command === commandname);
                 assert(equal(command.args, []));
-            });
+            }
 
-            it('Highlights', function () {
+            it 'Highlights' {
                 const command = handler.parse(Message(messages.detect.highlight));
 
                 assert(command.command === commandname);
                 assert(equal(command.args, []));
-            });
+            }
 
-            it('Query', function () {
+            it 'Query' {
                 const command = handler.parse(Message(messages.detect.query));
 
                 assert(command.command === commandname);
                 assert(equal(command.args, []));
-            });
+            }
 
-            it('Query with trigger', function () {
+            it 'Query with trigger' {
                 const command = handler.parse(Message(messages.detect.query_with_trigger));
 
                 assert(command.command === commandname);
                 assert(equal(command.args, []));
-            });
-        });
+            }
+        }
 
-        it('"args" property an array of the words of the message', function () {
+        it '"args" property an array of the words of the message' {
             const command = handler.parse(Message(messages.args));
 
             assert(command.command === commandname);
             assert(equal(command.args, [arg1, arg2]));
-        });
+        }
 
-        describe('Odd Spacing:', function () {
-            it('Highlight', function () {
+        describe 'Odd Spacing:' {
+            it 'Highlight' {
                 const command = handler.parse(Message(messages.detect.highlight_oddspacing));
 
                 assert(command.command === commandname);
                 assert(equal(command.args, []));
-            });
+            }
 
-            it('Args', function () {
+            it 'Args' {
                 const command = handler.parse(Message(messages.args_oddspacing));
 
                 assert(command.command === commandname);
                 assert(equal(command.args, [arg1, arg2]));
-            })
-        });
+            }
+        }
 
-        describe('events are emitted', function () {
-            it('of the command name', function (done) {
+        describe 'events are emitted' {
+            it 'of the command name' (done) {
                 handler.on(commandname, function (command) {
                     assert(command.command === commandname);
                     done();
                 });
 
                 handler.parse(Message(messages.command));
-            });
-        });
-    });
+            }
+        }
+    }
 
-    describe("Response handling", function () {
+    describe 'Response handling' {
         var receiver;
 
-        beforeEach(function () {
+        beforeEach {
             receiver = {
                 say: sinon.spy()
             };
-        });
+        }
 
-        it("no response", function (done) {
+        it 'no response' (done) {
             const after = handler.getAfter;
 
             handler.after(function () {
-                logfn("After function called.");
+                logfn('After function called.');
                 after.apply(handler, arguments);
                 setImmediate(function () {
                     assert(!receiver.say.called);
@@ -151,9 +151,9 @@ describe('Command Handler', function () {
             });
 
             handler.parse(Message(messages.command));
-        });
+        }
 
-        it("string response", function (done) {
+        it 'string response' (done) {
             receiver.say = function (_sender, response) {
                 try {
                     assert(sender === _sender);
@@ -170,9 +170,9 @@ describe('Command Handler', function () {
             });
 
             handler.parse(Message(messages.command, receiver));
-        });
+        }
 
-        it("[string] response", function (done) {
+        it '[string] response' (done) {
             receiver.say = function (_sender, response) {
                 try {
                     assert(sender === _sender);
@@ -189,9 +189,9 @@ describe('Command Handler', function () {
             });
 
             handler.parse(Message(messages.command, receiver));
-        });
+        }
 
-        it("Promise<string> response", function (done) {
+        it 'Promise<string> response' (done) {
             receiver.say = function (_sender, response) {
                 try {
                     assert(sender === _sender);
@@ -208,9 +208,9 @@ describe('Command Handler', function () {
             });
 
             handler.parse(Message(messages.command, receiver));
-        });
+        }
 
-        it("Promise<[string]> response", function (done) {
+        it 'Promise<[string]> response' (done) {
             receiver.say = function (_sender, response) {
                 try {
                     assert(sender === _sender);
@@ -227,6 +227,6 @@ describe('Command Handler', function () {
             });
 
             handler.parse(Message(messages.command, receiver));
-        });
-    });
-});
+        }
+    }
+}

@@ -9,15 +9,15 @@ const logfn = debug ? console.log.bind(console) : function () {};
 
 const EventEmiter = require('../lib/event-emitter.js');
 
-describe('After Event Emitter', function () {
+describe 'After Event Emitter' {
     var EE;
 
-    beforeEach(function () {
+    beforeEach {
         logfn(/* newline */);
         EE = EventEmiter();
-    });
+    }
 
-    it('works as an event emitter.', function (done) {
+    it 'works as an event emitter.' (done) {
         EE.on('x', function (arg1, arg2) { 
             assert(arg1 === true);
             assert(arg2 === false);
@@ -25,15 +25,15 @@ describe('After Event Emitter', function () {
         });
 
         EE.emit('x', true, false);
-    });
+    }
 
-    it('does not throw on non-existent events.', function (done) {
+    it 'does not throw on non-existent events.' (done) {
         EE.emit('y');
         done();
-    });
+    }
 
-    describe('#after', function () {
-        it('takes a function, which it calls after the listener returns.', function (done) {
+    describe '#after' {
+        it 'takes a function, which it calls after the listener returns.' (done) {
             EE.on('x', function () {return true;});
             EE.after(function (err, res, emitted, arg1, arg2) {
                 assert(err === undefined);
@@ -44,9 +44,9 @@ describe('After Event Emitter', function () {
                 done();
             });
             EE.emit('x', true, false);
-        });
+        }
 
-        it('passes the error to err if an error is thrown', function (done) {
+        it 'passes the error to err if an error is thrown' (done) {
             const error = new Error();
             EE.on('x', function () {throw error});
             EE.after(function (err, res, emitted) {
@@ -55,6 +55,6 @@ describe('After Event Emitter', function () {
                 done();
             });
             EE.emit('x');
-        });
-    });
-});
+        }
+    }
+}

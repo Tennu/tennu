@@ -9,28 +9,28 @@ const logfn = debug ? console.log.bind(console) : function () {};
 
 var UserModule = require('../tennu_modules/user.js');
 
-describe("User Module:", function () {
+describe 'User Module:' {
     var instance, client;
 
-    beforeEach(function () {
+    beforeEach {
         client = {
             debug: logfn,
             error: logfn
         };
 
         instance = UserModule.init(client, {});
-    });
+    }
 
-    describe("Utility Methods:", function () {
-        beforeEach(function () {
+    describe 'Utility Methods:' {
+        beforeEach( 
             logfn(/* newline */);
-        });
+        }
 
-        describe("isIdentifiedAs", function () {
+        describe 'isIdentifiedAs' {
             var isIdentifiedAs, clock;
             var off_spy, handlers;
 
-            beforeEach(function () {
+            beforeEach {
                 isIdentifiedAs = instance.exports.isIdentifiedAs;
                 clock = sinon.useFakeTimers();
 
@@ -40,10 +40,10 @@ describe("User Module:", function () {
                 client.on = function (_handlers) {
                     handlers = _handlers;
 
-                    onRegNick = handlers["RPL_WHOISREGNICK"];
-                    onLoggedIn = handlers["RPL_WHOISLOGGEDIN"];
-                    onWhoisEnd = handlers["RPL_ENDOFWHOIS"];
-                    onError = handlers["ERR_NOSUCHNICK"];
+                    onRegNick = handlers['RPL_WHOISREGNICK'];
+                    onLoggedIn = handlers['RPL_WHOISLOGGEDIN'];
+                    onWhoisEnd = handlers['RPL_ENDOFWHOIS'];
+                    onError = handlers['ERR_NOSUCHNICK'];
                     off_spy.withArgs(handlers);
                 };
 
@@ -82,22 +82,22 @@ describe("User Module:", function () {
                         break;
 
                         default:
-                        throw new Error("whois method called with unknown argument: " + nickname);
+                        throw new Error('whois method called with unknown argument: ' + nickname);
                     }
 
                     clock.tick(60 * 60 * 1000 + 1);
                 }
-            });
+            }
 
-            afterEach(function () {
+            afterEach(
                 clock.restore();
-            });
+            }
 
-            it("exists", function () {
+            it 'exists' {
                 assert(typeof instance.exports.isIdentifiedAs === 'function');
-            });
+            }
 
-            it("returns false for nonexistent nicks", function (done) {
+            it 'returns false for nonexistent nicks' (done) {
                 instance.exports.isIdentifiedAs('nonexistent', 'identified')
                 .then(function fulfilled (isIdentifiedAs) {
                     assert(isIdentifiedAs === false);
@@ -105,9 +105,9 @@ describe("User Module:", function () {
                 })
                 .then(done)
                 .done();
-            });
+            }
 
-            it("returns false for unidentified nicks", function (done) {
+            it 'returns false for unidentified nicks' (done) {
                 isIdentifiedAs('unidentified', 'identified')
                 .then(function fulfilled (isIdentifiedAs) {
                     assert(isIdentifiedAs === false);
@@ -115,9 +115,9 @@ describe("User Module:", function () {
                 })
                 .then(done)
                 .done();
-            });
+            }
 
-            it("returns false for identified nicks to a different nickname (307).", function (done) {
+            it 'returns false for identified nicks to a different nickname (307).' (done) {
                 isIdentifiedAs('identified-else-307', 'identified')
                 .then(function fulfilled (isIdentifiedAs) {
                     assert(isIdentifiedAs === false);
@@ -125,9 +125,9 @@ describe("User Module:", function () {
                 })
                 .then(done)
                 .done();
-            });
+            }
 
-            it("returns false for identified nicks to a different nickname (330).", function (done) {
+            it 'returns false for identified nicks to a different nickname (330).' (done) {
                 isIdentifiedAs('identified-else-330', 'identified')
                 .then(function fulfilled (isIdentifiedAs) {
                     assert(isIdentifiedAs === false);
@@ -135,9 +135,9 @@ describe("User Module:", function () {
                 })
                 .then(done)
                 .done();
-            });
+            }
 
-            it("returns true for identified nicks-307", function (done) {
+            it 'returns true for identified nicks-307' (done) {
                 isIdentifiedAs('identified-307', 'identified-307')
                 .then(function fulfilled (isIdentifiedAs) {
                     logfn(isIdentifiedAs);
@@ -146,9 +146,9 @@ describe("User Module:", function () {
                 })
                 .then(done)
                 .done();
-            });
+            }
 
-            it("returns true for identified nicks-330", function (done) {
+            it 'returns true for identified nicks-330' (done) {
                 isIdentifiedAs('identified-330', 'identified-330')
                 .then(function fulfilled (isIdentifiedAs) {
                     assert(isIdentifiedAs === true);
@@ -156,9 +156,9 @@ describe("User Module:", function () {
                 })
                 .then(done)
                 .done();
-            });
+            }
 
-            it("returns true for identified nicks identified to requested nickname.", function (done) {
+            it 'returns true for identified nicks identified to requested nickname.' (done) {
                 isIdentifiedAs('identified-alt', 'identified')
                 .then(function fulfilled (isIdentifiedAs) {
                     assert(isIdentifiedAs === true);
@@ -166,20 +166,20 @@ describe("User Module:", function () {
                 })
                 .then(done)
                 .done();
-            });
+            }
 
-            it("times out after an hour", function (done) {
+            it 'times out after an hour' (done) {
                 isIdentifiedAs('timeout', 'identified')
                 .then(function fulfilled (isIdentifiedAs) {
-                    assert(!"called");
+                    assert(!'called');
                 }, function onTimeout (reason) {
                     assert(reason instanceof Error);
-                    assert(reason.message === "Request timed out.");
+                    assert(reason.message === 'Request timed out.');
                     assert(off_spy.withArgs(handlers).calledOnce);
                 })
                 .then(done)
                 .done();
-            });
-        });
-    });
-});
+            }
+        }
+    }
+}

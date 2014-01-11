@@ -7,10 +7,17 @@ const Set = require('simplesets').Set;
 
 module.exports = {
     init: function (client, imports) {
+        const enabled = !(client.config('disable-help'));
+
+        if (!enabled) {
+            // Empty module.
+            return {};
+        }
+
         const registry = {};
         const commandset = new Set();
 
-        function helpResponse (query) {
+        function helpResponseMessage (query) {
             const cursor = query.reduce(function (cursor, topic) {
                 if (typeof cursor !== 'object') {
                     return undefined;
@@ -44,22 +51,24 @@ module.exports = {
                     client.notice('ModHelp', '!help being handled.');
                     // Default to showing the help for the help module if no args given.
                     const query = command.args.length === 0 ? ['help'] : command.args.slice();
-                    const response = helpResponse(query);
-                    return response;
+                    const response = helpResponseMessage(query);
+                    return {
+                        message: response,
+                        query: true,
+                        intent: 'say'
+                    };
                 },
 
                 '!commands': function (command) {
                     client.notice('ModHelp', '!commands being handled.');
 
                     const start = ["List of known commands: "];
-                    return start.concat(commandset.array().map(function (command) {
-                        return format(" * %s", command);
-                    }));
+                    return start.concat(commandset.array().join(", "));
                 }
             },
 
             exports: {
-                help: helpResponse,
+                help: helpResponseMessage,
                 helpObject: function () { return JSON.parse(JSON.stringify(registry)); },
                 HELP_NOT_FOUND: HELP_NOT_FOUND
             },

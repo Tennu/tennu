@@ -1,7 +1,7 @@
 {
   "name": "tennu",
-  "version": "0.8.1",
-  "description": "Tennu Node.js IRC Framework",
+  "version": "0.8.2",
+  "description": "Tennu - Modular IRC Bot Framework for Node.js",
   "maintainers": [
     {
       "name": "Ryan Scheel",
@@ -49,7 +49,10 @@
   "devDependencies": {
     "sinon": "~1.7.3",
     "deep-eql": "~0.1.3",
-    "better-assert": "~1.0.0"
+    "better-assert": "~1.0.0",
+    "sweet-bdd": "~1.0.0",
+    "fez-sweet.js": "~0.1.0",
+    "fez": "0.0.3"
   },
   "scripts": {
     "test": "mocha -R spec"

@@ -27,52 +27,53 @@ const arg2 = 'arg2';
 const argr = 'rest args';
 const raw = format(':%s %s %s %s :%s', prefix, command, arg1, arg2, argr);
 
-describe('Message Parsers', function () {
+describe 'Message Parsers' {
     var parser, receiver;
 
-    beforeEach(function () {
+    beforeEach {
         logfn(/* newline */);
 
         receiver = {_id: id()};
         parser = MessageHandler(receiver);
-    });
+    }
 
-    describe("#parse", function () {
+    describe '#parse' {
         var retval, evtval;
 
-        beforeEach(function (done) {
+        beforeEach (done) {
             parser.on('generic', function (message) {
                 evtval = message;
                 done();
             });
 
             retval = parser.parse(raw);
-        })
-        it('Return value', function () {
+        }
+
+        it 'Return value' {
             assert(retval.prefix === prefix);
             assert(retval.command === command);
             assert(retval.params[0] === arg1);
             assert(retval.params[1] === arg2);
             assert(retval.params[2] === argr);
             assert(retval.receiver === receiver);
-        });
+        }
 
-        it('Event Value', function () {
+        it 'Event Value' {
             assert(evtval.prefix === prefix);
             assert(evtval.command === command);
             assert(evtval.params[0] === arg1);
             assert(evtval.params[1] === arg2);
             assert(evtval.params[2] === argr);
             assert(evtval.receiver === receiver);
-        });
+        }
 
-        it('Emit and Return value are the same', function () {
+        it 'Emit and Return value are the same' {
             assert(retval === evtval);
-        });
-    });
+        }
+    }
 
-    describe('`*` event', function () {
-        it('is called with every function', function (done) {
+    describe '`*` event' {
+        it 'is called with every function' (done) {
             var count = 0;
 
             parser.on('*', function (message) {
@@ -85,6 +86,6 @@ describe('Message Parsers', function () {
 
             parser.parse(raw);
             parser.parse(raw);
-        });
-    });
-});
+        }
+    }
+}
