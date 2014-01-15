@@ -32,11 +32,11 @@ describe 'IRC Output Socket:' {
             assert(socket.raw.calledWithExactly(format("JOIN :%s", channel)));
         }
 
-        it 'On Success', function (done) {
+        it 'On Success' (done) {
             var joinmsg = {nickname: nickname, channel: channel};
 
             socket.raw = function () {
-                messageHandler.emit 'join', joinmsg);
+                messageHandler.emit('join', joinmsg);
             };
 
             assert(out.join(channel) === undefined);
@@ -60,12 +60,12 @@ describe 'IRC Output Socket:' {
     }
 
     it 'can quit without a reason' {
-        out.quit );
+        out.quit();
         assert(socket.raw.calledWithExactly("QUIT"));
     }
 
     it 'can quit with a reason' {
-        out.quit 'the reason');
+        out.quit('the reason');
         assert(socket.raw.calledWithExactly("QUIT :the reason"));
     }
 }

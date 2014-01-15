@@ -163,5 +163,10 @@ Changelog
       * intent ('say' | 'act')  Defaults to 'say'.
       * query (boolean)         Defaults to false. If true, responds in query.
     * Added fez and sweet.js into the developer dependencies.
-      * Note that fez doesn't do anything yet. I (havvy) need to write fez-sweet.js first.
-      * Tests are now using sweet-bdd (also by havvy), but I haven't compiled them yet.
+      * Note that fez doesn't do anything yet. fez-sweet.js has to be written first.
+      * Tests are now using sweet-bdd, but are not compiled.
+      * You can compile tests individually with `sjs -m sweet-bdd -o test/%file%.js test-src/%file%.sjs
+
+0.8.3:
+    * Response object can now take a target. (Either a channel or nickname)
+    * Fez properly builds tests.

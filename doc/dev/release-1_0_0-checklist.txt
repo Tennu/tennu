@@ -9,10 +9,10 @@ TODO
   * String (implemented)
   * Promise (implemented)
   * Object
-    * query: boolean?
-    * intent: message | action
+    * query: boolean? (implemented)
+    * intent: message | action (implemented)
     * target
-    * message
+    * message (implemented)
 * Default Modules
   * Help (implemented)
   * Server
@@ -20,14 +20,14 @@ TODO
   * User
   * Actions (OutputSocket methods )
     * Promises for known commands.
-* Module Reloading (if possible)
+* Plugin Reloading (if possible)
 * Promise for .connect().
 
 FINISHED
 
 * MessageParser basic functionality
 * CommandParser
-* Module System
+* Plugin System
 * On Method that delegates to CommandParser/MessageParser
 * OutputSocket basic functionality
 * Logging

@@ -27,13 +27,21 @@ const moduleHelps = {
     d: ['d *_1', 'd *_2']
 };
 
+const client = {
+    config: function (value) {
+        if (value === 'help-disabled') {
+            return false;
+        }
+    }
+};
+
 describe 'Help module' {
     var instance, help, HELP_NOT_FOUND;
 
     beforeEach {
         logfn(/* newline */);
 
-        instance = HelpModule.init({}, {});
+        instance = HelpModule.init(client, {});
         HELP_NOT_FOUND = instance.exports.HELP_NOT_FOUND;
 
         instance.hooks.help('a', moduleHelps.a);

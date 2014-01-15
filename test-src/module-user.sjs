@@ -22,7 +22,7 @@ describe 'User Module:' {
     }
 
     describe 'Utility Methods:' {
-        beforeEach( 
+        beforeEach {
             logfn(/* newline */);
         }
 
@@ -89,7 +89,7 @@ describe 'User Module:' {
                 }
             }
 
-            afterEach(
+            afterEach {
                 clock.restore();
             }
 

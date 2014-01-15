@@ -228,5 +228,29 @@ describe 'Command Handler' {
 
             handler.parse(Message(messages.command, receiver));
         }
+
+        it 'Promise<string> after Promise#catch()' (done) {
+            const failHandler = function (command) {
+                return Q
+                .reject(new Error())
+                .catch(function (err) {
+                    console.log("Returning sorry!");
+                    return 'Sorry!';
+                });
+            };
+
+            receiver.say = function (sender, response) {
+                try {
+                    assert(response === 'Sorry!');
+                    done();   
+                } catch (e) {
+                    done(e);
+                }
+            };
+
+            handler.on(commandname, failHandler);
+
+            handler.parse(Message(messages.command, receiver));
+        }
     }
 }
