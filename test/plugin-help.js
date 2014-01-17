@@ -1,13 +1,13 @@
-const sinon$374 = require('sinon');
-const assert$375 = require('better-assert');
-const equal$376 = require('deep-eql');
-const inspect$377 = require('util').inspect;
-const format$378 = require('util').format;
-const debug$379 = false;
-const logfn$380 = debug$379 ? console.log.bind(console) : function () {
+const sinon$701 = require('sinon');
+const assert$702 = require('better-assert');
+const equal$703 = require('deep-eql');
+const inspect$704 = require('util').inspect;
+const format$705 = require('util').format;
+const debug$706 = false;
+const logfn$707 = debug$706 ? console.log.bind(console) : function () {
     };
-const HelpModule$381 = require('../tennu_modules/help');
-const moduleHelps$382 = {
+const HelpModule$708 = require('../tennu_modules/help');
+const moduleHelps$709 = {
         a: 'a *',
         b: {
             b: {
@@ -26,7 +26,7 @@ const moduleHelps$382 = {
             'd *_2'
         ]
     };
-const client$383 = {
+const client$710 = {
         config: function (value) {
             if (value === 'help-disabled') {
                 return false;
@@ -34,59 +34,59 @@ const client$383 = {
         }
     };
 describe('Help module', function () {
-    var instance$385, help$386, HELP_NOT_FOUND$387;
+    var instance$712, help$713, HELP_NOT_FOUND$714;
     beforeEach(function () {
-        logfn$380();
-        instance$385 = HelpModule$381.init(client$383, {});
-        HELP_NOT_FOUND$387 = instance$385.exports.HELP_NOT_FOUND;
-        instance$385.hooks.help('a', moduleHelps$382.a);
-        instance$385.hooks.help('b', moduleHelps$382.b);
-        instance$385.hooks.help('c', moduleHelps$382.c);
-        instance$385.hooks.help('d', moduleHelps$382.d);
-        help$386 = instance$385.exports.help;
+        logfn$707();
+        instance$712 = HelpModule$708.init(client$710, {});
+        HELP_NOT_FOUND$714 = instance$712.exports.HELP_NOT_FOUND;
+        instance$712.hooks.help('a', moduleHelps$709.a);
+        instance$712.hooks.help('b', moduleHelps$709.b);
+        instance$712.hooks.help('c', moduleHelps$709.c);
+        instance$712.hooks.help('d', moduleHelps$709.d);
+        help$713 = instance$712.exports.help;
     });
     it('returns HELP_NOT_FOUND for unknown topics', function () {
-        assert$375(help$386(['dnd']) === HELP_NOT_FOUND$387);
+        assert$702(help$713(['dnd']) === HELP_NOT_FOUND$714);
     });
     it('returns HELP_NOT_FOUND for subtopics of unknown topics', function () {
-        assert$375(help$386([
+        assert$702(help$713([
             'dne',
             'subtopic'
-        ]) === HELP_NOT_FOUND$387);
+        ]) === HELP_NOT_FOUND$714);
     });
     it('assigns the topic of the module name the value of the string when given a string', function () {
-        logfn$380(inspect$377(help$386(['a'])));
-        assert$375(help$386(['a']) === 'a *');
+        logfn$707(inspect$704(help$713(['a'])));
+        assert$702(help$713(['a']) === 'a *');
     });
     it('assigns the topic of the module name the value of the array when given an array', function () {
-        logfn$380(inspect$377(help$386(['d'])));
-        assert$375(equal$376(help$386(['d']), [
+        logfn$707(inspect$704(help$713(['d'])));
+        assert$702(equal$703(help$713(['d']), [
             'd *_1',
             'd *_2'
         ]));
     });
     it('gives the * property of topics with an object value', function () {
-        assert$375(help$386(['b']) === 'b *');
+        assert$702(help$713(['b']) === 'b *');
     });
     it('gives HELP_NOT_FOUND for topics with an object value without the * property', function () {
-        assert$375(help$386(['c']) === HELP_NOT_FOUND$387);
+        assert$702(help$713(['c']) === HELP_NOT_FOUND$714);
     });
     it('gives the subtopic string value for subtopic type of string', function () {
-        logfn$380(inspect$377(help$386([
+        logfn$707(inspect$704(help$713([
             'b',
             'b1'
         ])));
-        assert$375(help$386([
+        assert$702(help$713([
             'b',
             'b1'
         ]) === 'b 1');
     });
     it('gives the subtopic array value for subtopic type of array', function () {
-        logfn$380(inspect$377(help$386([
+        logfn$707(inspect$704(help$713([
             'b',
             'b2'
         ])));
-        assert$375(equal$376(help$386([
+        assert$702(equal$703(help$713([
             'b',
             'b2'
         ]), [
@@ -95,23 +95,23 @@ describe('Help module', function () {
         ]));
     });
     it('gives the * property of subtopic type of object', function () {
-        logfn$380(inspect$377(help$386([
+        logfn$707(inspect$704(help$713([
             'b',
             'b3'
         ])));
-        assert$375(help$386([
+        assert$702(help$713([
             'b',
             'b3'
         ]) === 'b 3 *');
     });
     it('gives HELP_NOT_FOUND for nonexistent subtopic of existing topic', function () {
-        logfn$380(inspect$377(help$386([
+        logfn$707(inspect$704(help$713([
             'b',
             'b4'
         ])));
-        assert$375(help$386([
+        assert$702(help$713([
             'b',
             'b4'
-        ]) === HELP_NOT_FOUND$387);
+        ]) === HELP_NOT_FOUND$714);
     });
 });

@@ -36,26 +36,36 @@ myClient.connect();
 
 ----------
 
-## Network Configuration ##
+## Configuration ##
 
 A network configuration object has the following properties:
 
-* server      - IRC server to connect to. _Example:_ _irc.mibbit.net_
-* port        - Port to connect to. Defaults to 6667.
-* capab       - IRC3 CAP support. (Untested)
-* secure      - Use a TLS socket (Throws away the NetSocket)
-* nick        - Nickname the bot will use. Defaults to "tennubot"
-* user        - Username the bot will use. Defaults to "user"
-* realname    - Realname for the bot. Defaults to "tennu v0.3"
-* password    - Password for identifying to services.
-* nickserv    - Nickname of nickserv service. Defaults to "nickserv".
-* trigger     - Command character to trigger commands with. By default, '!'.
-* channels    - Array of channels to autojoin. _Example:_ ["#help", "#tennu"]
-* modules     - An array of module names that the bot requires.
+* server          - IRC server to connect to. _Example:_ _irc.mibbit.net_
+* port            - Port to connect to. Defaults to 6667.
+* password        - Password for IRC Network (most networks do not have a password)
+* secure          - Use a TLS socket (Throws away the NetSocket)
+* capab           - IRC3 CAP support. (Untested)
+* nickname        - Nickname the bot will use. Defaults to "tennubot"
+* username        - Username the bot will use. Defaults to "user"
+* realname        - Realname for the bot. Defaults to "tennu v0.3"
+* password        - Password for identifying to services.
+* nickserv        - Nickname of nickserv service. Defaults to "nickserv".
+* trigger         - Command character to trigger commands with. By default, '!'.
+* channels        - Array of channels to autojoin. _Example:_ ["#help", "#tennu"]
+* plugins         - An array of module names that the bot requires.
 
-Other modules may use additional properties.
+Other plugins may use additional properties.
 
-Network configuration objects are JSON encodable.
+Configuration objects are JSON encodable.
+
+[0.9.0]
+
+The following properties will be renamed:
+
+* user -> username
+* nick -> nickname
+* trigger -> command-trigger
+* password -> auth-password (or something better...)
 
 ## Dependency Management ##
 

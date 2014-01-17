@@ -1,56 +1,56 @@
-const sinon$545 = require('sinon');
-const assert$546 = require('better-assert');
-const equal$547 = require('deep-eql');
-const inspect$548 = require('util').inspect;
-const format$549 = require('util').format;
-const debug$550 = false;
-const logfn$551 = debug$550 ? console.log.bind(console) : function () {
+const sinon$519 = require('sinon');
+const assert$520 = require('better-assert');
+const equal$521 = require('deep-eql');
+const inspect$522 = require('util').inspect;
+const format$523 = require('util').format;
+const debug$524 = false;
+const logfn$525 = debug$524 ? console.log.bind(console) : function () {
     };
-const EventEmiter$552 = require('../lib/event-emitter.js');
+const EventEmiter$526 = require('../lib/event-emitter.js');
 describe('After Event Emitter', function () {
-    var EE$554;
+    var EE$528;
     beforeEach(function () {
-        logfn$551();
-        EE$554 = EventEmiter$552();
+        logfn$525();
+        EE$528 = EventEmiter$526();
     });
-    it('works as an event emitter.', function (done$559) {
-        EE$554.on('x', function (arg1$560, arg2$561) {
-            assert$546(arg1$560 === true);
-            assert$546(arg2$561 === false);
-            done$559();
+    it('works as an event emitter.', function (done$533) {
+        EE$528.on('x', function (arg1$534, arg2$535) {
+            assert$520(arg1$534 === true);
+            assert$520(arg2$535 === false);
+            done$533();
         });
-        EE$554.emit('x', true, false);
+        EE$528.emit('x', true, false);
     });
-    it('does not throw on non-existent events.', function (done$562) {
-        EE$554.emit('y');
-        done$562();
+    it('does not throw on non-existent events.', function (done$536) {
+        EE$528.emit('y');
+        done$536();
     });
     describe('#after', function () {
-        it('takes a function, which it calls after the listener returns.', function (done$565) {
-            EE$554.on('x', function () {
+        it('takes a function, which it calls after the listener returns.', function (done$539) {
+            EE$528.on('x', function () {
                 return true;
             });
-            EE$554.after(function (err$566, res$567, emitted$568, arg1$569, arg2$570) {
-                assert$546(err$566 === undefined);
-                assert$546(res$567 === true);
-                assert$546(emitted$568 === 'x');
-                assert$546(arg1$569 === true);
-                assert$546(arg2$570 === false);
-                done$565();
+            EE$528.after(function (err$540, res$541, emitted$542, arg1$543, arg2$544) {
+                assert$520(err$540 === undefined);
+                assert$520(res$541 === true);
+                assert$520(emitted$542 === 'x');
+                assert$520(arg1$543 === true);
+                assert$520(arg2$544 === false);
+                done$539();
             });
-            EE$554.emit('x', true, false);
+            EE$528.emit('x', true, false);
         });
-        it('passes the error to err if an error is thrown', function (done$571) {
-            const error$572 = new Error();
-            EE$554.on('x', function () {
-                throw error$572;
+        it('passes the error to err if an error is thrown', function (done$545) {
+            const error$546 = new Error();
+            EE$528.on('x', function () {
+                throw error$546;
             });
-            EE$554.after(function (err$573, res$574, emitted$575) {
-                assert$546(err$573 === error$572);
-                assert$546(res$574 === undefined);
-                done$571();
+            EE$528.after(function (err$547, res$548, emitted$549) {
+                assert$520(err$547 === error$546);
+                assert$520(res$548 === undefined);
+                done$545();
             });
-            EE$554.emit('x');
+            EE$528.emit('x');
         });
     });
 });

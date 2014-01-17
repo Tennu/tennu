@@ -1,6 +1,6 @@
 {
   "name": "tennu",
-  "version": "0.8.3",
+  "version": "0.8.4pre1",
   "description": "Tennu - Modular IRC Bot Framework for Node.js",
   "maintainers": [
     {
@@ -36,9 +36,9 @@
   "dependencies": {
     "simplesets": "1.2.x",
     "lodash": "2.4.x",
-    "irc-socket": "~1.2.x",
+    "irc-socket": "~2.2.0pre1",
     "irc-message": "1.0.x",
-    "tennu-modules": "2.1.x",
+    "tennu-plugins": "3.0.x",
     "commander": "~2.1.x",
     "q": "~0.9.x"
   },
@@ -48,7 +48,7 @@
     "better-assert": "~1.0.0",
     "sweet-bdd": "~1.0.0",
     "fez": "fez/fez",
-    "fez-sweet.js": "~0.1.0"
+    "fez-sweet.js": "~0.6.0"
   },
   "scripts": {
     "test": "mocha -R spec",
