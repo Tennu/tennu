@@ -1,81 +1,81 @@
-var sinon$561 = require('sinon');
-var assert$562 = require('better-assert');
-var equal$563 = require('deep-eql');
-var inspect$564 = require('util').inspect;
-var format$565 = require('util').format;
-const debug$566 = false;
-const logfn$567 = debug$566 ? console.log.bind(console) : function () {
+var sinon = require('sinon');
+var assert = require('better-assert');
+var equal = require('deep-eql');
+var inspect = require('util').inspect;
+var format = require('util').format;
+const debug = false;
+const logfn = debug ? console.log.bind(console) : function () {
     };
-const logger$568 = {
-        debug: logfn$567,
-        info: logfn$567,
-        notice: logfn$567,
-        warn: logfn$567,
-        error: logfn$567
+const logger = {
+        debug: logfn,
+        info: logfn,
+        notice: logfn,
+        warn: logfn,
+        error: logfn
     };
-const MessageHandler$569 = require('../lib/message-handler.js');
-const Message$570 = require('../lib/message.js');
-const Q$571 = require('q');
-const id$572 = function () {
+const MessageHandler = require('../lib/message-handler.js');
+const Message = require('../lib/message.js');
+const Q = require('q');
+const id = function () {
         var ix = 0;
         return function () {
             ix += 1;
             return ix;
         };
     }();
-const prefix$573 = 'irc.mibbit.net';
-const command$574 = 'generic';
-const arg1$575 = 'arg1';
-const arg2$576 = 'arg2';
-const argr$577 = 'rest args';
-const raw$578 = format$565(':%s %s %s %s :%s', prefix$573, command$574, arg1$575, arg2$576, argr$577);
+const prefix = 'irc.mibbit.net';
+const command = 'generic';
+const arg1 = 'arg1';
+const arg2 = 'arg2';
+const argr = 'rest args';
+const raw = format(':%s %s %s %s :%s', prefix, command, arg1, arg2, argr);
 describe('Message Parsers', function () {
-    var parser$580, receiver$581;
+    var parser, receiver;
     beforeEach(function () {
-        logfn$567();
-        receiver$581 = { _id: id$572() };
-        parser$580 = MessageHandler$569(receiver$581);
+        logfn();
+        receiver = { _id: id() };
+        parser = MessageHandler(receiver);
     });
     describe('#parse', function () {
-        var retval$585, evtval$586;
-        beforeEach(function (done$591) {
-            parser$580.on('generic', function (message$592) {
-                evtval$586 = message$592;
-                done$591();
+        var retval, evtval;
+        beforeEach(function (done) {
+            parser.on('generic', function (message) {
+                evtval = message;
+                done();
             });
-            retval$585 = parser$580.parse(raw$578);
+            retval = parser.parse(raw);
         });
         it('Return value', function () {
-            assert$562(retval$585.prefix === prefix$573);
-            assert$562(retval$585.command === command$574);
-            assert$562(retval$585.params[0] === arg1$575);
-            assert$562(retval$585.params[1] === arg2$576);
-            assert$562(retval$585.params[2] === argr$577);
-            assert$562(retval$585.receiver === receiver$581);
+            assert(retval.prefix === prefix);
+            assert(retval.command === command);
+            assert(retval.params[0] === arg1);
+            assert(retval.params[1] === arg2);
+            assert(retval.params[2] === argr);
+            assert(retval.receiver === receiver);
         });
         it('Event Value', function () {
-            assert$562(evtval$586.prefix === prefix$573);
-            assert$562(evtval$586.command === command$574);
-            assert$562(evtval$586.params[0] === arg1$575);
-            assert$562(evtval$586.params[1] === arg2$576);
-            assert$562(evtval$586.params[2] === argr$577);
-            assert$562(evtval$586.receiver === receiver$581);
+            assert(evtval.prefix === prefix);
+            assert(evtval.command === command);
+            assert(evtval.params[0] === arg1);
+            assert(evtval.params[1] === arg2);
+            assert(evtval.params[2] === argr);
+            assert(evtval.receiver === receiver);
         });
         it('Emit and Return value are the same', function () {
-            assert$562(retval$585 === evtval$586);
+            assert(retval === evtval);
         });
     });
     describe('`*` event', function () {
-        it('is called with every function', function (done$594) {
-            var count$595 = 0;
-            parser$580.on('*', function (message$596) {
-                count$595 += 1;
-                if (count$595 === 2) {
-                    done$594();
+        it('is called with every function', function (done) {
+            var count = 0;
+            parser.on('*', function (message) {
+                count += 1;
+                if (count === 2) {
+                    done();
                 }
             });
-            parser$580.parse(raw$578);
-            parser$580.parse(raw$578);
+            parser.parse(raw);
+            parser.parse(raw);
         });
     });
 });

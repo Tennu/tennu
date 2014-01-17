@@ -1,21 +1,21 @@
-const sinon$374 = require('sinon');
-const assert$375 = require('better-assert');
-const equal$376 = require('deep-eql');
-const inspect$377 = require('util').inspect;
-const format$378 = require('util').format;
-const debug$379 = false;
-const logfn$380 = debug$379 ? console.log.bind(console) : function () {
+const sinon = require('sinon');
+const assert = require('better-assert');
+const equal = require('deep-eql');
+const inspect = require('util').inspect;
+const format = require('util').format;
+const debug = false;
+const logfn = debug ? console.log.bind(console) : function () {
     };
-const logger$381 = {
-        debug: logfn$380,
-        info: logfn$380,
-        notice: logfn$380,
-        warn: logfn$380,
-        error: logfn$380
+const logger = {
+        debug: logfn,
+        info: logfn,
+        notice: logfn,
+        warn: logfn,
+        error: logfn
     };
-const Client$382 = require('../lib/client.js');
-const NetSocket$383 = require('../test-lib/mock-net-socket.js');
-const network$384 = {
+const Client = require('../lib/client.js');
+const NetSocket = require('../test-lib/mock-net-socket.js');
+const network = {
         nick: 'testbot',
         user: 'testuser',
         server: 'irc.test.net',
@@ -23,8 +23,8 @@ const network$384 = {
         password: 'testpass',
         channels: ['#test']
     };
-const fakeWrite$385 = function fakeWrite$385(message) {
-    fakeWrite$385.spy.apply(this, arguments);
+const fakeWrite = function fakeWrite$2(message) {
+    fakeWrite$2.spy.apply(this, arguments);
     message = message.substring(0, message.length - 2);
     // console.log('Fakewrite called with message `' + message + '`');
     try {
@@ -58,88 +58,88 @@ const fakeWrite$385 = function fakeWrite$385(message) {
         console.log(e.stack);
     }
 };
-const boxfn$386 = function (value) {
+const boxfn = function (value) {
     return function () {
         return value;
     };
 };
 describe('Tennu Client', function () {
-    var netsocket$388, tennu$389;
+    var netsocket, tennu;
     beforeEach(function () {
-        logfn$380();
-        fakeWrite$385.spy = sinon$374.spy();
-        netsocket$388 = new NetSocket$383(logger$381);
-        netsocket$388.write = fakeWrite$385;
-        tennu$389 = Client$382(network$384, {
-            NetSocket: boxfn$386(netsocket$388),
-            Logger: boxfn$386(logger$381)
+        logfn();
+        fakeWrite.spy = sinon.spy();
+        netsocket = new NetSocket(logger);
+        netsocket.write = fakeWrite;
+        tennu = Client(network, {
+            NetSocket: boxfn(netsocket),
+            Logger: boxfn(logger)
         });
     });
     afterEach(function () {
-        logfn$380('End of test.');
+        logfn('End of test.');
     });
     it('Basic Connecting and Disconnecting', function () {
-        assert$375(tennu$389.connected === false);
-        tennu$389.connect();
-        assert$375(tennu$389.connected === true);
-        tennu$389.disconnect();
-        assert$375(tennu$389.connected === false);
+        assert(tennu.connected === false);
+        tennu.connect();
+        assert(tennu.connected === true);
+        tennu.disconnect();
+        assert(tennu.connected === false);
     });
     // Move this to its own file.
     describe('Nickname Tracking', function () {
-        beforeEach(function (done$400) {
-            netsocket$388.on('connect', done$400);
-            tennu$389.connect();
+        beforeEach(function (done) {
+            netsocket.on('connect', done);
+            tennu.connect();
         });
-        afterEach(function (done$401) {
-            netsocket$388.on('close', done$401);
-            tennu$389.disconnect();
+        afterEach(function (done) {
+            netsocket.on('close', done);
+            tennu.disconnect();
         });
         it('tracks its initial nickname', function () {
-            assert$375(tennu$389.nickname() === 'testbot');
+            assert(tennu.nickname() === 'testbot');
         });
         describe('changing nick', function () {
-            beforeEach(function (done$404) {
-                tennu$389.on('nick', function () {
-                    done$404();
+            beforeEach(function (done) {
+                tennu.on('nick', function () {
+                    done();
                 });
-                tennu$389.nick('newNick');
+                tennu.nick('newNick');
             });
             it('tracks its changed nick', function () {
-                assert$375(tennu$389.nickname() === 'newNick');
+                assert(tennu.nickname() === 'newNick');
             });
         });
     });
     describe('autojoin', function () {
-        beforeEach(function (done$408) {
-            tennu$389.on('join', function () {
-                done$408();
+        beforeEach(function (done) {
+            tennu.on('join', function () {
+                done();
             });
-            tennu$389.connect();
+            tennu.connect();
         });
-        afterEach(function (done$409) {
-            netsocket$388.on('close', done$409);
-            tennu$389.disconnect();
+        afterEach(function (done) {
+            netsocket.on('close', done);
+            tennu.disconnect();
         });
         it('automatically joins specified channels.', function () {
-            assert$375(fakeWrite$385.spy.calledWith('JOIN :#test\r\n', 'utf-8'));
+            assert(fakeWrite.spy.calledWith('JOIN :#test\r\n', 'utf-8'));
         });
     });
     describe('autoidentify', function () {
-        beforeEach(function (done$413) {
-            tennu$389.on('notice', function (e$414) {
-                if (e$414.nickname === 'nickserv') {
-                    done$413();
+        beforeEach(function (done) {
+            tennu.on('notice', function (e) {
+                if (e.nickname === 'nickserv') {
+                    done();
                 }
             });
-            tennu$389.connect();
+            tennu.connect();
         });
-        afterEach(function (done$415) {
-            netsocket$388.on('close', done$415);
-            tennu$389.disconnect();
+        afterEach(function (done) {
+            netsocket.on('close', done);
+            tennu.disconnect();
         });
         it('automatically identifies to services.', function () {
-            assert$375(fakeWrite$385.spy.calledWith('PRIVMSG nickserv :identify testpass\r\n', 'utf-8'));
+            assert(fakeWrite.spy.calledWith('PRIVMSG nickserv :identify testpass\r\n', 'utf-8'));
         });
     });
 });

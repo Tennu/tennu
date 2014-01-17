@@ -1,91 +1,91 @@
-const sinon$802 = require('sinon');
-const assert$803 = require('better-assert');
-const equal$804 = require('deep-eql');
-const inspect$805 = require('util').inspect;
-const format$806 = require('util').format;
-const debug$807 = false;
-const logfn$808 = debug$807 ? console.log.bind(console) : function () {
+const sinon = require('sinon');
+const assert = require('better-assert');
+const equal = require('deep-eql');
+const inspect = require('util').inspect;
+const format = require('util').format;
+const debug = false;
+const logfn = debug ? console.log.bind(console) : function () {
     };
-const BiSubscriber$809 = require('../lib/bisubscriber');
-const EventEmitter$810 = require('events').EventEmitter;
+const BiSubscriber = require('../lib/bisubscriber');
+const EventEmitter = require('events').EventEmitter;
 describe('BiSubscribers', function () {
     beforeEach(function () {
-        logfn$808();
+        logfn();
     });
     describe('subscribe events to two event emitters', function () {
-        var subscriber$815, primary$816, secondary$817, primarySpy$818, secondarySpy$819;
+        var subscriber, primary, secondary, primarySpy, secondarySpy;
         beforeEach(function () {
-            primary$816 = new EventEmitter$810();
-            secondary$817 = new EventEmitter$810();
-            subscriber$815 = new BiSubscriber$809(primary$816, secondary$817);
-            primarySpy$818 = sinon$802.spy();
-            secondarySpy$819 = sinon$802.spy();
+            primary = new EventEmitter();
+            secondary = new EventEmitter();
+            subscriber = new BiSubscriber(primary, secondary);
+            primarySpy = sinon.spy();
+            secondarySpy = sinon.spy();
         });
         it('treats most events as primary events', function () {
-            subscriber$815.on('event', primarySpy$818);
-            primary$816.emit('event');
-            assert$803(primarySpy$818.called);
-            assert$803(!secondarySpy$819.called);
+            subscriber.on('event', primarySpy);
+            primary.emit('event');
+            assert(primarySpy.called);
+            assert(!secondarySpy.called);
         });
         it('treats events starting with "!" to be secondary', function () {
-            subscriber$815.on('!event', secondarySpy$819);
-            secondary$817.emit('event');
-            assert$803(!primarySpy$818.called);
-            assert$803(secondarySpy$819.called);
+            subscriber.on('!event', secondarySpy);
+            secondary.emit('event');
+            assert(!primarySpy.called);
+            assert(secondarySpy.called);
         });
         it('can subscribe multiple events', function () {
-            var primaryDataSpy$824, secondaryDataSpy$825;
-            primaryDataSpy$824 = sinon$802.spy();
-            secondaryDataSpy$825 = sinon$802.spy();
-            subscriber$815.on({
-                'event': primarySpy$818,
-                '!event': secondarySpy$819,
-                'data': primaryDataSpy$824,
-                '!data': secondaryDataSpy$825
+            var primaryDataSpy, secondaryDataSpy;
+            primaryDataSpy = sinon.spy();
+            secondaryDataSpy = sinon.spy();
+            subscriber.on({
+                'event': primarySpy,
+                '!event': secondarySpy,
+                'data': primaryDataSpy,
+                '!data': secondaryDataSpy
             });
-            primary$816.emit('event');
-            assert$803(primarySpy$818.called);
-            assert$803(!secondarySpy$819.called);
-            secondary$817.emit('data');
-            assert$803(!primaryDataSpy$824.called);
-            assert$803(secondaryDataSpy$825.called);
+            primary.emit('event');
+            assert(primarySpy.called);
+            assert(!secondarySpy.called);
+            secondary.emit('data');
+            assert(!primaryDataSpy.called);
+            assert(secondaryDataSpy.called);
         });
     });
     describe('quantification (on vs. once)', function () {
-        var subscriber$826, primary$827, secondary$828, spy$829, eventCount$830, isDone$831;
+        var subscriber, primary, secondary, spy, eventCount, isDone;
         beforeEach(function () {
-            primary$827 = new EventEmitter$810();
-            secondary$828 = new EventEmitter$810();
-            subscriber$826 = new BiSubscriber$809(primary$827, secondary$828, null);
-            spy$829 = sinon$802.spy();
-            eventCount$830 = 0;
-            subscriber$826.on('event !event', function () {
-                eventCount$830 += 1;
+            primary = new EventEmitter();
+            secondary = new EventEmitter();
+            subscriber = new BiSubscriber(primary, secondary, null);
+            spy = sinon.spy();
+            eventCount = 0;
+            subscriber.on('event !event', function () {
+                eventCount += 1;
             });
         });
         it('handles once one time (primary)', function () {
-            subscriber$826.once('event', spy$829);
-            primary$827.emit('event');
-            primary$827.emit('event');
-            assert$803(spy$829.calledOnce);
+            subscriber.once('event', spy);
+            primary.emit('event');
+            primary.emit('event');
+            assert(spy.calledOnce);
         });
         it('handles once one time (secondary)', function () {
-            subscriber$826.once('!event', spy$829);
-            secondary$828.emit('event');
-            secondary$828.emit('event');
-            assert$803(spy$829.calledOnce);
+            subscriber.once('!event', spy);
+            secondary.emit('event');
+            secondary.emit('event');
+            assert(spy.calledOnce);
         });
         it('handles on multiple times', function () {
-            subscriber$826.on('event', spy$829);
-            primary$827.emit('event');
-            primary$827.emit('event');
-            assert$803(spy$829.calledTwice);
+            subscriber.on('event', spy);
+            primary.emit('event');
+            primary.emit('event');
+            assert(spy.calledTwice);
         });
         it('handles once one time', function () {
-            subscriber$826.on('!event', spy$829);
-            secondary$828.emit('event');
-            secondary$828.emit('event');
-            assert$803(spy$829.calledTwice);
+            subscriber.on('!event', spy);
+            secondary.emit('event');
+            secondary.emit('event');
+            assert(spy.calledTwice);
         });
     });
 });

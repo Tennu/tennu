@@ -1,217 +1,217 @@
-const sinon$427 = require('sinon');
-const assert$428 = require('better-assert');
-const equal$429 = require('deep-eql');
-const inspect$430 = require('util').inspect;
-const format$431 = require('util').format;
-const debug$432 = false;
-const logfn$433 = debug$432 ? console.log.bind(console) : function () {
+const sinon = require('sinon');
+const assert = require('better-assert');
+const equal = require('deep-eql');
+const inspect = require('util').inspect;
+const format = require('util').format;
+const debug = false;
+const logfn = debug ? console.log.bind(console) : function () {
     };
-const logger$434 = {
-        debug: logfn$433,
-        info: logfn$433,
-        notice: logfn$433,
-        warn: logfn$433,
-        error: logfn$433
+const logger = {
+        debug: logfn,
+        info: logfn,
+        notice: logfn,
+        warn: logfn,
+        error: logfn
     };
-const CommandHandler$435 = require('../lib/command-handler.js');
-const Message$436 = require('../lib/message.js');
-const Q$437 = require('q');
-const config$438 = { trigger: '!' };
-const prefix$439 = 'sender!user@localhost';
-const commandname$440 = 'command';
-const channel$441 = '#test';
-const sender$442 = 'sender';
-const nickname$443 = 'testbot';
-const arg1$444 = 'arg-1';
-const arg2$445 = 'arg-2';
-const nicknamefn$446 = function () {
-    return nickname$443;
+const CommandHandler = require('../lib/command-handler.js');
+const Message = require('../lib/message.js');
+const Q = require('q');
+const config = { trigger: '!' };
+const prefix = 'sender!user@localhost';
+const commandname = 'command';
+const channel = '#test';
+const sender = 'sender';
+const nickname = 'testbot';
+const arg1 = 'arg-1';
+const arg2 = 'arg-2';
+const nicknamefn = function () {
+    return nickname;
 };
-const chanmsg$447 = function (message) {
-    return format$431(format$431(':%s PRIVMSG %s :%s', prefix$439, channel$441, message));
+const chanmsg = function (message) {
+    return format(format(':%s PRIVMSG %s :%s', prefix, channel, message));
 };
-const privmsg$448 = function (message) {
-    return format$431(format$431(':%s PRIVMSG %s :%s', prefix$439, nickname$443, message));
+const privmsg = function (message) {
+    return format(format(':%s PRIVMSG %s :%s', prefix, nickname, message));
 };
-const messages$449 = {
-        noncommand: chanmsg$447('hello'),
-        command: privmsg$448(format$431('%s', commandname$440)),
+const messages = {
+        noncommand: chanmsg('hello'),
+        command: privmsg(format('%s', commandname)),
         detect: {
-            trigger: chanmsg$447(format$431('!%s', commandname$440)),
-            highlight: chanmsg$447(format$431('%s: %s', nickname$443, commandname$440)),
-            query: privmsg$448(format$431('%s', commandname$440)),
-            query_with_trigger: privmsg$448(format$431('!%s', commandname$440)),
-            highlight_oddspacing: chanmsg$447(format$431('  %s:   %s   ', nickname$443, commandname$440))
+            trigger: chanmsg(format('!%s', commandname)),
+            highlight: chanmsg(format('%s: %s', nickname, commandname)),
+            query: privmsg(format('%s', commandname)),
+            query_with_trigger: privmsg(format('!%s', commandname)),
+            highlight_oddspacing: chanmsg(format('  %s:   %s   ', nickname, commandname))
         },
-        args: privmsg$448(format$431('%s %s %s', commandname$440, arg1$444, arg2$445)),
-        args_oddspacing: privmsg$448(format$431('%s  %s   %s  ', commandname$440, arg1$444, arg2$445))
+        args: privmsg(format('%s %s %s', commandname, arg1, arg2)),
+        args_oddspacing: privmsg(format('%s  %s   %s  ', commandname, arg1, arg2))
     };
 describe('Command Handler', function () {
-    var handler$451;
+    var handler;
     beforeEach(function () {
-        handler$451 = CommandHandler$435(config$438, nicknamefn$446, logger$434);
+        handler = CommandHandler(config, nicknamefn, logger);
     });
     describe('command detection:', function () {
         it('ignores non-commands by returning undefined', function () {
-            const message$460 = Message$436(messages$449.noncommand);
-            assert$428(handler$451.parse(message$460) === undefined);
+            const message = Message(messages.noncommand);
+            assert(handler.parse(message) === undefined);
         });
         describe('Recognition Types:', function () {
             it('Trigger', function () {
-                const command$465 = handler$451.parse(Message$436(messages$449.detect.trigger));
-                assert$428(command$465.command === commandname$440);
-                assert$428(equal$429(command$465.args, []));
+                const command = handler.parse(Message(messages.detect.trigger));
+                assert(command.command === commandname);
+                assert(equal(command.args, []));
             });
             it('Highlights', function () {
-                const command$466 = handler$451.parse(Message$436(messages$449.detect.highlight));
-                assert$428(command$466.command === commandname$440);
-                assert$428(equal$429(command$466.args, []));
+                const command = handler.parse(Message(messages.detect.highlight));
+                assert(command.command === commandname);
+                assert(equal(command.args, []));
             });
             it('Query', function () {
-                const command$467 = handler$451.parse(Message$436(messages$449.detect.query));
-                assert$428(command$467.command === commandname$440);
-                assert$428(equal$429(command$467.args, []));
+                const command = handler.parse(Message(messages.detect.query));
+                assert(command.command === commandname);
+                assert(equal(command.args, []));
             });
             it('Query with trigger', function () {
-                const command$468 = handler$451.parse(Message$436(messages$449.detect.query_with_trigger));
-                assert$428(command$468.command === commandname$440);
-                assert$428(equal$429(command$468.args, []));
+                const command = handler.parse(Message(messages.detect.query_with_trigger));
+                assert(command.command === commandname);
+                assert(equal(command.args, []));
             });
         });
         it('"args" property an array of the words of the message', function () {
-            const command$469 = handler$451.parse(Message$436(messages$449.args));
-            assert$428(command$469.command === commandname$440);
-            assert$428(equal$429(command$469.args, [
-                arg1$444,
-                arg2$445
+            const command = handler.parse(Message(messages.args));
+            assert(command.command === commandname);
+            assert(equal(command.args, [
+                arg1,
+                arg2
             ]));
         });
         describe('Odd Spacing:', function () {
             it('Highlight', function () {
-                const command$472 = handler$451.parse(Message$436(messages$449.detect.highlight_oddspacing));
-                assert$428(command$472.command === commandname$440);
-                assert$428(equal$429(command$472.args, []));
+                const command = handler.parse(Message(messages.detect.highlight_oddspacing));
+                assert(command.command === commandname);
+                assert(equal(command.args, []));
             });
             it('Args', function () {
-                const command$473 = handler$451.parse(Message$436(messages$449.args_oddspacing));
-                assert$428(command$473.command === commandname$440);
-                assert$428(equal$429(command$473.args, [
-                    arg1$444,
-                    arg2$445
+                const command = handler.parse(Message(messages.args_oddspacing));
+                assert(command.command === commandname);
+                assert(equal(command.args, [
+                    arg1,
+                    arg2
                 ]));
             });
         });
         describe('events are emitted', function () {
-            it('of the command name', function (done$475) {
-                handler$451.on(commandname$440, function (command$476) {
-                    assert$428(command$476.command === commandname$440);
-                    done$475();
+            it('of the command name', function (done) {
+                handler.on(commandname, function (command) {
+                    assert(command.command === commandname);
+                    done();
                 });
-                handler$451.parse(Message$436(messages$449.command));
+                handler.parse(Message(messages.command));
             });
         });
     });
     describe('Response handling', function () {
-        var receiver$477;
+        var receiver;
         beforeEach(function () {
-            receiver$477 = { say: sinon$427.spy() };
+            receiver = { say: sinon.spy() };
         });
-        it('no response', function (done$485) {
-            const after$486 = handler$451.getAfter;
-            handler$451.after(function () {
-                logfn$433('After function called.');
-                after$486.apply(handler$451, arguments);
+        it('no response', function (done) {
+            const after = handler.getAfter;
+            handler.after(function () {
+                logfn('After function called.');
+                after.apply(handler, arguments);
                 setImmediate(function () {
-                    assert$428(!receiver$477.say.called);
-                    done$485();
+                    assert(!receiver.say.called);
+                    done();
                 });
             });
-            handler$451.on(commandname$440, function () {
+            handler.on(commandname, function () {
                 return undefined;
             });
-            handler$451.parse(Message$436(messages$449.command));
+            handler.parse(Message(messages.command));
         });
-        it('string response', function (done$487) {
-            receiver$477.say = function (_sender$488, response$489) {
+        it('string response', function (done) {
+            receiver.say = function (_sender, response) {
                 try {
-                    assert$428(sender$442 === _sender$488);
-                    assert$428(response$489 === 'response');
-                    assert$428(arguments.length === 2);
-                    done$487();
-                } catch (e$490) {
-                    done$487(e$490);
+                    assert(sender === _sender);
+                    assert(response === 'response');
+                    assert(arguments.length === 2);
+                    done();
+                } catch (e) {
+                    done(e);
                 }
             };
-            handler$451.on(commandname$440, function () {
+            handler.on(commandname, function () {
                 return 'response';
             });
-            handler$451.parse(Message$436(messages$449.command, receiver$477));
+            handler.parse(Message(messages.command, receiver));
         });
-        it('[string] response', function (done$491) {
-            receiver$477.say = function (_sender$492, response$493) {
+        it('[string] response', function (done) {
+            receiver.say = function (_sender, response) {
                 try {
-                    assert$428(sender$442 === _sender$492);
-                    assert$428(equal$429(response$493, ['response']));
-                    assert$428(arguments.length === 2);
-                    done$491();
-                } catch (e$494) {
-                    done$491(e$494);
+                    assert(sender === _sender);
+                    assert(equal(response, ['response']));
+                    assert(arguments.length === 2);
+                    done();
+                } catch (e) {
+                    done(e);
                 }
             };
-            handler$451.on(commandname$440, function () {
+            handler.on(commandname, function () {
                 return ['response'];
             });
-            handler$451.parse(Message$436(messages$449.command, receiver$477));
+            handler.parse(Message(messages.command, receiver));
         });
-        it('Promise<string> response', function (done$495) {
-            receiver$477.say = function (_sender$496, response$497) {
+        it('Promise<string> response', function (done) {
+            receiver.say = function (_sender, response) {
                 try {
-                    assert$428(sender$442 === _sender$496);
-                    assert$428(response$497 === 'response');
-                    assert$428(arguments.length === 2);
-                    done$495();
-                } catch (e$498) {
-                    done$495(e$498);
+                    assert(sender === _sender);
+                    assert(response === 'response');
+                    assert(arguments.length === 2);
+                    done();
+                } catch (e) {
+                    done(e);
                 }
             };
-            handler$451.on(commandname$440, function () {
-                return Q$437('response');
+            handler.on(commandname, function () {
+                return Q('response');
             });
-            handler$451.parse(Message$436(messages$449.command, receiver$477));
+            handler.parse(Message(messages.command, receiver));
         });
-        it('Promise<[string]> response', function (done$499) {
-            receiver$477.say = function (_sender$500, response$501) {
+        it('Promise<[string]> response', function (done) {
+            receiver.say = function (_sender, response) {
                 try {
-                    assert$428(sender$442 === _sender$500);
-                    assert$428(equal$429(response$501, ['response']));
-                    assert$428(arguments.length === 2);
-                    done$499();
-                } catch (e$502) {
-                    done$499(e$502);
+                    assert(sender === _sender);
+                    assert(equal(response, ['response']));
+                    assert(arguments.length === 2);
+                    done();
+                } catch (e) {
+                    done(e);
                 }
             };
-            handler$451.on(commandname$440, function () {
-                return Q$437(['response']);
+            handler.on(commandname, function () {
+                return Q(['response']);
             });
-            handler$451.parse(Message$436(messages$449.command, receiver$477));
+            handler.parse(Message(messages.command, receiver));
         });
-        it('Promise<string> after Promise#catch()', function (done$503) {
-            const failHandler$504 = function (command) {
-                return Q$437.reject(new Error()).catch(function (err) {
+        it('Promise<string> after Promise#catch()', function (done) {
+            const failHandler = function (command) {
+                return Q.reject(new Error()).catch(function (err) {
                     console.log('Returning sorry!');
                     return 'Sorry!';
                 });
             };
-            receiver$477.say = function (sender$505, response$506) {
+            receiver.say = function (sender$2, response) {
                 try {
-                    assert$428(response$506 === 'Sorry!');
-                    done$503();
-                } catch (e$507) {
-                    done$503(e$507);
+                    assert(response === 'Sorry!');
+                    done();
+                } catch (e) {
+                    done(e);
                 }
             };
-            handler$451.on(commandname$440, failHandler$504);
-            handler$451.parse(Message$436(messages$449.command, receiver$477));
+            handler.on(commandname, failHandler);
+            handler.parse(Message(messages.command, receiver));
         });
     });
 });

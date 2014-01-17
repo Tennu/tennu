@@ -1,10 +1,10 @@
-var sinon$608 = require('sinon');
-var assert$609 = require('better-assert');
-var equal$610 = require('deep-eql');
-var inspect$611 = require('util').inspect;
-var format$612 = require('util').format;
-var Message$613 = require('../lib/message');
-var receiver$614 = {
+var sinon = require('sinon');
+var assert = require('better-assert');
+var equal = require('deep-eql');
+var inspect = require('util').inspect;
+var format = require('util').format;
+var Message = require('../lib/message');
+var receiver = {
         toString: function () {
             return '[Object Receiver]';
         },
@@ -12,134 +12,134 @@ var receiver$614 = {
             return 'bot';
         }
     };
-var hostmask$615 = 'sender!malicious@test.suite.net';
-var nickname$616 = 'buddy';
-var server$617 = 'server.network.net';
-var channel$618 = '#channel';
-var arg1$619 = 'arg-1';
-var arg2$620 = 'arg-2';
-var restargs$621 = 'rest arguments';
-var reason$622 = 'Because I want to.';
-var messages$623 = {
-        generic: format$612('GENERIC'),
-        generic_args: format$612('GENERIC %s %s :%s', arg1$619, arg2$620, restargs$621),
-        generic_prefix_server_args: format$612(':%s GENERIC %s %s :%s', server$617, arg1$619, arg2$620, restargs$621),
-        generic_prefix_hostmask: format$612(':%s GENERIC', hostmask$615),
-        generic_oddspacing: format$612('GENERIC    %s     %s    :%s', arg1$619, arg2$620, 'rest arguments    '),
-        privmsg_channel: format$612(':%s PRIVMSG %s :%s', hostmask$615, channel$618, 'somebody said something'),
-        privmsg_query: format$612(':%s PRIVMSG %s :%s', hostmask$615, receiver$614.nickname(), 'hi hi'),
+var hostmask = 'sender!malicious@test.suite.net';
+var nickname = 'buddy';
+var server = 'server.network.net';
+var channel = '#channel';
+var arg1 = 'arg-1';
+var arg2 = 'arg-2';
+var restargs = 'rest arguments';
+var reason = 'Because I want to.';
+var messages = {
+        generic: format('GENERIC'),
+        generic_args: format('GENERIC %s %s :%s', arg1, arg2, restargs),
+        generic_prefix_server_args: format(':%s GENERIC %s %s :%s', server, arg1, arg2, restargs),
+        generic_prefix_hostmask: format(':%s GENERIC', hostmask),
+        generic_oddspacing: format('GENERIC    %s     %s    :%s', arg1, arg2, 'rest arguments    '),
+        privmsg_channel: format(':%s PRIVMSG %s :%s', hostmask, channel, 'somebody said something'),
+        privmsg_query: format(':%s PRIVMSG %s :%s', hostmask, receiver.nickname(), 'hi hi'),
         privmsg_oddspacing: ':sender!user@localhost PRIVMSG #test :    testbot:     testcommand     ',
-        join: format$612(':%s JOIN %s', hostmask$615, channel$618),
-        part: format$612(':%s PART %s', hostmask$615, channel$618),
-        part_reason: format$612(':%s PART %s :%s', hostmask$615, channel$618, reason$622)
+        join: format(':%s JOIN %s', hostmask, channel),
+        part: format(':%s PART %s', hostmask, channel),
+        part_reason: format(':%s PART %s :%s', hostmask, channel, reason)
     };
 describe('Message', function () {
     describe('common properties', function () {
         it('for no-args, no-prefix, no-tags', function () {
-            var message$632 = Message$613(messages$623.generic, receiver$614);
-            assert$609(message$632.receiver === receiver$614);
-            assert$609(message$632.command === 'generic');
-            assert$609(equal$610(message$632.params, []));
-            assert$609(message$632.prefix === '');
-            assert$609(equal$610(message$632.tags, {}));
-            assert$609(message$632.hostmask === null);
+            var message = Message(messages.generic, receiver);
+            assert(message.receiver === receiver);
+            assert(message.command === 'generic');
+            assert(equal(message.params, []));
+            assert(message.prefix === '');
+            assert(equal(message.tags, {}));
+            assert(message.hostmask === null);
         });
         it('for args, no-prefix, no-tags', function () {
-            var message$633 = Message$613(messages$623.generic_args, receiver$614);
-            assert$609(message$633.receiver === receiver$614);
-            assert$609(message$633.command === 'generic');
-            assert$609(equal$610(message$633.params, [
-                arg1$619,
-                arg2$620,
-                restargs$621
+            var message = Message(messages.generic_args, receiver);
+            assert(message.receiver === receiver);
+            assert(message.command === 'generic');
+            assert(equal(message.params, [
+                arg1,
+                arg2,
+                restargs
             ]));
-            assert$609(message$633.prefix === '');
-            assert$609(equal$610(message$633.tags, {}));
-            assert$609(message$633.hostmask === null);
+            assert(message.prefix === '');
+            assert(equal(message.tags, {}));
+            assert(message.hostmask === null);
         });
         it('for args, server prefix, no-tags', function () {
-            var message$634 = Message$613(messages$623.generic_prefix_server_args, receiver$614);
-            assert$609(message$634.receiver === receiver$614);
-            assert$609(message$634.command === 'generic');
-            assert$609(equal$610(message$634.params, [
-                arg1$619,
-                arg2$620,
-                restargs$621
+            var message = Message(messages.generic_prefix_server_args, receiver);
+            assert(message.receiver === receiver);
+            assert(message.command === 'generic');
+            assert(equal(message.params, [
+                arg1,
+                arg2,
+                restargs
             ]));
-            assert$609(message$634.prefix === server$617);
-            assert$609(equal$610(message$634.tags, {}));
-            assert$609(message$634.hostmask === null);
+            assert(message.prefix === server);
+            assert(equal(message.tags, {}));
+            assert(message.hostmask === null);
         });
         it('for no-args, hostmask prefix, no-tags', function () {
-            var message$635 = Message$613(messages$623.generic_prefix_hostmask, receiver$614);
-            assert$609(message$635.receiver === receiver$614);
-            assert$609(message$635.command === 'generic');
-            assert$609(equal$610(message$635.params, []));
-            assert$609(message$635.prefix === hostmask$615);
-            assert$609(equal$610(message$635.tags, {}));
-            assert$609(equal$610(message$635.hostmask, {
+            var message = Message(messages.generic_prefix_hostmask, receiver);
+            assert(message.receiver === receiver);
+            assert(message.command === 'generic');
+            assert(equal(message.params, []));
+            assert(message.prefix === hostmask);
+            assert(equal(message.tags, {}));
+            assert(equal(message.hostmask, {
                 nickname: 'sender',
                 username: 'malicious',
                 hostname: 'test.suite.net'
             }));
-            assert$609(message$635.nickname === message$635.hostmask.nickname);
+            assert(message.nickname === message.hostmask.nickname);
         });
         it('handles odd spacing', function () {
-            var message$636 = Message$613(messages$623.generic_oddspacing, receiver$614);
-            assert$609(message$636.receiver === receiver$614);
-            assert$609(message$636.command === 'generic');
-            assert$609(equal$610(message$636.params, [
-                arg1$619,
-                arg2$620,
+            var message = Message(messages.generic_oddspacing, receiver);
+            assert(message.receiver === receiver);
+            assert(message.command === 'generic');
+            assert(equal(message.params, [
+                arg1,
+                arg2,
                 'rest arguments    '
             ]));
-            assert$609(message$636.prefix === '');
-            assert$609(equal$610(message$636.tags, {}));
-            assert$609(message$636.hostmask === null);
+            assert(message.prefix === '');
+            assert(equal(message.tags, {}));
+            assert(message.hostmask === null);
         });
     });
     describe('of type:', function () {
         describe('privmsg:', function () {
             it('channel', function () {
-                var message$643 = Message$613(messages$623.privmsg_channel, receiver$614);
-                assert$609(message$643.command === 'privmsg');
-                assert$609(!message$643.isQuery);
-                assert$609(message$643.nicknamename === message$643.hostmask.nicknamename);
-                assert$609(message$643.channel === '#channel');
-                assert$609(message$643.message === 'somebody said something');
+                var message = Message(messages.privmsg_channel, receiver);
+                assert(message.command === 'privmsg');
+                assert(!message.isQuery);
+                assert(message.nicknamename === message.hostmask.nicknamename);
+                assert(message.channel === '#channel');
+                assert(message.message === 'somebody said something');
             });
             it('query', function () {
-                var message$644 = Message$613(messages$623.privmsg_query, receiver$614);
-                assert$609(message$644.command === 'privmsg');
-                assert$609(message$644.channel === 'sender');
-                assert$609(message$644.isQuery);
-                assert$609(message$644.message === 'hi hi');
+                var message = Message(messages.privmsg_query, receiver);
+                assert(message.command === 'privmsg');
+                assert(message.channel === 'sender');
+                assert(message.isQuery);
+                assert(message.message === 'hi hi');
             });
             it('odd spacing', function () {
-                var message$645 = Message$613(messages$623.privmsg_oddspacing, receiver$614);
-                assert$609(message$645.params[0] === '#test');
-                assert$609(message$645.params[1] === '    testbot:     testcommand     ');
-                assert$609(message$645.command === 'privmsg');
-                assert$609(message$645.channel === '#test');
-                assert$609(!message$645.isQuery);
-                assert$609(message$645.message === 'testbot:     testcommand');
+                var message = Message(messages.privmsg_oddspacing, receiver);
+                assert(message.params[0] === '#test');
+                assert(message.params[1] === '    testbot:     testcommand     ');
+                assert(message.command === 'privmsg');
+                assert(message.channel === '#test');
+                assert(!message.isQuery);
+                assert(message.message === 'testbot:     testcommand');
             });
         });
         it('join', function () {
-            var message$646 = Message$613(messages$623.join, receiver$614);
-            assert$609(message$646.channel === channel$618);
+            var message = Message(messages.join, receiver);
+            assert(message.channel === channel);
         });
         describe('part:', function () {
             it('with reason', function () {
-                var message$649 = Message$613(messages$623.part_reason, receiver$614);
-                assert$609(message$649.channel === channel$618);
-                assert$609(message$649.reason === reason$622);
+                var message = Message(messages.part_reason, receiver);
+                assert(message.channel === channel);
+                assert(message.reason === reason);
             });
             it('without reason', function () {
-                var message$650 = Message$613(messages$623.part, receiver$614);
-                assert$609(message$650.channel === channel$618);
-                assert$609(message$650.reason === undefined);
-                assert$609(message$650.hasOwnProperty('reason'));
+                var message = Message(messages.part, receiver);
+                assert(message.channel === channel);
+                assert(message.reason === undefined);
+                assert(message.hasOwnProperty('reason'));
             });
         });
     });
