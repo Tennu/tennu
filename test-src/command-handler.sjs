@@ -39,6 +39,7 @@ const messages = {
     detect: {
         trigger:              chanmsg(format('!%s',           commandname)),
         highlight:            chanmsg(format('%s: %s',        nickname, commandname)),
+        case_insensitive_highlight: chanmsg(format('%s: %s', nickname.toUpperCase(), commandname)),
         query:                privmsg(format('%s',            commandname)),
         query_with_trigger:   privmsg(format('!%s',           commandname)),
         highlight_oddspacing: chanmsg(format('  %s:   %s   ', nickname, commandname)),
@@ -73,6 +74,13 @@ describe 'Command Handler' {
 
                 assert(command.command === commandname);
                 assert(equal(command.args, []));
+            }
+
+            it 'Highlights in case insensitive way' {
+                const command = handler.parse(Message(messages.detect.case_insensitive_highlight));
+                
+                assert(command.command === commandname);
+                assert(equal(command.args, []));            
             }
 
             it 'Query' {
