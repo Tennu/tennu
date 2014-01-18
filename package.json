@@ -56,7 +56,7 @@
     "mocha": "~1.17.0"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha -R spec",
+    "test": "mocha -R spec",
     "build": "./fez.js"
   },
   "bin": {
