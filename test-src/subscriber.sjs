@@ -11,18 +11,18 @@ const BiSubscriber = require('../lib/bisubscriber');
 const EventEmitter = require('events').EventEmitter;
 
 describe 'BiSubscribers' {
+    var subscriber, primary, secondary;
     beforeEach {
         logfn(/* newline */);
+        primary = new EventEmitter();
+        secondary = new EventEmitter();
+        subscriber = new BiSubscriber(primary, secondary);
     }
 
     describe 'subscribe events to two event emitters' {
-        var subscriber, primary, secondary, primarySpy, secondarySpy;
+        var primarySpy, secondarySpy;
 
         beforeEach {
-            primary = new EventEmitter();
-            secondary = new EventEmitter();
-            subscriber = new BiSubscriber(primary, secondary);
-
             primarySpy = sinon.spy();
             secondarySpy = sinon.spy();
         }
@@ -44,10 +44,8 @@ describe 'BiSubscribers' {
         }
 
         it 'can subscribe multiple events' {
-            var primaryDataSpy, secondaryDataSpy;
-
-            primaryDataSpy = sinon.spy();
-            secondaryDataSpy = sinon.spy();
+            const primaryDataSpy = sinon.spy();
+            const secondaryDataSpy = sinon.spy();
 
             subscriber.on({
                 'event': primarySpy,
@@ -69,18 +67,10 @@ describe 'BiSubscribers' {
     }
 
     describe 'quantification (on vs. once)' {
-        var subscriber, primary, secondary, spy, eventCount, isDone;
+        var spy;
 
         beforeEach {
-            primary = new EventEmitter();
-            secondary = new EventEmitter();
-            subscriber = new BiSubscriber(primary, secondary, null);
             spy = sinon.spy();
-            eventCount = 0;
-
-            subscriber.on('event !event', function () {
-                eventCount += 1;
-            });
         }
 
         it 'handles once one time (primary)' {
@@ -117,6 +107,40 @@ describe 'BiSubscribers' {
             secondary.emit('event');
 
             assert(spy.calledTwice);
+        }
+    }
+
+    describe 'unsubscribing' {
+        var spy;
+
+        beforeEach {
+            spy = sinon.spy();
+        }
+
+        it 'primary w/two arg version' {
+            subscriber.on('event', spy);
+            primary.emit('event');
+            subscriber.off('event', spy);
+            primary.emit('event');
+
+            assert(spy.calledOnce);
+        }
+
+        it 'primary w/object version' {
+            subscriber.on('event', spy);
+            subscriber.on('event2', spy);
+
+            primary.emit('event2');
+
+            subscriber.off({
+                'event': spy,
+                'event2': spy
+            });
+
+            primary.emit('event');
+            primary.emit('event2');
+
+            assert(spy.calledOnce);
         }
     }
 }

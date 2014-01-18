@@ -1,6 +1,6 @@
 {
   "name": "tennu",
-  "version": "0.8.4pre3",
+  "version": "0.8.4pre4",
   "description": "Tennu - Modular IRC Bot Framework for Node.js",
   "maintainers": [
     {
@@ -15,7 +15,7 @@
       "email": "ryan.havvy@gmail.com",
       "web": "http://havvy.net"
     },
-    { 
+    {
       "name": "Marc Talbot (metalbot)"
     }
   ],
@@ -51,7 +51,8 @@
     "better-assert": "~1.0.0",
     "sweet-bdd": "~1.0.0",
     "fez": "fez/fez",
-    "fez-sweet.js": "~0.6.0"
+    "fez-sweet.js": "~0.6.0",
+    "coco-js": "Havvy/coco-js"
   },
   "scripts": {
     "test": "mocha -R spec",
