@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Tennu/tennu.png?branch=master)](https://travis-ci.org/Tennu/tennu)
+
 Tennu is an IRC bot framework written in Node.js
 
 [![NPM](https://nodei.co/npm/tennu.png?downloads=true&stars=true)](https://nodei.co/npm/tennu/)
