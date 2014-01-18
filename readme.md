@@ -1,5 +1,9 @@
 Tennu is an IRC bot framework written in Node.js
 
+[![NPM](https://nodei.co/npm/tennu.png?downloads=true&stars=true)](https://nodei.co/npm/tennu/)
+
+See [Our Website](https://tennu.github.io) for (soon) better documentation.
+
 ----------
 
 ## Basic Usage ##
@@ -52,7 +56,7 @@ A network configuration object has the following properties:
 * nickserv        - Nickname of nickserv service. Defaults to "nickserv".
 * trigger         - Command character to trigger commands with. By default, '!'.
 * channels        - Array of channels to autojoin. _Example:_ ["#help", "#tennu"]
-* plugins         - An array of module names that the bot requires.
+* modules         - An array of module names that the bot requires.
 
 Other plugins may use additional properties.
 
@@ -66,6 +70,7 @@ The following properties will be renamed:
 * nick -> nickname
 * trigger -> command-trigger
 * password -> auth-password (or something better...)
+* modules -> plugins
 
 ## Dependency Management ##
 
