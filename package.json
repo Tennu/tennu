@@ -1,6 +1,6 @@
 {
   "name": "tennu",
-  "version": "0.8.4pre2",
+  "version": "0.8.4pre3",
   "description": "Tennu - Modular IRC Bot Framework for Node.js",
   "maintainers": [
     {
@@ -14,6 +14,9 @@
       "name": "Ryan Scheel (havvy)",
       "email": "ryan.havvy@gmail.com",
       "web": "http://havvy.net"
+    },
+    { 
+      "name": "Marc Talbot (metalbot)"
     }
   ],
   "repository": {
