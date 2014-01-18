@@ -52,10 +52,11 @@
     "sweet-bdd": "~1.0.0",
     "fez": "fez/fez",
     "fez-sweet.js": "~0.6.0",
-    "coco-js": "Havvy/coco-js"
+    "coco-js": "Havvy/coco-js",
+    "mocha": "~1.17.0"
   },
   "scripts": {
-    "test": "mocha -R spec",
+    "test": "./node_modules/mocha/bin/mocha -R spec",
     "build": "./fez.js"
   },
   "bin": {

@@ -2,7 +2,9 @@ Tennu is an IRC bot framework written in Node.js
 
 [![NPM](https://nodei.co/npm/tennu.png?downloads=true&stars=true)](https://nodei.co/npm/tennu/)
 
-See [Our Website](https://tennu.github.io) for (soon) better documentation.
+Note: Modules are going to be renamed to plugins. The only breaking change in code is that the config
+property will be changed and you'll have to move your private plugins from tennu_modules to tennu_plugins.
+The code for now will say 'modules', while the documentation says 'plugins'. They are synonomous.
 
 ----------
 
@@ -26,14 +28,16 @@ myClient.on('join', function (message) {
     this.say(message.channel, message.actor + " joined!");
 });
 
-// Do something when a user emits a command, in this case, hello.
-myClient.on('!hello', function (command) {
-    this.say(command.channel, 'world');
+// Do something when a user emits a command, in this case, join the specified channel.
+myClient.on('!join', function (command) {
+    this.join(command.args[0]);
 });
 
 // Load a module.
-// The require function is from node, and the method is from Tennu.
-myClient.require(require('./yourModule'));
+myClient.initialize(require('./yourModule'));
+
+// Or just use a module from tennu_modules/%f or node_modules/tennu-%f
+myClient.use(['admin', 'last-seen']);
 
 myClient.connect();
 ```
@@ -46,9 +50,11 @@ A network configuration object has the following properties:
 
 * server          - IRC server to connect to. _Example:_ _irc.mibbit.net_
 * port            - Port to connect to. Defaults to 6667.
-* password        - Password for IRC Network (most networks do not have a password)
 * secure          - Use a TLS socket (Throws away the NetSocket)
+* ipv6            - Whether you are connecting over ipv6 or not.
+* localAddress    - See net.Socket documentation. ;)
 * capab           - IRC3 CAP support. (Untested)
+* password        - Password for IRC Network (most networks do not have a password)
 * nickname        - Nickname the bot will use. Defaults to "tennubot"
 * username        - Username the bot will use. Defaults to "user"
 * realname        - Realname for the bot. Defaults to "tennu v0.3"
@@ -57,8 +63,11 @@ A network configuration object has the following properties:
 * trigger         - Command character to trigger commands with. By default, '!'.
 * channels        - Array of channels to autojoin. _Example:_ ["#help", "#tennu"]
 * modules         - An array of module names that the bot requires.
+* disable-help    - Disables the built-in help plugin.
 
-Other plugins may use additional properties.
+Password is listed twice. That is a bug that will be fixed in v0.9.0.
+
+Other plugins may add additional properties.
 
 Configuration objects are JSON encodable.
 
@@ -79,11 +88,10 @@ replace the factories that the Client uses by default.
 
 * NetSocket
 * IrcSocket
-* IrcOutputSocket
-* MessageParser
-* ChunkedMessageParser
-* CommandParser
-* Modules
+* IrcOutputSocket [0.9.0 - Will be removed in favor of the 'actions' plugin]
+* MessageHandler
+* CommandHandler
+* Modules         [0.9.0 - Will be renamed to Plugins]
 * BiSubscriber
 * Logger
 
@@ -165,7 +173,7 @@ All messages have the following fields:
 * tags       - IRC3 tags sent with message.
 
 Some messages have extended information. See
-[Message Properties](https://github.com/Havvy/tennu/blob/master/doc/message-properties.md).
+[Message Properties](http://tennu.github.io/documentation/api/message-properties).
 
 #### Command ####
 
@@ -277,10 +285,10 @@ As raw(message), but the arguments are passed through util.format() first.
 
 --------
 
-## Module System ##
+## Plugin System ##
 
-Tennu has its own module system, loosely based off of Node's. You can read
-about it at https://github.com/havvy/tennu-modules/.
+Tennu has its own plugin system, loosely based off of Node's module system.
+You can read about it at https://github.com/havvy/tennu-plguins/.
 
 You may access the module system's methods via the Client.modules property
 or by using one of the following methods:
@@ -289,12 +297,14 @@ or by using one of the following methods:
 * client.getModule()
 * client.getRole()
 * client.use()
-* client.initialize()
-* client.isInitializable()
+* client.initializeModule()
+* client.isModuleInitializable()
 
 ### Creating Your Own Modules ###
 
-See [Creating Your Own Modules](https://github.com/Havvy/tennu/blob/master/doc/creating-modules.md)
+See [Creating Your Own Modules](https://github.com/Havvy/tennu/blob/master/doc/creating-modules.md).
+
+See [Getting Started](http://tennu.github.io/documentation/getting-started).
 
 ### Built-In Modules ###
 
@@ -408,11 +418,13 @@ Documentation for these objects in isolation is currently unavailable.
 
 ## Testing ##
 
-Tests require mocha to be installed globally.
+```
+npm test
+```
 
-Afterwards, `npm test` in the directory.
-
-Between all projects (tennu, tennu-modules, irc-socket), there are over 100 test cases.
+Between all projects (tennu, tennu-plugins, irc-socket, after-events),
+there are over 100 tests, but more are always appreciated, especially
+if they are failing with an actual bug. ;)
 
 ## See Also ##
 
