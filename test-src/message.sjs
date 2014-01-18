@@ -32,8 +32,8 @@ var messages = {
     part:                       format(':%s PART %s', hostmask, channel),
     part_reason:                format(':%s PART %s :%s', hostmask, channel, reason),
 
-    quit:                       format(':%s QUIT %s', hostmask, channel),
-    quit_reason:                format(':%s QUIT %s :%s', hostmask, channel, reason)
+    quit:                       format(':%s QUIT', hostmask),
+    quit_reason:                format(':%s QUIT :%s', hostmask, reason)
 };
 
 describe 'Message' {
@@ -158,14 +158,12 @@ describe 'Message' {
             it 'with reason' {
                 var message = Message(messages.quit_reason, receiver);
 
-                assert(message.channel === channel);
                 assert(message.reason === reason);       
             }
 
             it 'without reason' {
                 var message = Message(messages.quit, receiver);
 
-                assert(message.channel === channel);
                 assert(message.reason === undefined);
                 assert(message.hasOwnProperty('reason'));   
             }

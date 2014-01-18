@@ -32,8 +32,8 @@ var messages = {
         join: format(':%s JOIN %s', hostmask, channel),
         part: format(':%s PART %s', hostmask, channel),
         part_reason: format(':%s PART %s :%s', hostmask, channel, reason),
-        quit: format(':%s QUIT %s', hostmask, channel),
-        quit_reason: format(':%s QUIT %s :%s', hostmask, channel, reason)
+        quit: format(':%s QUIT', hostmask),
+        quit_reason: format(':%s QUIT :%s', hostmask, reason)
     };
 describe('Message', function () {
     describe('common properties', function () {
@@ -147,12 +147,10 @@ describe('Message', function () {
         describe('quit:', function () {
             it('with reason', function () {
                 var message = Message(messages.quit_reason, receiver);
-                assert(message.channel === channel);
                 assert(message.reason === reason);
             });
             it('without reason', function () {
                 var message = Message(messages.quit, receiver);
-                assert(message.channel === channel);
                 assert(message.reason === undefined);
                 assert(message.hasOwnProperty('reason'));
             });
