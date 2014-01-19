@@ -26,4 +26,4 @@ FINISHED
 * Logging
 * Command Line Tool
 * Nickname tracking object
-* Respond Object (minus target property)
+* Respond Object

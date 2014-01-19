@@ -16,12 +16,12 @@ const logger = {
 const Client = require('../lib/client.js');
 const NetSocket = require('../test-lib/mock-net-socket.js');
 const network = {
-        nick: 'testbot',
-        user: 'testuser',
-        server: 'irc.test.net',
-        nickserv: 'nickserv',
-        password: 'testpass',
-        channels: ['#test']
+        'nickname': 'testbot',
+        'username': 'testuser',
+        'server': 'irc.test.net',
+        'nickserv': 'nickserv',
+        'auth-password': 'testpass',
+        'channels': ['#test']
     };
 const fakeWrite = function fakeWrite$2(message) {
     fakeWrite$2.spy.apply(this, arguments);

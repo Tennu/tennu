@@ -1,12 +1,12 @@
-var sinon = require('sinon');
-var assert = require('better-assert');
-var equal = require('deep-eql');
-var inspect = require('util').inspect;
-var format = require('util').format;
+const sinon = require('sinon');
+const assert = require('better-assert');
+const equal = require('deep-eql');
+const inspect = require('util').inspect;
+const format = require('util').format;
 const debug = false;
 const logfn = debug ? console.log.bind(console) : function () {
     };
-var UserModule = require('../tennu_modules/user.js');
+const UserModule = require('../tennu_plugins/user.js');
 describe('User Module:', function () {
     var instance, client;
     beforeEach(function () {

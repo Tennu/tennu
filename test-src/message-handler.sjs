@@ -5,8 +5,8 @@ var inspect = require('util').inspect;
 var format = require('util').format;
 
 const debug = false;
-const logfn = debug ? console.log.bind(console) : function () {};
-const logger = {debug: logfn, info: logfn, notice: logfn, warn: logfn, error: logfn};
+const log = debug ? console.log.bind(console) : function () {};
+const logger = {debug: log, info: log, notice: log, warn: log, error: log};
 
 const MessageHandler = require('../lib/message-handler.js');
 const Message = require('../lib/message.js');
@@ -31,10 +31,10 @@ describe 'Message Parsers' {
     var parser, receiver;
 
     beforeEach {
-        logfn(/* newline */);
+        log(/* newline */);
 
         receiver = {_id: id()};
-        parser = MessageHandler(receiver);
+        parser = MessageHandler(receiver, logger);
     }
 
     describe '#parse' {
@@ -55,7 +55,6 @@ describe 'Message Parsers' {
             assert(retval.params[0] === arg1);
             assert(retval.params[1] === arg2);
             assert(retval.params[2] === argr);
-            assert(retval.receiver === receiver);
         }
 
         it 'Event Value' {
@@ -64,7 +63,6 @@ describe 'Message Parsers' {
             assert(evtval.params[0] === arg1);
             assert(evtval.params[1] === arg2);
             assert(evtval.params[2] === argr);
-            assert(evtval.receiver === receiver);
         }
 
         it 'Emit and Return value are the same' {

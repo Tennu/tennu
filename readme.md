@@ -35,10 +35,10 @@ myClient.on('!join', function (command) {
     this.join(command.args[0]);
 });
 
-// Load a module.
+// Load a plugin.
 myClient.initialize(require('./yourModule'));
 
-// Or just use a module from tennu_modules/%f or node_modules/tennu-%f
+// Or just use a plugin from tennu_modules/%f or node_modules/tennu-%f
 myClient.use(['admin', 'last-seen']);
 
 myClient.connect();
@@ -60,28 +60,16 @@ A network configuration object has the following properties:
 * nickname        - Nickname the bot will use. Defaults to "tennubot"
 * username        - Username the bot will use. Defaults to "user"
 * realname        - Realname for the bot. Defaults to "tennu v0.3"
-* password        - Password for identifying to services.
+* auth-password   - Password for identifying to services.
 * nickserv        - Nickname of nickserv service. Defaults to "nickserv".
-* trigger         - Command character to trigger commands with. By default, '!'.
+* command-trigger - Command character to trigger commands with. By default, '!'.
 * channels        - Array of channels to autojoin. _Example:_ ["#help", "#tennu"]
-* modules         - An array of module names that the bot requires.
+* plugins         - An array of plugin names that the bot requires.
 * disable-help    - Disables the built-in help plugin.
-
-Password is listed twice. That is a bug that will be fixed in v0.9.0.
 
 Other plugins may add additional properties.
 
 Configuration objects are JSON encodable.
-
-[0.9.0]
-
-The following properties will be renamed:
-
-* user -> username
-* nick -> nickname
-* trigger -> command-trigger
-* password -> auth-password (or something better...)
-* modules -> plugins
 
 ## Dependency Management ##
 
@@ -90,10 +78,9 @@ replace the factories that the Client uses by default.
 
 * NetSocket
 * IrcSocket
-* IrcOutputSocket [0.9.0 - Will be removed in favor of the 'actions' plugin]
 * MessageHandler
 * CommandHandler
-* Modules         [0.9.0 - Will be renamed to Plugins]
+* Plugins         [0.9.0 - Will be renamed to Plugins]
 * BiSubscriber
 * Logger
 

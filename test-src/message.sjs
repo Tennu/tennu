@@ -1,22 +1,21 @@
-var sinon = require('sinon');
-var assert = require('better-assert');
-var equal = require('deep-eql');
-var inspect = require('util').inspect;
-var format = require('util').format;
+const sinon = require('sinon');
+const assert = require('better-assert');
+const equal = require('deep-eql');
+const inspect = require('util').inspect;
+const format = require('util').format;
 
-var Message = require('../lib/message');
-var receiver = {toString: function () { return '[Object Receiver]'}, nickname: function () { return 'bot'}};
+const Message = require('../lib/message');
 
-var hostmask = 'sender!malicious@test.suite.net';
-var nickname = 'buddy';
-var server = 'server.network.net';
-var channel = '#channel';
-var arg1 = 'arg-1';
-var arg2 = 'arg-2';
-var restargs = 'rest arguments';
-var reason = 'Because I want to.';
+const hostmask = 'sender!malicious@test.suite.net';
+const nickname = 'buddy';
+const server = 'server.network.net';
+const channel = '#channel';
+const arg1 = 'arg-1';
+const arg2 = 'arg-2';
+const restargs = 'rest arguments';
+const reason = 'Because I want to.';
 
-var messages = {
+const messages = {
     generic:                    format('GENERIC'),
     generic_args:               format('GENERIC %s %s :%s', arg1, arg2, restargs),
     generic_prefix_server_args: format(':%s GENERIC %s %s :%s', server, arg1, arg2, restargs),
@@ -24,7 +23,7 @@ var messages = {
     generic_oddspacing:         format('GENERIC    %s     %s    :%s', arg1, arg2, 'rest arguments    '),
 
     privmsg_channel:            format(':%s PRIVMSG %s :%s', hostmask, channel, 'somebody said something'),
-    privmsg_query:              format(':%s PRIVMSG %s :%s', hostmask, receiver.nickname(), 'hi hi'),
+    privmsg_query:              format(':%s PRIVMSG %s :%s', hostmask, nickname, 'hi hi'),
     privmsg_oddspacing:         ':sender!user@localhost PRIVMSG #test :    testbot:     testcommand     ',
 
     join:                       format(':%s JOIN %s', hostmask, channel),
@@ -39,9 +38,8 @@ var messages = {
 describe 'Message' {
     describe 'common properties' {
         it 'for no-args, no-prefix, no-tags' {
-            var message = Message(messages.generic, receiver);
+            const message = Message(messages.generic);
 
-            assert(message.receiver === receiver);
             assert(message.command === 'generic');
             assert(equal(message.params, []));
             assert(message.prefix === '');
@@ -50,9 +48,8 @@ describe 'Message' {
         }
 
         it 'for args, no-prefix, no-tags' {
-            var message = Message(messages.generic_args, receiver);
+            const message = Message(messages.generic_args);
 
-            assert(message.receiver === receiver);
             assert(message.command === 'generic')
             assert(equal(message.params, [arg1, arg2, restargs]));
             assert(message.prefix === '');
@@ -61,9 +58,8 @@ describe 'Message' {
         }
 
         it 'for args, server prefix, no-tags' {
-            var message = Message(messages.generic_prefix_server_args, receiver);
+            const message = Message(messages.generic_prefix_server_args);
 
-            assert(message.receiver === receiver);
             assert(message.command === 'generic');
             assert(equal(message.params, [arg1, arg2, restargs]));
             assert(message.prefix === server);
@@ -72,9 +68,8 @@ describe 'Message' {
         }
 
         it 'for no-args, hostmask prefix, no-tags' {
-            var message = Message(messages.generic_prefix_hostmask, receiver);
+            const message = Message(messages.generic_prefix_hostmask);
 
-            assert(message.receiver === receiver);
             assert(message.command === 'generic');
             assert(equal(message.params, []));
             assert(message.prefix === hostmask);
@@ -84,9 +79,8 @@ describe 'Message' {
         }
 
         it 'handles odd spacing' {
-            var message = Message(messages.generic_oddspacing, receiver);
+            const message = Message(messages.generic_oddspacing);
 
-            assert(message.receiver === receiver);
             assert(message.command === 'generic');
             assert(equal(message.params, [arg1, arg2, 'rest arguments    ']));
             assert(message.prefix === '');
@@ -98,7 +92,7 @@ describe 'Message' {
     describe 'of type:' {
         describe 'privmsg:' {
             it 'channel' {
-                var message = Message(messages.privmsg_channel, receiver);
+                const message = Message(messages.privmsg_channel);
 
                 assert(message.command === 'privmsg');
                 assert(!message.isQuery);
@@ -108,7 +102,7 @@ describe 'Message' {
             }
 
             it 'query' {
-                var message = Message(messages.privmsg_query, receiver);
+                const message = Message(messages.privmsg_query);
 
                 assert(message.command === 'privmsg');
                 assert(message.channel === 'sender');
@@ -118,7 +112,7 @@ describe 'Message' {
             }
 
             it 'odd spacing' {
-                var message = Message(messages.privmsg_oddspacing, receiver);
+                const message = Message(messages.privmsg_oddspacing);
 
                 assert(message.params[0] === '#test');
                 assert(message.params[1] === '    testbot:     testcommand     ');
@@ -132,21 +126,21 @@ describe 'Message' {
         }
 
         it 'join' {
-            var message = Message(messages.join, receiver);
+            const message = Message(messages.join);
 
             assert(message.channel === channel);
         }
 
         describe 'part:' {
             it 'with reason' {
-                var message = Message(messages.part_reason, receiver);
+                const message = Message(messages.part_reason);
 
                 assert(message.channel === channel);
                 assert(message.reason === reason);
             }
 
             it 'without reason' {
-                var message = Message(messages.part, receiver);
+                const message = Message(messages.part);
 
                 assert(message.channel === channel);
                 assert(message.reason === undefined);
@@ -156,13 +150,13 @@ describe 'Message' {
 
         describe 'quit:' {
             it 'with reason' {
-                var message = Message(messages.quit_reason, receiver);
+                const message = Message(messages.quit_reason);
 
                 assert(message.reason === reason);       
             }
 
             it 'without reason' {
-                var message = Message(messages.quit, receiver);
+                const message = Message(messages.quit);
 
                 assert(message.reason === undefined);
                 assert(message.hasOwnProperty('reason'));   

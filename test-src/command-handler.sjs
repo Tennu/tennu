@@ -10,10 +10,10 @@ const logger = {debug: logfn, info: logfn, notice: logfn, warn: logfn, error: lo
 
 const CommandHandler = require('../lib/command-handler.js');
 const Message = require('../lib/message.js');
-const Q = require('q');
+const Promise = require('bluebird');
 
 const config = {
-    trigger: '!'
+    'command-trigger': '!'
 };
 
 const prefix = 'sender!user@localhost';
@@ -39,7 +39,7 @@ const messages = {
     detect: {
         trigger:              chanmsg(format('!%s',           commandname)),
         highlight:            chanmsg(format('%s: %s',        nickname, commandname)),
-        case_insensitive_highlight: chanmsg(format('%s: %s', nickname.toUpperCase(), commandname)),
+        case_insensitive_highlight: chanmsg(format('%s: %s',  nickname.toUpperCase(), commandname)),
         query:                privmsg(format('%s',            commandname)),
         query_with_trigger:   privmsg(format('!%s',           commandname)),
         highlight_oddspacing: chanmsg(format('  %s:   %s   ', nickname, commandname)),
@@ -49,10 +49,14 @@ const messages = {
 };
 
 describe 'Command Handler' {
-    var handler;
+    var handler, receiver;
 
     beforeEach {
-        handler = CommandHandler(config, nicknamefn, logger);
+        receiver = {
+            say: sinon.spy()
+        };
+
+        handler = CommandHandler(config, receiver, nicknamefn, logger);
     }
 
     describe 'command detection:' {
@@ -134,14 +138,6 @@ describe 'Command Handler' {
     }
 
     describe 'Response handling' {
-        var receiver;
-
-        beforeEach {
-            receiver = {
-                say: sinon.spy()
-            };
-        }
-
         it 'no response' (done) {
             handler.after(function () {
                 try {
@@ -211,7 +207,7 @@ describe 'Command Handler' {
             };
 
             handler.on(commandname, function () {
-                return Q('response');
+                return Promise.resolve('response');
             });
 
             handler.parse(Message(messages.command, receiver));
@@ -230,7 +226,7 @@ describe 'Command Handler' {
             };
 
             handler.on(commandname, function () {
-                return Q(['response']);
+                return Promise.resolve(['response']);
             });
 
             handler.parse(Message(messages.command, receiver));
@@ -238,7 +234,7 @@ describe 'Command Handler' {
 
         it 'Promise<string> after Promise#catch()' (done) {
             const failHandler = function (command) {
-                return Q
+                return Promise
                 .reject(new Error())
                 .catch(function (err) {
                     console.log("Returning sorry!");

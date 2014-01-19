@@ -41,10 +41,11 @@
     "lodash": "2.4.x",
     "irc-socket": "~2.2.0",
     "irc-message": "1.0.x",
-    "tennu-modules": "2.1.x",
+    "tennu-plugins": "~3.0.0",
     "commander": "~2.1.x",
     "q": "~0.9.x",
-    "after-events": "~1.0.0"
+    "after-events": "~1.0.0",
+    "bluebird": "~1.0.0"
   },
   "devDependencies": {
     "sinon": "~1.7.3",

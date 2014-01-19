@@ -15,8 +15,8 @@ const logger = {
     };
 const CommandHandler = require('../lib/command-handler.js');
 const Message = require('../lib/message.js');
-const Q = require('q');
-const config = { trigger: '!' };
+const Promise = require('bluebird');
+const config = { 'command-trigger': '!' };
 const prefix = 'sender!user@localhost';
 const commandname = 'command';
 const channel = '#test';
@@ -48,9 +48,10 @@ const messages = {
         args_oddspacing: privmsg(format('%s  %s   %s  ', commandname, arg1, arg2))
     };
 describe('Command Handler', function () {
-    var handler;
+    var handler, receiver;
     beforeEach(function () {
-        handler = CommandHandler(config, nicknamefn, logger);
+        receiver = { say: sinon.spy() };
+        handler = CommandHandler(config, receiver, nicknamefn, logger);
     });
     describe('command detection:', function () {
         it('ignores non-commands by returning undefined', function () {
@@ -118,10 +119,6 @@ describe('Command Handler', function () {
         });
     });
     describe('Response handling', function () {
-        var receiver;
-        beforeEach(function () {
-            receiver = { say: sinon.spy() };
-        });
         it('no response', function (done) {
             handler.after(function () {
                 try {
@@ -181,7 +178,7 @@ describe('Command Handler', function () {
                 }
             };
             handler.on(commandname, function () {
-                return Q('response');
+                return Promise.resolve('response');
             });
             handler.parse(Message(messages.command, receiver));
         });
@@ -197,13 +194,13 @@ describe('Command Handler', function () {
                 }
             };
             handler.on(commandname, function () {
-                return Q(['response']);
+                return Promise.resolve(['response']);
             });
             handler.parse(Message(messages.command, receiver));
         });
         it('Promise<string> after Promise#catch()', function (done) {
             const failHandler = function (command) {
-                return Q.reject(new Error()).catch(function (err) {
+                return Promise.reject(new Error()).catch(function (err) {
                     console.log('Returning sorry!');
                     return 'Sorry!';
                 });
