@@ -14,7 +14,7 @@ var nickname = 'testbot';
 var nicknamefn = function () { return nickname; };
 
 var OutputSocket = require('../lib/output-socket.js');
-var EventEmitter = require('../lib/event-emitter.js');
+var EventEmitter = require('after-events');
 
 describe 'IRC Output Socket:' {
     var socket, out, messageHandler;

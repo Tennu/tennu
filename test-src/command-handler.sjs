@@ -143,15 +143,14 @@ describe 'Command Handler' {
         }
 
         it 'no response' (done) {
-            const after = handler.getAfter;
-
             handler.after(function () {
-                logfn('After function called.');
-                after.apply(handler, arguments);
-                setImmediate(function () {
+                try {
+                    logfn('After function called.');
                     assert(!receiver.say.called);
                     done();
-                });
+                } catch (e) {
+                    done(e);
+                }
             });
 
             handler.on(commandname, function () {
