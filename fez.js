@@ -9,5 +9,4 @@ exports.build = function(rule) {
 };
 
 exports.default = exports.build;
-
 fez(module);

@@ -180,7 +180,6 @@ Changelog
     ** Added localAddress (See irc-socket, net.Socket)
     * Nick highlight command trigger case is now case-insensitive. (Thanks metalbot)
     * Subscriber and Client gain .off() method which works as long as the event emitters has .removeListener or .off
-    * Maybe .quit() will finally accept a reason properly.
 
 0.9.0:
     [Not yet done]

@@ -5,15 +5,7 @@ Things not in this list are not considered critical for 1.0.0.
 TODO
 
 * Startup Object
-* Respond functionality
-  * String (implemented)
-  * Promise (implemented)
-  * Object
-    * query: boolean? (implemented)
-    * intent: message | action (implemented)
-    * target
-    * message (implemented)
-* Default Modules
+* Default Plugins
   * Help (implemented)
   * Server
   * Channel
@@ -22,14 +14,16 @@ TODO
     * Promises for known commands.
 * Plugin Reloading (if possible)
 * Promise for .connect().
+* Rename modules to plugins.
 
 FINISHED
 
-* MessageParser basic functionality
-* CommandParser
+* MessageHandler basic functionality
+* CommandHandler
 * Plugin System
 * On Method that delegates to CommandParser/MessageParser
 * OutputSocket basic functionality
 * Logging
 * Command Line Tool
 * Nickname tracking object
+* Respond Object (minus target property)
