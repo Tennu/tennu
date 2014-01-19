@@ -143,6 +143,8 @@ on({
 })
 ```
 
+You can also unsubscribe non-once events with `off`, taking the same parameters as `on`.
+
 ### Listener Parameters ###
 
 Listeners are passed either a message or command object.
@@ -276,28 +278,28 @@ As raw(message), but the arguments are passed through util.format() first.
 
 ## Plugin System ##
 
-Tennu has its own plugin system, loosely based off of Node's module system.
-You can read about it at https://github.com/havvy/tennu-plguins/.
+Tennu has its own plugin system.
+You can read about it at https://github.com/havvy/tennu-plugins/.
 
-You may access the module system's methods via the Client.modules property
+You may access the plugin system's methods via the Client.plugins property
 or by using one of the following methods:
 
 * client.require()
 * client.getModule()
 * client.getRole()
 * client.use()
-* client.initializeModule()
-* client.isModuleInitializable()
+* client.initializePlugin()
+* client.isPluginInitializable()
 
-### Creating Your Own Modules ###
+### Creating Your Own Plugins ###
 
-See [Creating Your Own Modules](https://github.com/Havvy/tennu/blob/master/doc/creating-modules.md).
+See [Creating Your Own Plugins](https://github.com/Havvy/tennu/blob/master/doc/creating-plugins.md).
 
 See [Getting Started](http://tennu.github.io/documentation/getting-started).
 
 ### Built-In Modules ###
 
-Only the help module is currently implemented.
+Only the help module is currently fully implemented.
 
 #### help ####
 
@@ -376,9 +378,6 @@ The capabilities object looks like this for the Mibbit network.
 
 ## Command Line Utility
 
-Note: Don't listen to this. Instead, keep tennu in your bot's dependencies, and
-run `./node_modules/tennu/bin/cli.js`.
-
 Install `Tennu` globally, and you'll gain access to the `tennu` command line tool.
 
 ```bash
@@ -392,6 +391,8 @@ node_modules/ tennu_modules/ config.json
 The tennu command takes two optional argument, -v (--verbose) and -d (--debug),
 for adding a Logger that logs to the console (info level and above without -d).
 
+You can also use the tennu command inside your npm scripts when Tennu is installed
+locally, and if you are distributing the bot, this is a better option.
 
 ## Other Objects ##
 
@@ -399,13 +400,16 @@ The following other objects can be obtained from the Tennu module:
 
 * Message
 * OutputSocket
-* MessageParser
-* CommandParser
+* MessageHandler
+* CommandHandler
 * Bisubscriber
 
-Documentation for these objects in isolation is currently unavailable.
+Documentation for these objects in isolation is currently unavailable,
+and may be removed in future versions.
 
-## Testing ##
+## Contributing ##
+
+### Tests ###
 
 ```
 npm test
@@ -414,6 +418,15 @@ npm test
 Between all projects (tennu, tennu-plugins, irc-socket, after-events),
 there are over 100 tests, but more are always appreciated, especially
 if they are failing with an actual bug. ;)
+
+### Building Files ###
+
+Tennu is written using the Sweet.js dialect of JavaScript. If you've never
+used it, it is just JavaScript with macros.
+
+To turn the sweet.js files into javascript files, run `fez.js`.
+
+Place sweet.js files in either `src/` or `test-src/`.
 
 ## See Also ##
 

@@ -99,8 +99,10 @@ const defaultClientConfiguration = {
     client._modules.addHook('handlers', function (module, handlers) {
         client._subscriber.on(handlers);
     });
+    client.notice('Tennu', 'Loading default plugins');
     client._modules.use(['server', 'help', 'user', 'channel'], __dirname);
-    client._modules.use(config.plugins, process.cwd());
+    client.notice('Tennu', 'Loading your plugins');
+    client._modules.use(config.plugins || [], process.cwd());
 
 
     // Startup stuff!
@@ -208,8 +210,8 @@ Client::off                    = delegate _subscriber off;
 Client::use                    = delegate _modules use;
 Client::getModule              = delegate _modules moduleExports;
 Client::getRole                = delegate _modules roleExports;
-Client::initializeModule       = delegate _modules initialize;
-Client::isModuleInitializable  = delegate _modules isInitializable;
+Client::initializePlugin       = delegate _modules initialize;
+Client::isPluginInitializable  = delegate _modules isInitializable;
 Client::addHook                = delegate _modules addHook;
 
 // implements Logger

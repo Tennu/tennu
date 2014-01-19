@@ -182,7 +182,6 @@ Changelog
     * Subscriber and Client gain .off() method which works as long as the event emitters has .removeListener or .off
 
 0.9.0:
-    [Not yet done]
     * Update tennu-modules 2.x.y to tennu-plugins 3.0.y
     ** Move tennu_modules -> tennu_plugins
     * Remove lib/event-emitter.js, use `after-events` instead.
@@ -193,5 +192,6 @@ Changelog
     ** module -> plugin
     ** trigger -> command-trigger (This is so that plugins that define triggers can do something like `factoid-trigger`)
     ** password -> auth-password (nb: password for the server password will still work)
+    * Removed receiver (client) from Message object.
 
     * Will work on documentation after this.

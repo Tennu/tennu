@@ -1,6 +1,6 @@
 {
   "name": "tennu",
-  "version": "0.9.0pre1",
+  "version": "0.9.0pre2",
   "description": "Tennu - Modular IRC Bot Framework for Node.js",
   "maintainers": [
     {
