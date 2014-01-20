@@ -55,7 +55,8 @@
     "fez": "fez/fez",
     "fez-sweet.js": "~0.6.0",
     "coco-js": "Havvy/coco-js",
-    "mocha": "~1.17.0"
+    "mocha": "~1.17.0",
+    "sparkler": "~0.1.6"
   },
   "scripts": {
     "test": "mocha -R spec",

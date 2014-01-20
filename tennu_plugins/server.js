@@ -1,47 +1,29 @@
-/*
-
-var util = require('util');
-
-var ServerModule = function () {
-    this.capabilities = {};
-};
-
-ServerModule.prototype.getModule = function () {
-    return {
-        name: "server",
-        exports: {
-            "capabilities" : this.capabilities
-        },
-        handlers: {
-            "005" : this.isupportHandler.bind(this)
-        },
-        help: "Internal module. Right now only grabs the isupport info."
-    };
-};
-
-ServerModule.prototype.isupportHandler = function (e) {
-    // First parameter is my nickname!
-    // Last parameter is plain text.
-    for (var ix = 1; ix < e.args.length - 1; ix++) {
-        var capability = e.args[ix].split("=");
-        switch (capability.length) {
-            case 1:
-                this.capabilities[capability[0]] = true;
-                break;
-            case 2:
-                this.capabilities[capability[0]] = capability[1];
-        }
-    }
-};
-
-module.exports = function (nrc) {
-    return (new ServerModule()).getModule();
-};
-
-*/
-
 module.exports = {
-    init: function (tennu) {
-        return {};
+    init: function (client, imports) {
+        const isupport = {};
+        return {
+            handlers: {
+                '005': function (isupportMessage) {
+                    isupportMessage.params.map(function (param) {
+                        return param.split('=');
+                    }).forEach(function (a0) {
+                        var r0 = Object.prototype.toString, r6 = '[object Array]';
+                        if (r0.call(a0) === r6 && a0.length === 1) {
+                            var r13 = a0[0];
+                            var supported = r13;
+                            return isupport[supported] = true;
+                        }
+                        if (r0.call(a0) === r6 && a0.length === 2) {
+                            var r14 = a0[0];
+                            var r15 = a0[1];
+                            var supported = r14, value = r15;
+                            return isupport[supported] = value;
+                        }
+                        throw new TypeError('No match');
+                    });
+                }
+            },
+            exports: { isupport: isupport }
+        };
     }
 };
