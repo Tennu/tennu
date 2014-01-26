@@ -15,7 +15,6 @@ const logger = {
     };
 const MessageHandler = require('../lib/message-handler.js');
 const Message = require('../lib/message.js');
-const Q = require('q');
 const id = function () {
         var ix = 0;
         return function () {

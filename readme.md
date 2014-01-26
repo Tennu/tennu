@@ -5,14 +5,14 @@ Tennu is an IRC bot framework written in Node.js
 [![NPM](https://nodei.co/npm/tennu.png?downloads=true&stars=true)](https://nodei.co/npm/tennu/)
 
 Note: Modules are going to be renamed to plugins. The only breaking change in code is that the config
-property will be changed and you'll have to move your private plugins from tennu_modules to tennu_plugins.
-The code for now will say 'modules', while the documentation says 'plugins'. They are synonomous.
+property will be changed and you'll have to move your private plugins from tennu_plugins to tennu_plugins.
+The code for now will say 'plugins', while the documentation says 'plugins'. They are synonomous.
 
 ----------
 
 ## Basic Usage ##
 
-With Tennu, you create an irc client, require your modules or subscribe to your event listeners, and then connect.
+With Tennu, you create an irc client, require your plugins or subscribe to your event listeners, and then connect.
 
 ```javascript
 var tennu = require('tennu');
@@ -21,7 +21,7 @@ var myClient = tennu.Client(network);
 myClient.connect();
 ```
 
-Before connecting, add listeners to events from irc & users, or load modules.
+Before connecting, add listeners to events from irc & users, or load plugins.
 
 ```javascript
 
@@ -38,7 +38,7 @@ myClient.on('!join', function (command) {
 // Load a plugin.
 myClient.initialize(require('./yourModule'));
 
-// Or just use a plugin from tennu_modules/%f or node_modules/tennu-%f
+// Or just use a plugin from tennu_plugins/%f or node_plugins/tennu-%f
 myClient.use(['admin', 'last-seen']);
 
 myClient.connect();
@@ -80,7 +80,7 @@ replace the factories that the Client uses by default.
 * IrcSocket
 * MessageHandler
 * CommandHandler
-* Plugins         [0.9.0 - Will be renamed to Plugins]
+* Plugins
 * BiSubscriber
 * Logger
 
@@ -93,7 +93,7 @@ returned by the Logger function must implement the following methods:
 
 `debug, info, notice, warn, error, crit, alert, emerg`
 
-Base Tennu will only use debug through error, but other modules and event
+Base Tennu will only use debug through error, but other plugins and event
 emitters may use crit through emerg.
 
 -------------
@@ -185,7 +185,7 @@ For example, a command of "!do-it ARG1 ARG2" will have args be ["ARG1", "ARG2"] 
 All of the following are methods on Tennu that can be used once connected.
 
 These methods are also available on the client's 'out' property.
-In Tennu 0.9.0, the 'out' property will go away, and the 'actions' module
+In Tennu 0.9.0, the 'out' property will go away, and the 'actions' plugin
 will export these methods.
 
 ### say(channel, message) ###
@@ -299,7 +299,7 @@ See [Getting Started](http://tennu.github.io/documentation/getting-started).
 
 ### Built-In Modules ###
 
-Only the help module is currently fully implemented.
+Only the help plugin is currently fully implemented.
 
 #### help ####
 
@@ -307,7 +307,7 @@ Only the help module is currently fully implemented.
 
 Sets the command `!help`.
 
-See [Help Module Documentation](https://github.com/Havvy/tennu/blob/master/doc/module/help.md).
+See [Help Module Documentation](https://tennu.github.io/plugins/help).
 
 [0.8.2+]
 
@@ -321,18 +321,18 @@ Unimplemented.
 
 [0.7.3+]
 
-This module has a single method exported: isIdentifedAs(nickname, nickname_identified, callback)
+This plugin has a single method exported: isIdentifedAs(nickname, nickname_identified, callback)
 
-See [User Module Documentation](https://github.com/Havvy/tennu/blob/master/doc/module/user.md).
+See [User Module Documentation](https://tennu.github.io/plugins/user).
 
 #### server ####
 
-Unimplemented.
+[0.9.x+]
 
-[0.4.x and below]
-
-Information about the server. For now, the only thing this module offers is a
+Information about the server. For now, the only thing this plugin offers is a
 capabilities map listing the information from the 005 raw numeric.
+
+See [Server Plugin Documentation](https://tennu.github.io/plugins/server).
 
 ```javascript
 
@@ -340,51 +340,15 @@ var server = tennu.use("server");
 console.log(util.inspect(server.capabilities));
 ```
 
-The capabilities object looks like this for the Mibbit network.
-
-```javascript
-{
-  CMDS: 'KNOCK,MAP,DCCALLOW,USERIP',
-  UHNAMES: true,
-  NAMESX: true,
-  SAFELIST: true,
-  HCN: true,
-  MAXCHANNELS: '40',
-  CHANLIMIT: '#:40',
-  MAXLIST: 'b:120,e:120,I:120',
-  NICKLEN: '30',
-  CHANNELLEN: '32',
-  TOPICLEN: '307',
-  KICKLEN: '307',
-  AWAYLEN: '307',
-  MAXTARGETS: '20',
-  WALLCHOPS: true,
-  WATCH: '128',
-  WATCHOPTS: 'A',
-  SILENCE: '15',
-  MODES: '12',
-  CHANTYPES: '#',
-  PREFIX: '(qaohv)~&@%+',
-  CHANMODES: 'beI,kfL,lj,psmntirRcOAQKVCuzNSMTG',
-  NETWORK: 'Mibbit',
-  CASEMAPPING: 'ascii',
-  EXTBAN: '~,cqnr',
-  ELIST: 'MNUCT',
-  STATUSMSG: '~&@%+',
-  EXCEPTS: true,
-  INVEX: true
-}
-```
-
 ## Command Line Utility
 
-Install `Tennu` globally, and you'll gain access to the `tennu` command line tool.
+Install Tennu globally, and you'll gain access to the `tennu` command line tool.
 
 ```bash
 > pwd
 /home/you/your-tennubot
 > ls
-node_modules/ tennu_modules/ config.json
+node_plugins/ tennu_plugins/ config.json
 > tennu config.json
 ```
 
@@ -393,19 +357,6 @@ for adding a Logger that logs to the console (info level and above without -d).
 
 You can also use the tennu command inside your npm scripts when Tennu is installed
 locally, and if you are distributing the bot, this is a better option.
-
-## Other Objects ##
-
-The following other objects can be obtained from the Tennu module:
-
-* Message
-* OutputSocket
-* MessageHandler
-* CommandHandler
-* Bisubscriber
-
-Documentation for these objects in isolation is currently unavailable,
-and may be removed in future versions.
 
 ## Contributing ##
 

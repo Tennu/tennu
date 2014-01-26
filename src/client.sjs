@@ -73,15 +73,15 @@ const defaultClientConfiguration = {
     // Create the listener to the socket.
     // This listener will parse the raw messages of the socket, and
     // emits specific events to listen to.
-    const messageHandler = new di.MessageHandler(client, client._logger, client._socket);
+    client._messageHandler = new di.MessageHandler(client, client._logger, client._socket);
 
     // Create the object that tracks the nickname of the client.
     // Because this object is a function, it is expected that
     // the factory function does not use `this`.
-    client._nickname = di.NicknameTracker(config.nickname, messageHandler);
+    client._nickname = di.NicknameTracker(config.nickname, client._messageHandler);
 
     // The output socket wraps the `raw` method of the client._socket.
-    client._outputSocket = new di.IrcOutputSocket(client._socket, messageHandler, client._nickname, client._logger);
+    client._outputSocket = new di.IrcOutputSocket(client._socket, client._messageHandler, client._nickname, client._logger);
 
     // Create the listener to private messages from the IRCMessageEmitter
     // The commander will parse these private messages for commands, and
@@ -91,7 +91,7 @@ const defaultClientConfiguration = {
     // The subscriber handles event subscriptions to the Client object,
     // determining whether they should be handled by the IrcMessageEmitter
     // or the Command Handler.
-    client._subscriber = new di.BiSubscriber(messageHandler, commandHandler);
+    client._subscriber = new di.BiSubscriber(client._messageHandler, commandHandler);
     client._subscriber.on('privmsg', function (privmsg) { commandHandler.parse(privmsg); });
 
     // And finally, the module system.
@@ -198,6 +198,7 @@ Client::join                   = delegate _outputSocket join;
 Client::userhost               = delegate _outputSocket userhost;
 Client::whois                  = delegate _outputSocket whois;
 Client::nick                   = delegate _outputSocket nick;
+Client::mode                   = delegate _outputSocket mode;
 Client::raw                    = delegate _outputSocket raw;
 Client::rawf                   = delegate _outputSocket rawf;
 

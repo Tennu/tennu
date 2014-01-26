@@ -193,5 +193,8 @@ Changelog
     ** trigger -> command-trigger (This is so that plugins that define triggers can do something like `factoid-trigger`)
     ** password -> auth-password (nb: password for the server password will still work)
     * Removed receiver (client) from Message object.
+    * Readded isupport support
+    * Messily pass isupport object to Message(raw, isupport)
+    ** Currently unused by Message. Future versions will use it.
 
     * Will work on documentation after this.

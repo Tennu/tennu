@@ -1,6 +1,7 @@
 module.exports = {
     init: function (client, imports) {
         const isupport = {};
+        client._messageHandler.isupport(isupport);
         return {
             handlers: {
                 '005': function (isupportMessage) {

@@ -2,6 +2,8 @@ module.exports = {
     init: function (client, imports) {
         const isupport = {};
 
+        client._messageHandler.isupport(isupport);
+
         return {
             handlers: {
                 '005': function (isupportMessage) {
@@ -10,11 +12,6 @@ module.exports = {
                     }).forEach(function {
                         case ([supported]) => isupport[supported] = true;
                         case ([supported, value]) => isupport[supported] = value;
-                        /*
-                        const supported = supportedArray[0];
-                        const value = supportedArray[1] || true;
-                        isupport[supported] = value;
-                        */
                     });
                 }
             },

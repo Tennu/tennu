@@ -6,10 +6,9 @@ TODO
 
 * Startup Object
 * Default Plugins
-  * Help (implemented)
-  * Server
+  * Server (has isupport)
   * Channel
-  * User
+  * User (Has a helper function)
   * Actions (OutputSocket methods )
     * Promises for known commands.
 * Plugin Reloading (if possible)
@@ -26,3 +25,5 @@ FINISHED
 * Command Line Tool
 * Nickname tracking object
 * Respond Object
+* Default Plugins
+  *  Help

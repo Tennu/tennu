@@ -38,8 +38,7 @@ var selfJoin = function (channel) {
  * The Message object handles adding users and channel automatically, so
  * there really isn't any work that has to be done here other than actually
  * adding the channels to the users.
- */
-/*
+ *//*
 var namesHandler = function (msg) {
     msg.users.forEach(function (user) {
         addChannelToUser(msg.channel, user);
@@ -90,6 +89,7 @@ module.exports = {
 };
 
 */
+
 module.exports = {
     init: function (tennu) {
         return {};
