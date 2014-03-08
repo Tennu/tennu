@@ -12,6 +12,9 @@ const arg1 = 'arg-1';
 const arg2 = 'arg-2';
 const restargs = 'rest arguments';
 const reason = 'Because I want to.';
+const nick1 = 'adam';
+const nick2 = 'beatrice';
+const nick3 = 'charlie';
 const messages = {
         generic: format('GENERIC'),
         generic_args: format('GENERIC %s %s :%s', arg1, arg2, restargs),
@@ -25,7 +28,8 @@ const messages = {
         part: format(':%s PART %s', hostmask, channel),
         part_reason: format(':%s PART %s :%s', hostmask, channel, reason),
         quit: format(':%s QUIT', hostmask),
-        quit_reason: format(':%s QUIT :%s', hostmask, reason)
+        quit_reason: format(':%s QUIT :%s', hostmask, reason),
+        a_353_with_whitespace: format(':%s 353 %s = %s :%s %s %s ', server, nickname, channel, nick1, nick2, nick3)
     };
 describe('Message', function () {
     describe('common properties', function () {
@@ -140,6 +144,15 @@ describe('Message', function () {
                 const message = Message(messages.quit);
                 assert(message.reason === undefined);
                 assert(message.hasOwnProperty('reason'));
+            });
+        });
+        describe('353:', function () {
+            it('creates correct nicknames array', function () {
+                var message = Message(messages.a_353_with_whitespace);
+                assert(message.nicknames.length === 3);
+                assert(message.nicknames[0] === 'adam');
+                assert(message.nicknames[1] === 'beatrice');
+                assert(message.nicknames[2] === 'charlie');
             });
         });
     });
