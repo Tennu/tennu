@@ -9,7 +9,7 @@ module.exports = {
 
             const timeout = setTimeout(function () {
                 unregister();
-                client.error("isIdentifiedAs request timed out after one hour.");
+                client.error("PluginUser", "isIdentifiedAs request timed out after one hour.");
                 deferred.reject(new Error("Request timed out."));
             }, 1000 * 60 * 60);
 
@@ -18,12 +18,13 @@ module.exports = {
                     if (reply.nickname.toLowerCase() === nickname) {
                         fn(reply);
                     } else {
-                        client.debug("Whois response for another nick: " + reply.nickname);
+                        client.debug("PluginUser", "Whois response for another nick: " + reply.nickname);
                     }
                 }
             };
 
             const unregister = function () {
+                client.debug('PluginUser', 'Unregistering isIdentifiedAs handlers.');
                 client.off(handlers);
                 clearTimeout(timeout)
             }
@@ -32,22 +33,22 @@ module.exports = {
 
             const onLoggedIn = fornick(function (reply) {
                 if (reply.identifiedas.toLowerCase() === accountname) {
-                    client.debug("isIdentifiedAs found a match.");
+                    client.debug('PluginUser', "isIdentifiedAs found a match.");
                     result = true;
                 }
             });
 
             const onRegNick = fornick(function (reply) {
                 if (nickname === accountname) {
-                    client.debug("isIdentifiedAs found a match.");
+                    client.debug('PluginUser', "isIdentifiedAs found a match.");
                     result = true;
                 }
             });
 
             const onWhoisEnd = fornick(function (reply) {
-                client.debug("isIdentifiedAs found end of whois.");
+                client.debug('PluginUser', "isIdentifiedAs found end of whois.");
                 unregister();
-                client.debug("Resolving " + result);
+                client.debug('PluginUser', "Resolving " + result);
                 deferred.resolve(result)
             });
 
@@ -57,14 +58,15 @@ module.exports = {
             });
 
             const handlers = {
-                "RPL_WHOISREGNICK": onRegNick,
-                "RPL_WHOISLOGGEDIN": onLoggedIn,
-                "RPL_ENDOFWHOIS": onWhoisEnd,
-                "ERR_NOSUCHNICK": onError
+                "rpl_whoisregnick": onRegNick,
+                "rpl_whoisloggedin": onLoggedIn,
+                "rpl_endofwhois": onWhoisEnd,
+                "err_nosuchnick": onError
             };
 
+            client.debug('Registerting isIdentifiedAs handlers');
             client.on(handlers);
-            client.whois(nickname);
+            setImmediate(function () { client.whois(nickname) });
 
             return deferred.promise;
         };

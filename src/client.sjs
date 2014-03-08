@@ -30,13 +30,13 @@ const defaultClientConfiguration = {
     'secure': false,
     'password': undefined,
     'capab': false,
-    'nickserv': 'nickserv',
     'nickname': 'tennubot',
     'username': 'tennu',
     'realname': 'tennu 0.9.x',
 
     // Tennu Config
     'channels': [],
+    'nickserv': 'nickserv',
     'auth-password': undefined,
     'plugins': [],
     'command-trigger': '!',
@@ -49,12 +49,12 @@ const defaultClientConfiguration = {
  * _logger
  * out      (_outputSocket)
  * events   (_subscriber)
- * modules  (_modules)
+ * plugins  (_plugins)
  * nickname (_nickname)
  */
  const Client = function (config, dependencies) {
     if (config.nick || config.user) {
-        throw new Error('Please use \'nickname\' and \'username\' instead of \'nick\' or \'user\' in your configuration.');
+        throw new Error('Please use \'nickname\' and \'username\' instead of \'nick\' and \'user\' in your configuration.');
     }
 
     const client = Object.create(Client.prototype);
@@ -95,54 +95,24 @@ const defaultClientConfiguration = {
     client._subscriber.on('privmsg', function (privmsg) { commandHandler.parse(privmsg); });
 
     // And finally, the module system.
-    client._modules = new di.Plugins('tennu', client);
-    client._modules.addHook('handlers', function (module, handlers) {
+    client._plugins = new di.Plugins('tennu', client);
+    client._plugins.addHook('handlers', function (module, handlers) {
         client._subscriber.on(handlers);
     });
-    client.notice('Tennu', 'Loading default plugins');
-    client._modules.use(['server', 'help', 'user', 'channel'], __dirname);
-    client.notice('Tennu', 'Loading your plugins');
-    client._modules.use(config.plugins || [], process.cwd());
-
-
-    // Startup stuff!
-    client._socket.on('ready', function () {
-        // RAWR! I'm a <s>monster</s> Bot!
-        client._outputSocket.mode(config.nick, 'B');
-
-        if (config['auth-password']) {
-            client.notice('Tennu', 'Identifying to services.');
-            client.say(config.nickserv, 'identify ' + config['auth-password']);
-        }
-
-        if (Array.isArray(config.channels)) {
-            client.notice('Tennu', 'Joining default channels.');
-            config.channels.forEach(function (channel) {
-                client.join(channel);
-            });
-        }
-    });
-
-    client._socket.on('data', function (line) {
-        client.info('<-', line);
-    });
-
-    // Standard event for IRC quitting.
-    client._subscriber.on('error', function () {
-        client.notice('Tennu', 'Closing IRC Connection.');
-        client.disconnect();
-    });
-    // End of Startup stuff
+    client.note('Tennu', 'Loading default plugins');
+    client._plugins.use(['server', 'help', 'user', 'channel', 'startup'], __dirname);
+    client.note('Tennu', 'Loading your plugins');
+    client._plugins.use(config.plugins || [], process.cwd());
 
 
     client.out = client._outputSocket;
     client.events = client._subscriber;
-    client.modules = client._modules;
+    client.plugins = client._plugins;
     client.nickname = client._nickname;
 
     client.connected = false;
 
-    client.notice('Tennu', 'Client created.');
+    client.note('Tennu', 'Client created.');
     return client;
 };
 
@@ -192,6 +162,9 @@ Client::end = disconnect;
 
 Client::say                    = delegate _outputSocket say;
 Client::act                    = delegate _outputSocket act;
+// CONFLICT!
+// Client::notice                 = delegate _outputSocket notice;
+Client::ctcp                   = delegate _outputSocket ctcp;
 Client::part                   = delegate _outputSocket part;
 Client::quit                   = delegate _outputSocket quit;
 Client::join                   = delegate _outputSocket join;
@@ -208,17 +181,19 @@ Client::once                   = delegate _subscriber once;
 Client::off                    = delegate _subscriber off;
 
 // implements ModuleSystem
-Client::use                    = delegate _modules use;
-Client::getModule              = delegate _modules moduleExports;
-Client::getRole                = delegate _modules roleExports;
-Client::initializePlugin       = delegate _modules initialize;
-Client::isPluginInitializable  = delegate _modules isInitializable;
-Client::addHook                = delegate _modules addHook;
+Client::use                    = delegate _plugins use;
+Client::getModule              = delegate _plugins moduleExports;
+Client::getRole                = delegate _plugins roleExports;
+Client::initializePlugin       = delegate _plugins initialize;
+Client::isPluginInitializable  = delegate _plugins isInitializable;
+Client::addHook                = delegate _plugins addHook;
 
 // implements Logger
 Client::debug                  = delegate _logger debug;
 Client::info                   = delegate _logger info;
+// CONFLICT!
 Client::notice                 = delegate _logger notice;
+Client::note                   = delegate _logger notice;
 Client::warn                   = delegate _logger warn;
 Client::error                  = delegate _logger error;
 Client::crit                   = delegate _logger crit;

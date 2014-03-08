@@ -30,10 +30,10 @@ describe('User Module:', function () {
                 var onRegNick, onLoggedIn, onWhoisEnd, onError;
                 client.on = function (_handlers) {
                     handlers = _handlers;
-                    onRegNick = handlers['RPL_WHOISREGNICK'];
-                    onLoggedIn = handlers['RPL_WHOISLOGGEDIN'];
-                    onWhoisEnd = handlers['RPL_ENDOFWHOIS'];
-                    onError = handlers['ERR_NOSUCHNICK'];
+                    onRegNick = handlers['rpl_whoisregnick'];
+                    onLoggedIn = handlers['rpl_whoisloggedin'];
+                    onWhoisEnd = handlers['rpl_endofwhois'];
+                    onError = handlers['err_nosuchnick'];
                     off_spy.withArgs(handlers);
                 };
                 client.whois = function (nickname) {

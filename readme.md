@@ -4,10 +4,6 @@ Tennu is an IRC bot framework written in Node.js
 
 [![NPM](https://nodei.co/npm/tennu.png?downloads=true&stars=true)](https://nodei.co/npm/tennu/)
 
-Note: Modules are going to be renamed to plugins. The only breaking change in code is that the config
-property will be changed and you'll have to move your private plugins from tennu_plugins to tennu_plugins.
-The code for now will say 'plugins', while the documentation says 'plugins'. They are synonomous.
-
 ----------
 
 ## Basic Usage ##
