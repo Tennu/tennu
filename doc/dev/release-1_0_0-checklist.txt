@@ -4,7 +4,6 @@ Things not in this list are not considered critical for 1.0.0.
 
 TODO
 
-* Startup Object
 * Default Plugins
   * Server (has isupport)
   * Channel
@@ -27,3 +26,4 @@ FINISHED
 * Respond Object
 * Default Plugins
   *  Help
+* Startup Object
