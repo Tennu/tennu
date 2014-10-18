@@ -118,7 +118,7 @@ const defaultClientConfiguration = {
 
 // implements ConfigurationStorage
 
-Client::config = function (param) {
+Client.prototype.config = function (param) {
     return this._config[param];
 };
 
@@ -138,8 +138,8 @@ const connect = function () {
     return this;
 }
 
-Client::connect = connect;
-Client::start = connect;
+Client.prototype.connect = connect;
+Client.prototype.start = connect;
 
 const disconnect = function () {
     this.debug('Tennu', 'Trying to disconnect.');
@@ -155,53 +155,53 @@ const disconnect = function () {
     return this;
 };
 
-Client::disconnect = disconnect;
-Client::end = disconnect;
+Client.prototype.disconnect = disconnect;
+Client.prototype.end = disconnect;
 
 // implements IRC Output Socket
 
-Client::say                    = delegate _outputSocket say;
-Client::act                    = delegate _outputSocket act;
+Client.prototype.say                    = delegate _outputSocket say;
+Client.prototype.act                    = delegate _outputSocket act;
 // CONFLICT!
-// Client::notice                 = delegate _outputSocket notice;
-Client::ctcp                   = delegate _outputSocket ctcp;
-Client::part                   = delegate _outputSocket part;
-Client::quit                   = delegate _outputSocket quit;
-Client::join                   = delegate _outputSocket join;
-Client::userhost               = delegate _outputSocket userhost;
-Client::whois                  = delegate _outputSocket whois;
-Client::nick                   = delegate _outputSocket nick;
-Client::mode                   = delegate _outputSocket mode;
-Client::raw                    = delegate _outputSocket raw;
-Client::rawf                   = delegate _outputSocket rawf;
+// Client.prototype.notice                 = delegate _outputSocket notice;
+Client.prototype.ctcp                   = delegate _outputSocket ctcp;
+Client.prototype.part                   = delegate _outputSocket part;
+Client.prototype.quit                   = delegate _outputSocket quit;
+Client.prototype.join                   = delegate _outputSocket join;
+Client.prototype.userhost               = delegate _outputSocket userhost;
+Client.prototype.whois                  = delegate _outputSocket whois;
+Client.prototype.nick                   = delegate _outputSocket nick;
+Client.prototype.mode                   = delegate _outputSocket mode;
+Client.prototype.raw                    = delegate _outputSocket raw;
+Client.prototype.rawf                   = delegate _outputSocket rawf;
 
 // implements BiSubscriber
-Client::on                     = delegate _subscriber on;
-Client::once                   = delegate _subscriber once;
-Client::off                    = delegate _subscriber off;
+Client.prototype.on                     = delegate _subscriber on;
+Client.prototype.once                   = delegate _subscriber once;
+Client.prototype.off                    = delegate _subscriber off;
 
 // implements ModuleSystem
-Client::use                    = delegate _plugins use;
-Client::getModule              = delegate _plugins moduleExports;
-Client::getRole                = delegate _plugins roleExports;
-Client::initializePlugin       = delegate _plugins initialize;
-Client::isPluginInitializable  = delegate _plugins isInitializable;
-Client::addHook                = delegate _plugins addHook;
+Client.prototype.use                    = delegate _plugins use;
+Client.prototype.getModule              = delegate _plugins moduleExports;
+Client.prototype.getRole                = delegate _plugins roleExports;
+Client.prototype.initializePlugin       = delegate _plugins initialize;
+Client.prototype.isPluginInitializable  = delegate _plugins isInitializable;
+Client.prototype.addHook                = delegate _plugins addHook;
 
 // implements Logger
-Client::debug                  = delegate _logger debug;
-Client::info                   = delegate _logger info;
+Client.prototype.debug                  = delegate _logger debug;
+Client.prototype.info                   = delegate _logger info;
 // CONFLICT!
-Client::notice                 = delegate _logger notice;
-Client::note                   = delegate _logger notice;
-Client::warn                   = delegate _logger warn;
-Client::error                  = delegate _logger error;
-Client::crit                   = delegate _logger crit;
-Client::alert                  = delegate _logger alert;
-Client::emerg                  = delegate _logger emerg;
+Client.prototype.notice                 = delegate _logger notice;
+Client.prototype.note                   = delegate _logger notice;
+Client.prototype.warn                   = delegate _logger warn;
+Client.prototype.error                  = delegate _logger error;
+Client.prototype.crit                   = delegate _logger crit;
+Client.prototype.alert                  = delegate _logger alert;
+Client.prototype.emerg                  = delegate _logger emerg;
 
-Client::log = function (level) {
-    const args = Array::slice.call(arguments, 1);
+Client.prototype.log = function (level) {
+    const args = Array.prototype.slice.call(arguments, 1);
     this[level].apply(this, args);
 };
 

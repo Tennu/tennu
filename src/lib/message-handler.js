@@ -33,64 +33,87 @@
  * MessageParser#toString(): String
  *   Returns '[Object MessageParser]'.
  */
+
 var util = require('util');
 var EventEmitter = require('after-events');
 var Message = require('./message');
-var MessageParser = function MP(client, logger, socket) {
+
+var MessageParser = function MP (client, logger, socket) {
     var parser = Object.create(EventEmitter());
     var isupport;
+
     parser.parse = function (raw) {
         var message = new Message(raw, isupport);
+
         if (message === null) {
-            logger.error('Raw message given was not a valid IRC message!', raw);
+            logger.error("Raw message given was not a valid IRC message!", raw);
             return null;
         }
+
         this.emit(message.command.toLowerCase(), message);
+
         if (message.replyname) {
             this.emit(message.replyname.toLowerCase(), message);
         }
-        this.emit('*', message);
+
+        this.emit("*", message);
+
         return message;
     };
-    parser.listen = function (socket$2) {
-        socket$2.on('data', this.parse.bind(this));
+
+    parser.listen = function (socket) {
+        socket.on('data', this.parse.bind(this));
     };
+
     parser.after(function (err, res, type, message) {
         // err := Error
         // res := string U [string] U {message: string, query: boolean?, intent: ('say' | 'act')?, target: target?}
         // type := string
         // message := message
+
         if (err) {
             logger.error('Message Handler', 'Error thrown in message handler!');
             logger.error('Message Handler', err.stack);
             return;
         }
+
         // Tests require that the undefined case return immediately.
         if (res === undefined || message.channel === undefined) {
             return;
         }
+
         logger.debug('Message Handler', 'Response exists.');
+
         if (Array.isArray(res) || typeof res === 'string') {
             client.say(message.channel, res);
             return;
         }
+
         if (typeof res === 'object' && res.message) {
-            const channel = res.query ? message.nickname : res.target || message.channel;
+            const channel = res.query ? message.nickname :
+                     /* otherwise */   (res.target || message.channel);
             const intent = res.intent === 'act' ? 'act' : 'say';
+
             client[intent](channel, res.message);
             return;
         }
+       
         logger.error('Message Handler', format(badResponseFormat, message.message, inspect(res)));
     });
+
     parser.toString = function () {
-        return '[Object MessageParser]';
+        return "[Object MessageParser]";
     };
+
     parser.isupport = function (value) {
         isupport = value;
     };
+
     if (socket) {
         parser.listen(socket);
     }
+
     return parser;
 };
+
 module.exports = MessageParser;

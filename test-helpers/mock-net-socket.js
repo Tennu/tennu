@@ -6,7 +6,7 @@ var ix = 0;
 
 const Socket = function (logger) {
     ix += 1;
-    const ixNow = ix;
+    const sx = ix;
 
     return {
         connected: true,
@@ -35,7 +35,7 @@ const Socket = function (logger) {
         setEncoding: sinon.spy(),
 
         toString: function () {
-            return '[Object MockNetSocket ' + ixNow + ']';
+            return '[Object MockNetSocket ' + sx + ']';
         },
 
         on: EventEmitter.prototype.on,

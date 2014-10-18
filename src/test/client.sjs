@@ -9,7 +9,7 @@ const logfn = debug ? console.log.bind(console) : function () {};
 const logger = {debug: logfn, info: logfn, notice: logfn, warn: logfn, error: logfn};
 
 const Client = require('../lib/client.js');
-const NetSocket = require('../test-lib/mock-net-socket.js');
+const NetSocket = require('../test-helpers/mock-net-socket.js');
 
 const network = {
     'nickname': 'testbot',

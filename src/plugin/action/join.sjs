@@ -1,3 +1,4 @@
+/*
 module.exports = function (client, action_module) {
     const server = action_module.imports.server;
 
@@ -26,3 +27,4 @@ module.exports = function (client, action_module) {
         return deferred.promise;        
     }
 };
+*/

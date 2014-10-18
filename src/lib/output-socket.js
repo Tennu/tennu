@@ -19,9 +19,11 @@
  *   raw
  *   rawf
  */
+
 var inspect = require('util').inspect;
 var format = require('util').format;
 var Q = require('q');
+
 var partition = function (array, length) {
     var partitions = [];
     for (var i = 0, len = array.length; i < len; i += length) {
@@ -29,117 +31,132 @@ var partition = function (array, length) {
     }
     return partitions;
 };
+
 var OutputSocket = function (socket, messageHandler, nickname, logger) {
     var raw = function (line) {
-        if (Array.isArray(line)) {
-            line = line.join(' ');
-        }
-        logger.info('->: ' + String(line));
+        if (Array.isArray(line)) { line = line.join(" "); }
+        logger.info("->: " + String(line));
         socket.raw(line);
     };
+
     var rawf = function () {
         raw(format.apply(null, arguments));
     };
+
     return {
-        say: function recur(location, message) {
+        say : function recur (location, message) {
             if (Array.isArray(message)) {
                 message.forEach(function (msg) {
                     recur.call(this, location, msg);
                 });
+
                 return;
             }
-            rawf('PRIVMSG %s :%s', location, message);
+            rawf("PRIVMSG %s :%s", location, message);
         },
-        ctcp: function recur(location, type, message) {
+
+        ctcp : function recur (location, type, message) {
             if (Array.isArray(message)) {
                 message.forEach(function (msg) {
                     recur.call(this, location, type, msg);
                 });
+
                 return;
             }
-            this.say(location, format('\x01%s %s\x01', type, message));
+            this.say(location, format('\u0001%s %s\u0001', type, message));
         },
+
         act: function (location, message) {
-            this.ctcp(location, 'ACTION', message);
+            this.ctcp(location, "ACTION", message);
         },
-        join: function (channel) {
+
+        join : function (channel) {
             var deferred = Q.defer();
+
             var unsubscribe = function () {
-                logger.debug('Join response or timeout occured.');
+                logger.debug("Join response or timeout occured.");
                 messageHandler.off('join', onJoin);
             };
+
             var onJoin = function (join) {
                 if (join.nickname !== nickname() || join.channel !== channel) {
                     return;
                 }
+
                 unsubscribe();
-                logger.debug('Resolving with join message.');
+                logger.debug("Resolving with join message.");
                 deferred.resolve(join);
             };
+
             messageHandler.on('join', onJoin);
-            rawf('JOIN :%s', channel);
-            return undefined;
-            // WIP Code.
+
+            rawf("JOIN :%s", channel);
+
+            return undefined; // WIP Code.
             return deferred.promise;
         },
-        part: function (channel, reason) {
-            raw('PART ' + channel + (reason ? ' :' + reason : ''));
+
+        part : function (channel, reason) {
+            raw("PART " + channel + (reason ? " :" + reason : ""));
         },
-        nick: function (newNick) {
-            rawf('NICK %s', newNick);
+
+        nick : function (newNick) {
+            rawf("NICK %s", newNick);
         },
-        quit: function (reason) {
-            logger.notice(format('Quitting with reason: %s', reason));
-            raw('QUIT' + (reason ? ' :' + reason : ''));
+
+        quit : function (reason) {
+            logger.notice(format("Quitting with reason: %s", reason));
+            raw("QUIT" + (reason ? " :" + reason : ""));
         },
-        mode: function (target, plus, minus, inArgs) {
-            var args = ':';
+
+        mode : function (target, plus, minus, inArgs) {
+            var args = ":";
+
             if (plus) {
-                args += '+' + plus;
+                args += "+" + plus;
             }
+
             if (minus) {
-                args += '-' + minus;
+                args += "-" + minus;
             }
+
             if (inArgs) {
-                args += ' ' + util.isArray(inArgs) ? inArgs.join(' ') : inArgs;
+                args += " " + util.isArray(inArgs) ? inArgs.join(' ') : inArgs;
             }
-            raw([
-                'MODE',
-                target,
-                args
-            ]);
+
+            raw(["MODE", target, args]);
         },
-        userhost: function recur(users) {
+
+        userhost : function recur (users) {
             if (typeof users === 'string') {
-                rawf('USERHOST :%s', users);
+                rawf("USERHOST :%s", users);
             } else if (typeof users === 'array') {
-                partition(users, 5).map(function (hosts) {
-                    return hosts.join(' ');
-                }).map(recur);
+                partition(users, 5)
+                .map(function (hosts) { return hosts.join(' '); })
+                .map(recur);
             } else {
-                throw new Error('Userhost command takes either a string (a single nick) or an array (of string nicks)');
+                throw new Error("Userhost command takes either a string (a single nick) or an array (of string nicks)");
             }
         },
-        whois: function recur(users, server) {
-            if (typeof users === 'array') {
+
+        whois : function recur (users, server) {
+            if (typeof users === "array") {
                 if (users.length > 15) {
-                    partition(users, 15).map(function (users$2) {
-                        return users$2.join(',');
-                    }).map(function (users$2) {
-                        recur(users$2, server);
-                    });
+                    partition(users, 15)
+                    .map(function (users) { return users.join(','); })
+                    .map(function (users) { recur(users, server); });
                 }
             } else if (typeof users === 'string') {
-                raw('WHOIS ' + (server ? server + ' ' : '') + users);
+                raw("WHOIS " + (server ? server + " " : "") + users);
             } else {
-                throw new Error('Whois command takes either a string (a single nick) or an array (of string nicks)');
+                throw new Error("Whois command takes either a string (a single nick) or an array (of string nicks)");
             }
         },
-        raw: raw,
-        rawf: rawf,
-        toString: function () {
-            return '[Object IrcOutputSocket]';
-        }
+
+        raw : raw,
+        rawf : rawf,
+        toString : function () { return "[Object IrcOutputSocket]"; }
     };
 };
+
 module.exports = OutputSocket;
