@@ -146,7 +146,7 @@ const disconnect = function () {
 
     if (!this.connected) {
         this.warn('Tennu', 'Attempted to end Tennu Client that already is not connected.');
-        return;
+        return this;
     }
 
     this._socket.end();
