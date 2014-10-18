@@ -58,7 +58,7 @@
     "gulp-sweetjs": "~0.5.4"
   },
   "scripts": {
-    "test": "mocha -R spec",
+    "test": "gulp test && mocha -R spec",
     "build": "gulp build"
   },
   "bin": {

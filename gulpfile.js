@@ -2,11 +2,19 @@ var gulp = require('gulp');
 var sweetjs = require("gulp-sweetjs");
 
 gulp.task('default', function() {
-  // place code for your default task here
+  console.log("Use either the 'build' or 'test' tasks");
 });
 
-// 'sparkler/macros' 'sweet-bdd'
-gulp.task("build", function() {
+gulp.task("test", function () {
+    gulp.src("src/test/**/*.sjs")
+    .pipe(sweetjs({
+        modules: ['sweet-bdd'],
+        readableNames: true
+    }))
+    .pipe(gulp.dest('test'));
+});
+
+gulp.task("build", function () {
     gulp.src("src/lib/**/*.js")
     //.pipe(sourcemaps.init())
     .pipe(sweetjs({

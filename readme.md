@@ -356,7 +356,21 @@ locally, and if you are distributing the bot, this is a better option.
 
 ## Contributing ##
 
-### Building ###
+See the contributors.md file for specific ways you can help, if you're just
+looking for any way to help.
+
+### Directory Structure ###
+
+The `lib`, `tennu_plugins`, and `test` directories are all auto-generated files,
+with the actual source in subdirectories in the `src` directory.
+
+The `bin` directory contains the executables that the package provides. Right now this
+is only the 'tennu' program described in the Command Line Utility section.
+
+The `examples` directory contains example bots, mainly used for integration testing.
+
+The `doc` directory contains documents written by Havvy. They're mostly being phased out
+for having the documentation on [https://tennu.github.io/](https://tennu.github.io/).
 
 ### Tests ###
 
@@ -364,19 +378,21 @@ locally, and if you are distributing the bot, this is a better option.
 npm test
 ```
 
+This command will rebuild the test files and then run the test suite.
+
 Between all projects (tennu, tennu-plugins, irc-socket, after-events),
 there are over 100 tests, but more are always appreciated, especially
 if they are failing with an actual bug. ;)
 
 ### Building Files ###
 
+```
+npm run-script build
+```
+
 Tennu is written using the Sweet.js dialect of JavaScript. If you've never
-used it, it is just JavaScript with macros.
-
-To turn the sweet.js files into javascript files, install Gulp and run `gulp build`.
-It might be possible to use the local development version of gulp. I just can't recall how.
-
-The main source files are all in `/src`, plus an additional helper in `/test-helpers`.
+used it, it is just JavaScript with macros. But because it's not vanilla JS,
+a build step is used.
 
 ## See Also ##
 
