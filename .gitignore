@@ -1,8 +1,13 @@
-node_modules
-node_modules/*
+# Build Tools
 .project
 .buildpath
-npm-debug.log
 *sublime*
-.grunt
-.grunt/*
+
+# Auto-generated files
+node_modules/
+lib/
+tennu_plugins/
+test/
+
+# NPM Error Logs...
+*npm-debug.log

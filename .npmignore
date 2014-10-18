@@ -1,4 +1,21 @@
+# Build Tools
+gulpfile.js
 .travis.yml
-fez.js
-*src/
-*subl*
+
+# Source Files
+src/
+
+# Test Files
+test/
+test-helpers/
+examples/
+
+# Documentation
+doc/
+contributors.md
+
+# Tools
+*sublime*
+
+# NPM Error Logs...
+*npm-debug.log
