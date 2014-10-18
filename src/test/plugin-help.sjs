@@ -7,7 +7,7 @@ const format = require('util').format;
 const debug = false;
 const logfn = debug ? console.log.bind(console) : function () {};
 
-const HelpModule = require('../tennu_plugins/help');
+const HelpPlugin = require('../tennu_plugins/help');
 
 const moduleHelps = {
     a: 'a *',
@@ -41,7 +41,7 @@ describe 'Help module' {
     beforeEach {
         logfn(/* newline */);
 
-        instance = HelpModule.init(client, {});
+        instance = HelpPlugin.init(client, {});
         HELP_NOT_FOUND = instance.exports.HELP_NOT_FOUND;
 
         instance.hooks.help('a', moduleHelps.a);
