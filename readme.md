@@ -356,6 +356,8 @@ locally, and if you are distributing the bot, this is a better option.
 
 ## Contributing ##
 
+### Building ###
+
 ### Tests ###
 
 ```
@@ -371,9 +373,10 @@ if they are failing with an actual bug. ;)
 Tennu is written using the Sweet.js dialect of JavaScript. If you've never
 used it, it is just JavaScript with macros.
 
-To turn the sweet.js files into javascript files, run `fez.js`.
+To turn the sweet.js files into javascript files, install Gulp and run `gulp build`.
+It might be possible to use the local development version of gulp. I just can't recall how.
 
-Place sweet.js files in either `src/` or `test-src/`.
+The main source files are all in `/src`, plus an additional helper in `/test-helpers`.
 
 ## See Also ##
 
