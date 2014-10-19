@@ -57,7 +57,7 @@
     "sinon": "~1.7.3",
     "source-map-support": "^0.2.7",
     "sparkler": "~0.1.6",
-    "sweet-bdd": "~1.0.0"
+    "sweet-bdd": "~1.1.0"
   },
   "scripts": {
     "test": "gulp build && mocha -R spec",
