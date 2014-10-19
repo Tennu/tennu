@@ -1,20 +1,21 @@
-var sinon = require('sinon');
-var assert = require('better-assert');
-var equal = require('deep-eql');
-var inspect = require('util').inspect;
-var format = require('util').format;
+const sinon = require('sinon');
+const assert = require('better-assert');
+const equal = require('deep-eql');
+const inspect = require('util').inspect;
+const format = require('util').format;
+require('source-map-support').install();
 
-var debug = false;
-var logfn = debug ? console.log.bind(console) : function () {};
-var logger = {debug: logfn, info: logfn, notice: logfn, warn: logfn, error: logfn};
+const debug = false;
+const logfn = debug ? console.log.bind(console) : function () {};
+const logger = {debug: logfn, info: logfn, notice: logfn, warn: logfn, error: logfn};
 
-var channel = "#test";
-var nickname = 'testbot';
+const channel = "#test";
+const nickname = 'testbot';
 
-var nicknamefn = function () { return nickname; };
+const nicknamefn = function () { return nickname; };
 
-var OutputSocket = require('../lib/output-socket.js');
-var EventEmitter = require('after-events');
+const OutputSocket = require('../lib/output-socket.js');
+const EventEmitter = require('after-events');
 
 describe 'IRC Output Socket:' {
     var socket, out, messageHandler;
@@ -33,7 +34,7 @@ describe 'IRC Output Socket:' {
         }
 
         it 'On Success' (done) {
-            var joinmsg = {nickname: nickname, channel: channel};
+            const joinmsg = {nickname: nickname, channel: channel};
 
             socket.raw = function () {
                 messageHandler.emit('join', joinmsg);

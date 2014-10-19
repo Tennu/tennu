@@ -48,14 +48,16 @@
     "bluebird": "~1.0.0"
   },
   "devDependencies": {
-    "sinon": "~1.7.3",
-    "deep-eql": "~0.1.3",
     "better-assert": "~1.0.0",
-    "sweet-bdd": "~1.0.0",
-    "mocha": "~1.17.0",
-    "sparkler": "~0.1.6",
+    "deep-eql": "~0.1.3",
     "gulp": "~3.8.8",
-    "gulp-sweetjs": "~0.5.4"
+    "gulp-sourcemaps": "^1.2.4",
+    "gulp-sweetjs": "~0.5.4",
+    "mocha": "~1.17.0",
+    "sinon": "~1.7.3",
+    "source-map-support": "^0.2.7",
+    "sparkler": "~0.1.6",
+    "sweet-bdd": "~1.1.0"
   },
   "scripts": {
     "test": "gulp build && mocha -R spec",

@@ -3,6 +3,7 @@ const assert = require('better-assert');
 const equal = require('deep-eql');
 const inspect = require('util').inspect;
 const format = require('util').format;
+require('source-map-support').install();
 
 const Message = require('../lib/message');
 
