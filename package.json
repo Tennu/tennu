@@ -37,27 +37,27 @@
     "event-driven"
   ],
   "dependencies": {
-    "simplesets": "1.2.x",
-    "lodash": "2.4.x",
-    "irc-socket": "~2.2.0",
-    "irc-message": "1.0.x",
-    "tennu-plugins": "~3.0.0",
-    "commander": "~2.1.x",
+    "simplesets": "^1.2.0",
+    "lodash": "^2.4.0",
+    "irc-socket": "^2.2.0",
+    "irc-message": "^1.0.0",
+    "tennu-plugins": "^3.1.0",
+    "commander": "^2.1.0",
     "q": "~0.9.x",
-    "after-events": "~1.0.0",
-    "bluebird": "~1.0.0"
+    "after-events": "^1.0.0",
+    "bluebird": "^1.0.0"
   },
   "devDependencies": {
-    "better-assert": "~1.0.0",
-    "deep-eql": "~0.1.3",
-    "gulp": "~3.8.8",
+    "better-assert": "^1.0.0",
+    "deep-eql": "^0.1.3",
+    "gulp": "^3.8.8",
     "gulp-sourcemaps": "^1.2.4",
-    "gulp-sweetjs": "~0.5.4",
-    "mocha": "~1.17.0",
-    "sinon": "~1.7.3",
+    "gulp-sweetjs": "^0.5.4",
+    "mocha": "^1.17.0",
+    "sinon": "^1.7.3",
     "source-map-support": "^0.2.7",
-    "sparkler": "~0.1.6",
-    "sweet-bdd": "~1.1.0"
+    "sparkler": "^0.1.6",
+    "sweet-bdd": "^1.1.0"
   },
   "scripts": {
     "test": "gulp build && mocha -R spec",
