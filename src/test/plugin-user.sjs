@@ -10,7 +10,7 @@ const logfn = debug ? console.log.bind(console) : function () {};
 
 const UserModule = require('../tennu_plugins/user.js');
 
-describe 'User Module:' {
+describe only 'User Module:' {
     var instance, client;
 
     beforeEach {
@@ -49,6 +49,7 @@ describe 'User Module:' {
                 };
 
                 client.whois = function (nickname) {
+                    logfn("whois called");
                     var message = {nickname: nickname};
 
                     switch (nickname) {
@@ -101,11 +102,15 @@ describe 'User Module:' {
             it 'returns false for nonexistent nicks' (done) {
                 instance.exports.isIdentifiedAs('nonexistent', 'identified')
                 .then(function fulfilled (isIdentifiedAs) {
+                    logfn("Method returned");
                     assert(isIdentifiedAs === false);
                     assert(off_spy.withArgs(handlers).calledOnce);
+                    logfn("Assert passed!");
                 })
                 .then(done)
                 .done();
+
+                clock.tick(1);
             }
 
             it 'returns false for unidentified nicks' (done) {
@@ -116,6 +121,8 @@ describe 'User Module:' {
                 })
                 .then(done)
                 .done();
+
+                clock.tick(1);
             }
 
             it 'returns false for identified nicks to a different nickname (307).' (done) {
@@ -126,6 +133,8 @@ describe 'User Module:' {
                 })
                 .then(done)
                 .done();
+
+                clock.tick(1);
             }
 
             it 'returns false for identified nicks to a different nickname (330).' (done) {
@@ -136,6 +145,8 @@ describe 'User Module:' {
                 })
                 .then(done)
                 .done();
+
+                clock.tick(1);
             }
 
             it 'returns true for identified nicks-307' (done) {
@@ -147,6 +158,8 @@ describe 'User Module:' {
                 })
                 .then(done)
                 .done();
+
+                clock.tick(1);
             }
 
             it 'returns true for identified nicks-330' (done) {
@@ -157,6 +170,8 @@ describe 'User Module:' {
                 })
                 .then(done)
                 .done();
+
+                clock.tick(1);
             }
 
             it 'returns true for identified nicks identified to requested nickname.' (done) {
@@ -167,6 +182,8 @@ describe 'User Module:' {
                 })
                 .then(done)
                 .done();
+
+                clock.tick(1);
             }
 
             it 'times out after an hour' (done) {
@@ -180,6 +197,8 @@ describe 'User Module:' {
                 })
                 .then(done)
                 .done();
+
+                clock.tick(1);
             }
         }
     }

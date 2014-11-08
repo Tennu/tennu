@@ -54,7 +54,7 @@
     "gulp-sourcemaps": "^1.2.4",
     "gulp-sweetjs": "^0.5.4",
     "mocha": "^1.17.0",
-    "sinon": "^1.7.3",
+    "sinon": "^1.11.1",
     "source-map-support": "^0.2.7",
     "sparkler": "^0.3.4",
     "sweet-bdd": "^1.1.0"
