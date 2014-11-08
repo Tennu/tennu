@@ -10,8 +10,8 @@ module.exports = {
                     isupportMessage.params.map(function (param) {
                         return param.split('=');
                     }).forEach(function {
-                        case ([supported]) => isupport[supported] = true;
-                        case ([supported, value]) => isupport[supported] = value;
+                        ([supported]) => isupport[supported] = true,
+                        ([supported, value]) => isupport[supported] = value
                     });
                 }
             },
