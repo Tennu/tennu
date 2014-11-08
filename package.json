@@ -43,7 +43,6 @@
     "irc-message": "^1.0.0",
     "tennu-plugins": "^3.1.0",
     "commander": "^2.1.0",
-    "q": "~0.9.x",
     "after-events": "^1.0.0",
     "bluebird": "^1.0.0"
   },

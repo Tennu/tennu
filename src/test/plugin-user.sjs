@@ -10,7 +10,7 @@ const logfn = debug ? console.log.bind(console) : function () {};
 
 const UserModule = require('../tennu_plugins/user.js');
 
-describe only 'User Module:' {
+describe 'User Module:' {
     var instance, client;
 
     beforeEach {

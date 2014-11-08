@@ -22,7 +22,7 @@
 
 var inspect = require('util').inspect;
 var format = require('util').format;
-var Q = require('q');
+var Promise = require('bluebird');
 
 var partition = function (array, length) {
     var partitions = [];
@@ -71,29 +71,26 @@ var OutputSocket = function (socket, messageHandler, nickname, logger) {
         },
 
         join : function (channel) {
-            var deferred = Q.defer();
+            return new Promise(function (resolve, reject) {
+                var unsubscribe = function () {
+                    logger.debug("Join response or timeout occured.");
+                    messageHandler.off('join', onJoin);
+                };
 
-            var unsubscribe = function () {
-                logger.debug("Join response or timeout occured.");
-                messageHandler.off('join', onJoin);
-            };
+                var onJoin = function (join) {
+                    if (join.nickname !== nickname() || join.channel !== channel) {
+                        return;
+                    }
 
-            var onJoin = function (join) {
-                if (join.nickname !== nickname() || join.channel !== channel) {
-                    return;
-                }
+                    unsubscribe();
+                    logger.debug("Resolving with join message.");
+                    deferred.resolve(join);
+                };
 
-                unsubscribe();
-                logger.debug("Resolving with join message.");
-                deferred.resolve(join);
-            };
+                messageHandler.on('join', onJoin);
 
-            messageHandler.on('join', onJoin);
-
-            rawf("JOIN :%s", channel);
-
-            return undefined; // WIP Code.
-            return deferred.promise;
+                rawf("JOIN :%s", channel);
+            });
         },
 
         part : function (channel, reason) {
