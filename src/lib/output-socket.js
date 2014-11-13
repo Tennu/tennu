@@ -84,7 +84,7 @@ var OutputSocket = function (socket, messageHandler, nickname, logger) {
 
                     unsubscribe();
                     logger.debug("Resolving with join message.");
-                    deferred.resolve(join);
+                    resolve(join);
                 };
 
                 messageHandler.on('join', onJoin);

@@ -33,15 +33,18 @@ describe 'IRC Output Socket:' {
             assert(socket.raw.calledWithExactly(format("JOIN :%s", channel)));
         }
 
-        it skip 'On Success' (done) {
+        it 'On Success' (done) {
             const joinmsg = {nickname: nickname, channel: channel};
 
             socket.raw = function () {
                 messageHandler.emit('join', joinmsg);
             };
 
-            assert(out.join(channel) === undefined);
-            done();
+            out.join(channel).then(function (join) {
+                assert(join.channel === channel);
+                assert(join.nickname === nickname);
+                done();
+            });
         }
     }
 
