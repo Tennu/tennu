@@ -112,7 +112,7 @@ var extensions = {
     '332': function (message) {
         // :<server> 332 <me> <channel> :<topic>
         message.replyname = 'RPL_TOPIC';
-        message.chanenl = message.params[1];
+        message.channel = message.params[1];
         message.topic = message.params[2];
     },
 
