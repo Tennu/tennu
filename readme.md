@@ -40,6 +40,8 @@ myClient.use(['admin', 'last-seen']);
 myClient.connect();
 ```
 
+See [https://tennu.github.io/](tennu.github.io) for the full documentation.
+
 ----------
 
 ## Configuration ##
@@ -84,7 +86,7 @@ These functions will always be called as constructors (with `new`).
 
 ### Logging ###
 
-Of these, the only one you will probably care about is Logger. The object
+The only one you will probably care about is Logger. The object
 returned by the Logger function must implement the following methods:
 
 `debug, info, notice, warn, error, crit, alert, emerg`
@@ -94,11 +96,19 @@ emitters may use crit through emerg.
 
 -------------
 
+## Version ##
+
+Tennu follows SemVer. Tennu will have breaking changes in the future, and
+many updates will be breaking updates, so expect to see the major version
+go up to pretty high numbers. The alternative was to have verisons 0.16.x
+at some point, and that's just silly. Tennu is usable today, might as well
+call it post-1.0, even if it's not 'feature complete'.
+
 ## Event Handling ##
 
-Note: Tennu uses a custom event handler. Listeners are placed at the end of the event queue,
-insead of happening right away. Errors are currently logged to console, but otherwise
-swallowed.
+Note: Tennu uses a custom event handler. Listeners are placed at the end of the
+node event queue (with setImmediate), insead of happening in the same turn.
+Errors are currently logged to console, but otherwise swallowed.
 
 ### Respond Functionality ###
 
@@ -266,15 +276,13 @@ If you find yourself using raw(), please file an issue.
 
 ### rawf(format, args...) ###
 
-[0.7.1]
-
 As raw(message), but the arguments are passed through util.format() first.
 
 --------
 
 ## Plugin System ##
 
-Tennu has its own plugin system.
+Tennu has its own (optional to use) plugin system.
 You can read about it at https://github.com/havvy/tennu-plugins/.
 
 You may access the plugin system's methods via the Client.plugins property
@@ -299,23 +307,17 @@ Only the help plugin is currently fully implemented.
 
 #### help ####
 
-[0.6.0+]
-
-Sets the command `!help`.
+Handles the two commands "!commands" and "!help".
 
 See [Help Module Documentation](https://tennu.github.io/plugins/help).
-
-[0.8.2+]
 
 If you don't want this functionality, set `disable-help` to `true` in your configuration object.
 
 #### channels ####
 
-Unimplemented.
+Unimplemented. Currently being worked on by Dan_Ugore.
 
 #### users ####
-
-[0.7.3+]
 
 This plugin has a single method exported: isIdentifedAs(nickname, nickname_identified, callback)
 
@@ -323,15 +325,12 @@ See [User Module Documentation](https://tennu.github.io/plugins/user).
 
 #### server ####
 
-[0.9.x+]
-
 Information about the server. For now, the only thing this plugin offers is a
 capabilities map listing the information from the 005 raw numeric.
 
 See [Server Plugin Documentation](https://tennu.github.io/plugins/server).
 
 ```javascript
-
 var server = tennu.use("server");
 console.log(util.inspect(server.capabilities));
 ```
