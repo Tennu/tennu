@@ -1,4 +1,5 @@
-const lodash = require('lodash');
+const lodash = require("lodash");
+const packagejson = require("../package.json")[""]
 
 macro delegate {
     rule { $property:ident $method:ident } => {
@@ -10,37 +11,37 @@ macro delegate {
 }
 
 const defaultFactoryConfiguration = {
-    'NetSocket' : require('net').Socket,
-    'IrcSocket' : require('irc-socket'),
-    'IrcOutputSocket' : require('./output-socket.js'),
-    'MessageHandler' : require('./message-handler.js'),
-    'CommandHandler' : require('./command-handler.js'),
-    'Plugins' : require('tennu-plugins'),
-    'BiSubscriber' : require('./bisubscriber.js'),
-    'Logger': require('./null-logger.js'),
-    'NicknameTracker': require('./nickname-tracker.js')
+    "NetSocket" : require("net").Socket,
+    "IrcSocket" : require("irc-socket"),
+    "IrcOutputSocket" : require("./output-socket.js"),
+    "MessageHandler" : require("./message-handler.js"),
+    "CommandHandler" : require("./command-handler.js"),
+    "Plugins" : require("tennu-plugins"),
+    "BiSubscriber" : require("./bisubscriber.js"),
+    "Logger": require("./null-logger.js"),
+    "NicknameTracker": require("./nickname-tracker.js")
 };
 
 const defaultClientConfiguration = {
     // IrcSocket Config
-    'server': undefined,
-    'port': 6667,
-    'ipv6': undefined,
-    'localAddress': undefined,
-    'secure': false,
-    'password': undefined,
-    'capab': false,
-    'nickname': 'tennubot',
-    'username': 'tennu',
-    'realname': 'tennu 0.9.x',
+    "server": undefined,
+    "port": 6667,
+    "ipv6": undefined,
+    "localAddress": undefined,
+    "secure": false,
+    "password": undefined,
+    "capab": false,
+    "nickname": "tennubot",
+    "username": "tennu",
+    "realname": "tennu " + require("../package.json")["version"],
 
     // Tennu Config
-    'channels': [],
-    'nickserv': 'nickserv',
-    'auth-password': undefined,
-    'plugins': [],
-    'command-trigger': '!',
-    'disable-help': false
+    "channels": [],
+    "nickserv": "nickserv",
+    "auth-password": undefined,
+    "plugins": [],
+    "command-trigger": "!",
+    "disable-help": false
 };
 
 /** Fields
@@ -54,7 +55,7 @@ const defaultClientConfiguration = {
  */
  const Client = function (config, dependencies) {
     if (config.nick || config.user) {
-        throw new Error('Please use \'nickname\' and \'username\' instead of \'nick\' and \'user\' in your configuration.');
+        throw new Error("Please use \"nickname\" and \"username\" instead of \"nick\" and \"user\" in your configuration.");
     }
 
     const client = Object.create(Client.prototype);
@@ -92,16 +93,16 @@ const defaultClientConfiguration = {
     // determining whether they should be handled by the IrcMessageEmitter
     // or the Command Handler.
     client._subscriber = new di.BiSubscriber(client._messageHandler, commandHandler);
-    client._subscriber.on('privmsg', function (privmsg) { commandHandler.parse(privmsg); });
+    client._subscriber.on("privmsg", function (privmsg) { commandHandler.parse(privmsg); });
 
     // And finally, the module system.
-    client._plugins = new di.Plugins('tennu', client);
-    client._plugins.addHook('handlers', function (module, handlers) {
+    client._plugins = new di.Plugins("tennu", client);
+    client._plugins.addHook("handlers", function (module, handlers) {
         client._subscriber.on(handlers);
     });
-    client.note('Tennu', 'Loading default plugins');
-    client._plugins.use(['server', 'help', 'user', 'channel', 'startup'], __dirname);
-    client.note('Tennu', 'Loading your plugins');
+    client.note("Tennu", "Loading default plugins");
+    client._plugins.use(["server", "help", "user", "channel", "startup"], __dirname);
+    client.note("Tennu", "Loading your plugins");
     client._plugins.use(config.plugins || [], process.cwd());
 
 
@@ -112,7 +113,7 @@ const defaultClientConfiguration = {
 
     client.connected = false;
 
-    client.note('Tennu', 'Client created.');
+    client.note("Tennu", "Client created.");
     return client;
 };
 
@@ -125,16 +126,16 @@ Client.prototype.config = function (param) {
 // implements Runnable ;)
 
 const connect = function () {
-    this.debug('Tennu', 'Trying to connect.');
+    this.debug("Tennu", "Trying to connect.");
 
     if (this.connected) {
-        this.warn('Tennu', 'Attempted to start Tennu Client that already is connected.');
+        this.warn("Tennu", "Attempted to start Tennu Client that already is connected.");
         return;
     }
 
     this._socket.connect();
     this.connected = true;
-    this.debug('Tennu', 'Connected');
+    this.debug("Tennu", "Connected");
     return this;
 }
 
@@ -142,16 +143,16 @@ Client.prototype.connect = connect;
 Client.prototype.start = connect;
 
 const disconnect = function () {
-    this.debug('Tennu', 'Trying to disconnect.');
+    this.debug("Tennu", "Trying to disconnect.");
 
     if (!this.connected) {
-        this.warn('Tennu', 'Attempted to end Tennu Client that already is not connected.');
+        this.warn("Tennu", "Attempted to end Tennu Client that already is not connected.");
         return this;
     }
 
     this._socket.end();
     this.connected = false;
-    this.debug('Tennu', 'Disconnected');
+    this.debug("Tennu", "Disconnected");
     return this;
 };
 
