@@ -161,19 +161,19 @@ Client.prototype.end = disconnect;
 
 // implements IRC Output Socket
 
-Client.prototype.say                    = delegate _outputSocket say;
 Client.prototype.act                    = delegate _outputSocket act;
-// CONFLICT!
-// Client.prototype.notice                 = delegate _outputSocket notice;
 Client.prototype.ctcp                   = delegate _outputSocket ctcp;
+Client.prototype.join                   = delegate _outputSocket join;
+Client.prototype.mode                   = delegate _outputSocket mode;
+Client.prototype.nick                   = delegate _outputSocket nick;
+// Client.prototype.notice                 = delegate _outputSocket notice;
+// CONFLICT!
 Client.prototype.part                   = delegate _outputSocket part;
 Client.prototype.quit                   = delegate _outputSocket quit;
-Client.prototype.join                   = delegate _outputSocket join;
+Client.prototype.say                    = delegate _outputSocket say;
 Client.prototype.userhost               = delegate _outputSocket userhost;
-Client.prototype.whois                  = delegate _outputSocket whois;
-Client.prototype.nick                   = delegate _outputSocket nick;
-Client.prototype.mode                   = delegate _outputSocket mode;
 Client.prototype.who                    = delegate _outputSocket who;
+Client.prototype.whois                  = delegate _outputSocket whois;
 Client.prototype.raw                    = delegate _outputSocket raw;
 Client.prototype.rawf                   = delegate _outputSocket rawf;
 
