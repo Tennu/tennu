@@ -51,6 +51,50 @@ var extensions = {
         message.new = message.params[0];
     },
 
+    mode: function (message) {
+        message.channel = message.params[0]; // Channel or nick
+        message.modestring = message.params[1]; // +asd-asdaf
+        // The IRCd should only send the modestring with the argument modes last.
+        // i.e "+soh nick nick" or "+s-zh+o nick nick" or "+pzh-o nick nick"
+        message.modes = [];
+        var args = message.params.slice(2);
+        var modes = message.modestring.split('');
+        var prefixes = {'+':true,'-':false};
+        var argModes = { // TODO: Use the "CHANMODES" sent by the server on connect to make this dict
+            'a': "nick",
+            'b': "mask",
+            'e': "mask",
+            'f': "lines:second",
+            'h': "nick",
+            'I': "mask",
+            'J': "joins:second",
+            'k': "key",
+            'l': "max_users",
+            'L': "channel",
+            'o': "nick",
+            'O': "nick",
+            'q': "nick",
+            'v': "nick"
+        };
+        for (var i = 0, set_mode = true; i < modes.length; i++) {
+            var mode = modes[i];
+            if (mode in prefixes) {
+                set_mode = prefixes[mode];
+            } else if (mode in argModes) {
+                message.modes.push({
+                    mode: mode,
+                    parameter: args.shift(),
+                    set: set_mode
+                });
+            } else {
+                message.modes.push({
+                    mode: mode,
+                    set: set_mode
+                });
+            }
+        }
+    },
+
     '307': function (message) {
         // :<server> 307 <me> <nick> :is a registered nick
         // FIXME: Only accounts for Unrealircd
