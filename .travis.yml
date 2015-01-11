@@ -2,4 +2,6 @@ language: node_js
 node_js:
   - "0.10"
 notifications:
-  irc: "irc.coldfront.net#tennu"
+  irc: "irc.mibbit.net#heartless"
+  use_notice: true
+  skip_join: true
