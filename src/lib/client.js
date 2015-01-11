@@ -173,6 +173,7 @@ Client.prototype.userhost               = delegate _outputSocket userhost;
 Client.prototype.whois                  = delegate _outputSocket whois;
 Client.prototype.nick                   = delegate _outputSocket nick;
 Client.prototype.mode                   = delegate _outputSocket mode;
+Client.prototype.who                    = delegate _outputSocket who;
 Client.prototype.raw                    = delegate _outputSocket raw;
 Client.prototype.rawf                   = delegate _outputSocket rawf;
 
