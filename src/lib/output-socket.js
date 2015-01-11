@@ -152,7 +152,7 @@ var OutputSocket = function (socket, messageHandler, nickname, logger) {
 
         who: function (channel) {
             raw(["WHO", channel]);
-        }
+        },
 
         raw: raw,
         rawf: rawf,
