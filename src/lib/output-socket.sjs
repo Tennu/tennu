@@ -70,6 +70,10 @@ var OutputSocket = function (socket, messageHandler, nickname, logger) {
             this.ctcp(target, "ACTION", message);
         },
 
+        notice: function (target, message) {
+            rawf("NOTICE %s :%s", target, message);
+        },
+
         join: function (channel) {
             return new Promise(function (resolve, reject) {
                 var unsubscribe = function () {

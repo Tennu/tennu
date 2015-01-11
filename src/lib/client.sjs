@@ -166,8 +166,7 @@ Client.prototype.ctcp                   = delegate _outputSocket ctcp;
 Client.prototype.join                   = delegate _outputSocket join;
 Client.prototype.mode                   = delegate _outputSocket mode;
 Client.prototype.nick                   = delegate _outputSocket nick;
-// Client.prototype.notice                 = delegate _outputSocket notice;
-// CONFLICT!
+Client.prototype.notice                 = delegate _outputSocket notice;
 Client.prototype.part                   = delegate _outputSocket part;
 Client.prototype.quit                   = delegate _outputSocket quit;
 Client.prototype.say                    = delegate _outputSocket say;
@@ -193,8 +192,6 @@ Client.prototype.addHook                = delegate _plugins addHook;
 // implements Logger
 Client.prototype.debug                  = delegate _logger debug;
 Client.prototype.info                   = delegate _logger info;
-// CONFLICT!
-Client.prototype.notice                 = delegate _logger notice;
 Client.prototype.note                   = delegate _logger notice;
 Client.prototype.warn                   = delegate _logger warn;
 Client.prototype.error                  = delegate _logger error;

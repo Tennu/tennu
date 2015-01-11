@@ -1,7 +1,12 @@
-var gulp = require('gulp');
-var sweetjs = require("gulp-sweetjs");
-var sourcemaps = require('gulp-sourcemaps');
-var concat = require('gulp-concat-util');
+const gulp = require('gulp');
+const sweetjs = require("gulp-sweetjs");
+const sourcemaps = require('gulp-sourcemaps');
+const concat = require('gulp-concat-util');
+
+// Macro packages.
+const match = "sparkler/macros";
+const lambda = "lambda-chop/macros";
+const bdd = "sweet-bdd";
 
 gulp.task('default', function() {
   console.log("Use either the 'build' or 'test' tasks");
@@ -19,9 +24,9 @@ gulp.task("build", function () {
         .pipe(gulp.dest(to))
     }
 
-    pipeline("lib", "lib", []);
-    pipeline("plugin", "tennu_plugins", ['sparkler/macros', 'lambda-chop/macros']);
-    pipeline("test", "test", ['sweet-bdd']);
+    pipeline("lib", "lib", [match, lambda]);
+    pipeline("plugin", "tennu_plugins", [match]);
+    pipeline("test", "test", [bdd]);
 
     gulp.src("src/bin/**/*.sjs")
     .pipe(sourcemaps.init())

@@ -37,6 +37,7 @@
 var util = require('util');
 var EventEmitter = require('after-events');
 var Message = require('./message');
+var Promise = require('bluebird');
 
 var MessageParser = function MP (client, logger, socket) {
     var parser = Object.create(EventEmitter());
@@ -66,10 +67,15 @@ var MessageParser = function MP (client, logger, socket) {
     };
 
     parser.after(function (err, res, type, message) {
+        // Intent := "say" | "act" | "ctcp" | "notice" | "none"
+        // Target: NickName | ChannelName
+        // Response := {message: String | [CtcpType, String], intent: Intent, target: Target, query: Boolean}
+        // Result = undefined | string | [string] | Response
+
         // err := Error
-        // res := string U [string] U {message: string, query: boolean?, intent: ('say' | 'act')?, target: target?}
+        // res := Result | Promise<Result>
         // type := string
-        // message := message
+        // message := Message
 
         if (err) {
             logger.error('Message Handler', 'Error thrown in message handler!');
@@ -77,33 +83,58 @@ var MessageParser = function MP (client, logger, socket) {
             return;
         }
 
-        // Tests require that the undefined case return immediately.
-        if (res === undefined || message.channel === undefined) {
-            return;
+        if (message.channel !== undefined) {
+            Promise.resolve(res)
+            .then(normalizeResponse)
+            .then(sendResponse)
+            .catch(logBadResponseError)
         }
 
-        logger.debug('Message Handler', 'Response exists.');
-
-        if (Array.isArray(res) || typeof res === 'string') {
-            client.say(message.channel, res);
-            return;
+        // Result -> Response
+        function normalizeResponse (res) {
+            if (typeof res === "undefined") {
+                return {
+                    intent: "none",
+                    message: res,
+                    target: message.channel
+                };
+            } else if (typeof res === "string" || Array.isArray(res)) {
+                return {
+                    intent: "say",
+                    message: res,
+                    target: message.channel
+                };
+            } else if (typeof res === "object") {
+                return {
+                    message: res.message,
+                    intent: res.intent || "say",
+                    target: res.query ? message.nickname : (res.target || message.channel)
+                };
+            } else {
+                throw new Error("Bad Response");
+            }
         }
 
-        if (typeof res === 'object' && res.message) {
-            const channel = res.query ? message.nickname :
-                     /* otherwise */   (res.target || message.channel);
-            const intent = res.intent === 'act' ? 'act' : 'say';
+        function sendResponse (response) {
+            var intents = {
+                say: λ[client.say(#, #)],
+                act: λ[client.act(#, #)],
+                notice: λ[client.notice(#, #)],
+                none: λ[undefined],
+                ctcp: function {
+                    (target, [ctcpType, message]) => client.ctcp(target, ctcpType, message)
+                }
+            };
 
-            client[intent](channel, res.message);
-            return;
+            intents[response.intent](response.target, response.message);
         }
-       
-        logger.error('Message Handler', format(badResponseFormat, message.message, inspect(res)));
+
+        function logBadResponseError (err) {
+            logger.error('Message Handler', format(badResponseFormat, message.message, inspect(res)));
+        }
     });
 
-    parser.toString = function () {
-        return "[Object MessageParser]";
-    };
+    parser.toString = λ["[Object MessageParser]"];
 
     parser.isupport = function (value) {
         isupport = value;
