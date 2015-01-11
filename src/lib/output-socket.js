@@ -52,7 +52,7 @@ var OutputSocket = function (socket, messageHandler, nickname, logger) {
 
                 return;
             }
-            rawf("PRIVMSG %s:%s", target, message);
+            rawf("PRIVMSG %s :%s", target, message);
         },
 
         ctcp: function recur (target, type, message) {
@@ -89,12 +89,12 @@ var OutputSocket = function (socket, messageHandler, nickname, logger) {
 
                 messageHandler.on('join', onJoin);
 
-                rawf("JOIN:%s", channel);
+                rawf("JOIN :%s", channel);
             });
         },
 
         part: function (channel, reason) {
-            raw("PART " + channel + (reason ? ":" + reason: ""));
+            raw("PART " + channel + (reason ? " :" + reason: ""));
         },
 
         nick: function (newNick) {
@@ -103,11 +103,11 @@ var OutputSocket = function (socket, messageHandler, nickname, logger) {
 
         quit: function (reason) {
             logger.notice(format("Quitting with reason: %s", reason));
-            raw("QUIT" + (reason ? ":" + reason: ""));
+            raw("QUIT" + (reason ? " :" + reason : ""));
         },
 
         mode: function (target, plus, minus, inArgs) {
-            var args = ":";
+            var args = " :";
 
             if (plus) {
                 args += "+" + plus;
@@ -118,7 +118,7 @@ var OutputSocket = function (socket, messageHandler, nickname, logger) {
             }
 
             if (inArgs) {
-                args += " " + util.isArray(inArgs) ? inArgs.join(' '): inArgs;
+                args += " " + util.isArray(inArgs) ? inArgs.join(' ') : inArgs;
             }
 
             raw(["MODE", target, args]);
@@ -144,7 +144,7 @@ var OutputSocket = function (socket, messageHandler, nickname, logger) {
                     .map(function (users) { recur(users, server); });
                 }
             } else if (typeof users === 'string') {
-                raw("WHOIS " + (server ? server + " ": "") + users);
+                raw("WHOIS " + (server ? server + " " : "") + users);
             } else {
                 throw new Error("Whois command takes either a string (a single nick) or an array (of string nicks)");
             }

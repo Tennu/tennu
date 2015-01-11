@@ -136,8 +136,8 @@ describe 'Tennu Client' {
 
     describe 'autoidentify' {
         beforeEach (done) {
-            tennu.on('notice', function(e) {
-                if (e.nickname === 'nickserv') {
+            tennu.on('notice', function (message) {
+                if (message.nickname === 'nickserv') {
                     done();
                 }
             });
