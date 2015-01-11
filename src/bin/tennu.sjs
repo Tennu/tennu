@@ -1,5 +1,3 @@
-#! /usr/bin/env node
-
 var program = require('commander');
 var Client = require('../lib/client.js');
 var fs = require('fs');
@@ -7,7 +5,7 @@ var inspect = require('util').inspect;
 var format = require('util').format;
 
 program
-  .version('0.7.0')
+  .version('1.0.0')
   .usage('[options] <config file>')
   .option('-v, --verbose', 'Log to standard out')
   .option('-d, --debug', 'Log debug messages. Requires -v')
@@ -93,8 +91,12 @@ try {
 }
 
 // Register hangup functions
-var onabort = function () {
-    client.quit("Bot terminated.");
+var onabort = function self () {
+    if (!self.attemptedToQuitAlready) {
+        client.quit("Bot terminated.");
+    } else {
+        process.exit(1);
+    }
 };
 
 process.on('SIGHUP', onabort);

@@ -4,11 +4,12 @@
 *sublime*
 
 # Auto-generated files
-node_modules/
-lib/
-tennu_plugins/
-sourcemaps/
-test/
+/node_modules/
+/lib/
+/tennu_plugins/
+/bin/
+/sourcemaps/
+/test/
 
 # NPM Error Logs...
 *npm-debug.log

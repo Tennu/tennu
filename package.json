@@ -50,8 +50,9 @@
     "better-assert": "^1.0.0",
     "deep-eql": "^0.1.3",
     "gulp": "^3.8.8",
+    "gulp-concat-util": "^0.5.1",
     "gulp-sourcemaps": "^1.2.4",
-    "gulp-sweetjs": "^0.5.4",
+    "gulp-sweetjs": "^0.6.0",
     "lambda-chop": "^0.1.5",
     "mocha": "^1.17.0",
     "sinon": "^1.11.1",
@@ -64,7 +65,7 @@
     "build": "gulp build"
   },
   "bin": {
-    "tennu": "bin/cli.js"
+    "tennu": "bin/tennu.js"
   },
   "license": "ISC"
 }
