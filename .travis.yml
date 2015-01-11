@@ -4,7 +4,6 @@ node_js:
 notifications:
   irc: "irc.mibbit.net#heartless"
     use_notice: true
-    skip_join: true
     template:
       - "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}"
       - "Change : %{commit_message}"
