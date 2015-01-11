@@ -22,7 +22,6 @@ gulp.task("build", function () {
     pipeline("lib", "lib", []);
     pipeline("plugin", "tennu_plugins", ['sparkler/macros', 'lambda-chop/macros']);
     pipeline("test", "test", ['sweet-bdd']);
-    pipeline("bin", "bin", []);
 
     gulp.src("src/bin/**/*.sjs")
     .pipe(sourcemaps.init())
