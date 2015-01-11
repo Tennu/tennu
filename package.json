@@ -52,6 +52,7 @@
     "gulp": "^3.8.8",
     "gulp-sourcemaps": "^1.2.4",
     "gulp-sweetjs": "^0.5.4",
+    "lambda-chop": "^0.1.5",
     "mocha": "^1.17.0",
     "sinon": "^1.11.1",
     "source-map-support": "^0.2.7",
