@@ -1,3 +1,8 @@
+// This entire plugin is written so badly, but I don't know how to make it cleaner.
+// :(
+//
+// -- Havvy
+
 const HELP_NOT_FOUND = 'Help file for selected topic does not exist.';
 
 const isArray = require('util').isArray;
@@ -12,6 +17,16 @@ module.exports = {
         if (!enabled) {
             // Empty module.
             return {};
+        }
+
+        const commandTrigger = client.config('command-trigger');
+        // (string | [string]) -> string | [string]
+        function replaceCommandTrigger (response) {
+            if (typeof response === "string") {
+                return response.replace(/{{!}}/g, commandTrigger);
+            } else {
+                return response.map(replaceCommandTrigger);
+            }
         }
 
         const registry = {};
@@ -35,11 +50,11 @@ module.exports = {
             }
 
             if (typeof cursor === 'string' || Array.isArray(cursor)) {
-                return cursor;
+                return replaceCommandTrigger(cursor);
             }
 
             if (typeof cursor['*'] === 'string' || Array.isArray(cursor['*'])) {
-                return cursor['*'];
+                return replaceCommandTrigger(cursor['*']);
             }
 
             return HELP_NOT_FOUND;
@@ -51,7 +66,8 @@ module.exports = {
                     client.notice('ModHelp', '!help being handled.');
                     // Default to showing the help for the help module if no args given.
                     const query = command.args.length === 0 ? ['help'] : command.args.slice();
-                    const response = helpResponseMessage(query);
+                    var response = helpResponseMessage(query);
+
                     return {
                         message: response,
                         query: true,
