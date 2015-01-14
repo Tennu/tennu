@@ -38,6 +38,7 @@ var util = require('util');
 var EventEmitter = require('after-events');
 var Message = require('./message');
 var Promise = require('bluebird');
+var Response = require('./response');
 
 var MessageParser = function MP (client, logger, socket) {
     var parser = Object.create(EventEmitter());
@@ -69,8 +70,8 @@ var MessageParser = function MP (client, logger, socket) {
     parser.after(function (err, res, type, message) {
         // Intent := "say" | "act" | "ctcp" | "notice" | "none"
         // Target: NickName | ChannelName
-        // Response := {message: String | [CtcpType, String], intent: Intent, target: Target, query: Boolean}
-        // Result = undefined | string | [string] | Response
+        // ReturnResponse := {message: String | [CtcpType, CtcpBody], intent: Intent, target: Target, query: Boolean}
+        // Result = undefined | string | [string] | ReturnResponse
 
         // err := Error
         // res := Result | Promise<Result>
@@ -85,48 +86,9 @@ var MessageParser = function MP (client, logger, socket) {
 
         if (message.channel !== undefined) {
             Promise.resolve(res)
-            .then(normalizeResponse)
-            .then(sendResponse)
+            .then(λ[Response.create(#, message)])
+            .then(λ[Response.send(#, client)])
             .catch(logBadResponseError)
-        }
-
-        // Result -> Response
-        function normalizeResponse (res) {
-            if (typeof res === "undefined") {
-                return {
-                    intent: "none",
-                    message: res,
-                    target: message.channel
-                };
-            } else if (typeof res === "string" || Array.isArray(res)) {
-                return {
-                    intent: "say",
-                    message: res,
-                    target: message.channel
-                };
-            } else if (typeof res === "object") {
-                return {
-                    message: res.message,
-                    intent: res.intent || "say",
-                    target: res.query ? message.nickname : (res.target || message.channel)
-                };
-            } else {
-                throw new Error("Bad Response");
-            }
-        }
-
-        function sendResponse (response) {
-            var intents = {
-                say: λ[client.say(#, #)],
-                act: λ[client.act(#, #)],
-                notice: λ[client.notice(#, #)],
-                none: λ[undefined],
-                ctcp: function {
-                    (target, [ctcpType, message]) => client.ctcp(target, ctcpType, message)
-                }
-            };
-
-            intents[response.intent](response.target, response.message);
         }
 
         function logBadResponseError (err) {
