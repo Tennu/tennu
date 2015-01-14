@@ -132,7 +132,7 @@ module.exports = {
 
             help: {
                 help: [
-                    '!help <query>',
+                    '{{!}}help <query>',
                     ' ',
                     'Display the help message for the topic located at the given query.',
                     'Query can be made of multiple subtopics',
@@ -143,7 +143,7 @@ module.exports = {
                 ],
 
                 commands: [
-                    '!commands',
+                    '{{!}}commands',
                     ' ',
                     'Show the list of commands.'
                 ]
