@@ -160,7 +160,6 @@ Client.prototype.disconnect = disconnect;
 Client.prototype.end = disconnect;
 
 // implements IRC Output Socket
-
 Client.prototype.act                    = delegate _outputSocket act;
 Client.prototype.ctcp                   = delegate _outputSocket ctcp;
 Client.prototype.join                   = delegate _outputSocket join;
