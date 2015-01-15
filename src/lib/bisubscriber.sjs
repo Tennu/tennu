@@ -50,9 +50,9 @@ BiEventSubscriber.prototype = {
     _onString : function (type, listener) {
         type.split(' ').forEach(function (event) {
             if (event[0] === '!') {
-                this._secondary.on(event.substr(1), listener);
+                this._secondary.on(event.substr(1).toLowerCase(), listener);
             } else {
-                this._primary.on(event, listener);
+                this._primary.on(event.toLowerCase(), listener);
             }
         }.bind(this));
     },
@@ -66,9 +66,9 @@ BiEventSubscriber.prototype = {
     _offString : function (type, listener) {
         type.split(' ').forEach(function (event) {
             if (event[0] === '!') {
-                this._secondary[this._secondaryOff](event, listener);
+                this._secondary[this._secondaryOff](event.substr(1).toLowerCase(), listener);
             } else {
-                this._primary[this._primaryOff](event, listener);
+                this._primary[this._primaryOff](event.toLowerCase(), listener);
             }
         }.bind(this));
     },
@@ -82,9 +82,9 @@ BiEventSubscriber.prototype = {
     _onceString : function (type, listener) {
         type.split(' ').forEach(function (event) {
             if (event[0] === '!') {
-                this._secondary.once(event.substr(1), listener);
+                this._secondary.once(event.substr(1).toLowerCase(), listener);
             } else {
-                this._primary.once(event, listener);
+                this._primary.once(event.toLowerCase(), listener);
             }
         }.bind(this));
     },
