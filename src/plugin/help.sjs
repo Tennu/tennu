@@ -138,8 +138,8 @@ module.exports = {
                     'Query can be made of multiple subtopics',
                     'Without a query, shows this help message.',
                     '',
-                    'Ex: !help commands',
-                    'Ex: !help uno start'
+                    'Ex: {{!}}help commands',
+                    'Ex: {{!}}help uno start'
                 ],
 
                 commands: [
