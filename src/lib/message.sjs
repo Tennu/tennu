@@ -170,6 +170,7 @@ var extensions = {
 
     '353': function (message) {
         // :<server> 353 <me> = <channel> :<nicknames>
+        // The replyname really doesn't have an "E" in it.
         message.replyname = 'RPL_NAMREPLY';
         message.channel = message.params[2];
         message.nicknames = message.params[3].trim().split(" ");
