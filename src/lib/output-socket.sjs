@@ -130,7 +130,7 @@ var OutputSocket = function (socket, messageHandler, nickname, logger) {
 
         userhost: function recur (users) {
             if (typeof users === 'string') {
-                rawf("USERHOST:%s", users);
+                rawf("USERHOST: %s", users);
             } else if (typeof users === 'array') {
                 partition(users, 5)
                 .map(function (hosts) { return hosts.join(' '); })
