@@ -180,10 +180,11 @@ Client.prototype.on                     = delegate _subscriber on;
 Client.prototype.once                   = delegate _subscriber once;
 Client.prototype.off                    = delegate _subscriber off;
 
-// implements ModuleSystem
+// implements PluginSystem
 Client.prototype.use                    = delegate _plugins use;
-Client.prototype.getModule              = delegate _plugins moduleExports;
-Client.prototype.getRole                = delegate _plugins roleExports;
+Client.prototype.getModule              = delegate _plugins getPlugin;
+Client.prototype.getPlugin              = delegate _plugins getPlugin
+Client.prototype.getRole                = delegate _plugins getRole;
 Client.prototype.initializePlugin       = delegate _plugins initialize;
 Client.prototype.isPluginInitializable  = delegate _plugins isInitializable;
 Client.prototype.addHook                = delegate _plugins addHook;
