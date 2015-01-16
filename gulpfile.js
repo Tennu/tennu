@@ -25,7 +25,7 @@ gulp.task("build", function () {
     }
 
     pipeline("lib", "lib", [match, lambda]);
-    pipeline("plugin", "tennu_plugins", [match]);
+    pipeline("plugin", "tennu_plugins", [match, lambda]);
     pipeline("test", "test", [bdd]);
 
     gulp.src("src/bin/**/*.sjs")
