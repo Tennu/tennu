@@ -163,7 +163,6 @@ Messages are immutable, as are their args. Make sure to copy the args array befo
 
 All messages have the following fields:
 
-* receiver   - Receiver of the message. A reference to the Client object.
 * prefix     - The prefix is either a hostmask of the format "nickname!username@hostname", or the server you are connected to.
 * command    - Message command type. For example, 'privmsg' or 'nick'.
 * params     - Array of sent parameters.
