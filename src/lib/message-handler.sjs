@@ -79,8 +79,8 @@ var MessageParser = function MP (client, logger, socket) {
         // message := Message
 
         if (err) {
-            logger.error('Message Handler', 'Error thrown in message handler!');
-            logger.error('Message Handler', err.stack);
+            logger.error('MessageHandler', 'Error thrown in message handler!');
+            logger.error('MessageHandler', err.stack);
             return;
         }
 
@@ -92,7 +92,7 @@ var MessageParser = function MP (client, logger, socket) {
         }
 
         function logBadResponseError (err) {
-            logger.error('Message Handler', format(badResponseFormat, message.message, inspect(res)));
+            logger.error('MessageHandler', format(badResponseFormat, message.message, inspect(res)));
         }
     });
 
