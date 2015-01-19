@@ -50,14 +50,14 @@ const messages = {
 };
 
 describe 'Command Handler' {
-    var handler, receiver;
+    var handler, client;
 
     beforeEach {
-        receiver = {
+        client = {
             say: sinon.spy()
         };
 
-        handler = CommandHandler(config, receiver, nicknamefn, logger);
+        handler = CommandHandler(config, client, nicknamefn, logger);
     }
 
     describe 'command detection:' {
@@ -143,7 +143,7 @@ describe 'Command Handler' {
             handler.after(function () {
                 try {
                     logfn('After function called.');
-                    assert(!receiver.say.called);
+                    assert(!client.say.called);
                     done();
                 } catch (e) {
                     done(e);
@@ -158,7 +158,7 @@ describe 'Command Handler' {
         }
 
         it 'string response' (done) {
-            receiver.say = function (_sender, response) {
+            client.say = function (_sender, response) {
                 try {
                     assert(sender === _sender);
                     assert(response === 'response');
@@ -173,11 +173,11 @@ describe 'Command Handler' {
                 return 'response';
             });
 
-            handler.parse(Message(messages.command, receiver));
+            handler.parse(Message(messages.command, client));
         }
 
         it '[string] response' (done) {
-            receiver.say = function (_sender, response) {
+            client.say = function (_sender, response) {
                 try {
                     assert(sender === _sender);
                     assert(equal(response, ['response']));
@@ -192,11 +192,11 @@ describe 'Command Handler' {
                 return ['response'];
             });
 
-            handler.parse(Message(messages.command, receiver));
+            handler.parse(Message(messages.command, client));
         }
 
         it 'Promise<string> response' (done) {
-            receiver.say = function (_sender, response) {
+            client.say = function (_sender, response) {
                 try {
                     assert(sender === _sender);
                     assert(response === 'response');
@@ -211,11 +211,11 @@ describe 'Command Handler' {
                 return Promise.resolve('response');
             });
 
-            handler.parse(Message(messages.command, receiver));
+            handler.parse(Message(messages.command, client));
         }
 
         it 'Promise<[string]> response' (done) {
-            receiver.say = function (_sender, response) {
+            client.say = function (_sender, response) {
                 try {
                     assert(sender === _sender);
                     assert(equal(response, ['response']));
@@ -230,7 +230,7 @@ describe 'Command Handler' {
                 return Promise.resolve(['response']);
             });
 
-            handler.parse(Message(messages.command, receiver));
+            handler.parse(Message(messages.command, client));
         }
 
         it 'Promise<string> after Promise#catch()' (done) {
@@ -243,7 +243,7 @@ describe 'Command Handler' {
                 });
             };
 
-            receiver.say = function (sender, response) {
+            client.say = function (sender, response) {
                 try {
                     assert(response === 'Sorry!');
                     done();   
@@ -254,7 +254,7 @@ describe 'Command Handler' {
 
             handler.on(commandname, failHandler);
 
-            handler.parse(Message(messages.command, receiver));
+            handler.parse(Message(messages.command, client));
         }
     }
 }

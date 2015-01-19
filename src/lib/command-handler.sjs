@@ -2,6 +2,8 @@ const EventEmitter = require('after-events');
 const inspect = require('util').inspect;
 const format = require('util').format;
 const lodash = require('lodash');
+const Response = require('./response');
+const Promise = require('bluebird');
 
 const badResponseFormat = 'Command handler for %s returned with invalid value: %s';
 

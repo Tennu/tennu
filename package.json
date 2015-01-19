@@ -37,14 +37,15 @@
     "event-driven"
   ],
   "dependencies": {
-    "simplesets": "^1.2.0",
-    "lodash": "^2.4.0",
-    "irc-socket": "^2.3.0",
-    "irc-message": "^1.0.0",
-    "tennu-plugins": "^3.1.0",
-    "commander": "^2.1.0",
     "after-events": "^1.0.0",
-    "bluebird": "^1.0.0"
+    "bluebird": "^1.0.0",
+    "chunk": "0.0.2",
+    "commander": "^2.1.0",
+    "irc-message": "^1.0.0",
+    "irc-socket": "^2.3.0",
+    "lodash": "^2.4.0",
+    "simplesets": "^1.2.0",
+    "tennu-plugins": "^3.1.0"
   },
   "devDependencies": {
     "better-assert": "^1.0.0",
