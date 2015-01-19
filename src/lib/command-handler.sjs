@@ -54,45 +54,40 @@ function CommandParser (config, client, nickname, logger) {
         if (maybeCommand) {
             const command = Command(privmsg, maybeCommand);
             logger.notice('Command Handler', 'Emitting command:', command.command);
+
+
             this.emit(command.command, command);
             return command;
         }
     };
 
     parser.after(function (err, res, type, command) {
+        // Intent := "say" | "act" | "ctcp" | "notice" | "none"
+        // Target: NickName | ChannelName
+        // ReturnResponse := {message: String | [CtcpType, CtcpBody], intent: Intent, target: Target, query: Boolean}
+        // Result = undefined | string | [string] | ReturnResponse
+
         // err := Error
-        // res := string U [string] U {message: string, query: boolean?, intent: ('say' | 'act')?, target: target?}
+        // res := Result | Promise<Result>
         // type := string
-        // commmand := commmand
+        // command := Command
 
         if (err) {
-            logger.error('Command Handler', 'Error thrown in command handler!');
-            logger.error('Command Handler', err.stack);
+            logger.error('CommandHandler', 'Error thrown in message handler!');
+            logger.error('CommandHandler', err.stack);
             return;
         }
 
-        // Tests require that the undefined case return immediately.
-        if (res === undefined) {
-            return;
+        if (command.channel !== undefined) {
+            Promise.resolve(res)
+            .then(λ[Response.create(#, command)])
+            .then(λ[Response.send(#, client)])
+            .catch(logBadResponseError)
         }
 
-        logger.debug('Command Handler', 'Response exists.');
-
-        if (Array.isArray(res) || typeof res === 'string') {
-            client.say(command.channel, res);
-            return;
-        } 
-
-        if (typeof res === 'object' && res.message) {
-            const channel = res.query ? command.nickname :
-                     /* otherwise */   (res.target || command.channel);
-            const intent = res.intent === 'act' ? 'act' : 'say';
-
-            client[intent](channel, res.message);
-            return;
+        function logBadResponseError (err) {
+            logger.error('CommandHandler', format(badResponseFormat, command.message, inspect(res)));
         }
-       
-        logger.error('Command Handler', format(badResponseFormat, command.command, inspect(res)));
     });
 
     return parser;
