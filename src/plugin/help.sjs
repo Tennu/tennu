@@ -3,23 +3,23 @@
 //
 // -- Havvy
 
-const HELP_NOT_FOUND = 'Help file for selected topic does not exist.';
+const HELP_NOT_FOUND = "Help file for selected topic does not exist.";
 
-const isArray = require('util').isArray;
-const format = require('util').format;
-const inspect = require('util').inspect;
-const Set = require('simplesets').Set;
+const isArray = require("util").isArray;
+const format = require("util").format;
+const inspect = require("util").inspect;
+const Set = require("simplesets").Set;
 
 module.exports = {
     init: function (client, imports) {
-        const enabled = !(client.config('disable-help'));
+        const enabled = !(client.config("disable-help"));
 
         if (!enabled) {
             // Empty module.
             return {};
         }
 
-        const commandTrigger = client.config('command-trigger');
+        const commandTrigger = client.config("command-trigger");
         // (string | [string]) -> string | [string]
         function replaceCommandTrigger (response) {
             if (typeof response === "string") {
@@ -34,7 +34,7 @@ module.exports = {
 
         function helpResponseMessage (query) {
             const cursor = query.reduce(function (cursor, topic) {
-                if (typeof cursor !== 'object') {
+                if (typeof cursor !== "object") {
                     return undefined;
                 }
 
@@ -49,12 +49,12 @@ module.exports = {
                 return HELP_NOT_FOUND;
             }
 
-            if (typeof cursor === 'string' || Array.isArray(cursor)) {
+            if (typeof cursor === "string" || Array.isArray(cursor)) {
                 return replaceCommandTrigger(cursor);
             }
 
-            if (typeof cursor['*'] === 'string' || Array.isArray(cursor['*'])) {
-                return replaceCommandTrigger(cursor['*']);
+            if (typeof cursor["*"] === "string" || Array.isArray(cursor["*"])) {
+                return replaceCommandTrigger(cursor["*"]);
             }
 
             return HELP_NOT_FOUND;
@@ -62,21 +62,21 @@ module.exports = {
 
         return {
             handlers: {
-                '!help': function (command) {
-                    client.notice('ModHelp', '!help being handled.');
+                "!help": function (command) {
+                    client.notice("ModHelp", "!help being handled.");
                     // Default to showing the help for the help module if no args given.
-                    const query = command.args.length === 0 ? ['help'] : command.args.slice();
+                    const query = command.args.length === 0 ? ["help"] : command.args.slice();
                     var response = helpResponseMessage(query);
 
                     return {
                         message: response,
                         query: true,
-                        intent: 'say'
+                        intent: "say"
                     };
                 },
 
-                '!commands': function (command) {
-                    client.notice('ModHelp', '!commands being handled.');
+                "!commands": function (command) {
+                    client.notice("ModHelp", "!commands being handled.");
 
                     const start = ["List of known commands: "];
                     return start.concat(commandset.array().join(", "));
@@ -91,20 +91,20 @@ module.exports = {
 
             hooks: {
                 help: function (module, help) {
-                    if (typeof help === 'string') {
-                        registry[module] = {'*': help}
+                    if (typeof help === "string") {
+                        registry[module] = {"*": help}
                         return;
                     }
 
                     if (Array.isArray(help)) {
-                        registry[module] = {'*': help}
+                        registry[module] = {"*": help}
                         return;
                     }
 
-                    if (typeof help === 'object') {
+                    if (typeof help === "object") {
                         Object.keys(help).forEach(function (key) {
-                            if (key === '*') {
-                                registry[module] = help['*'];
+                            if (key === "*") {
+                                registry[module] = help["*"];
                             }
 
                             registry[key] = help[key];
@@ -112,17 +112,17 @@ module.exports = {
                         return;
                     }
 
-                    throw new TypeError(format('Help property for module %s is invalid.', module));
+                    throw new TypeError(format("Help property for module %s is invalid.", module));
                 },
 
                 commands: function (module, commands) {
                     if (!Array.isArray(commands)) {
-                        throw new TypeError(format('Commands property for module %s is invalid.', module));
+                        throw new TypeError(format("Commands property for module %s is invalid.", module));
                     }
 
                     commands.forEach(function (command) {
-                        if (typeof command !== 'string') {
-                            throw new TypeError(format('Commands property for module %s is invalid.', module));
+                        if (typeof command !== "string") {
+                            throw new TypeError(format("Commands property for module %s is invalid.", module));
                         }
 
                         commandset.add(command);
@@ -132,24 +132,24 @@ module.exports = {
 
             help: {
                 help: [
-                    '{{!}}help <query>',
-                    ' ',
-                    'Display the help message for the topic located at the given query.',
-                    'Query can be made of multiple subtopics',
-                    'Without a query, shows this help message.',
-                    '',
-                    'Ex: {{!}}help commands',
-                    'Ex: {{!}}help uno start'
+                    "{{!}}help <query>",
+                    " ",
+                    "Display the help message for the topic located at the given query.",
+                    "Query can be made of multiple subtopics",
+                    "Without a query, shows this help message.",
+                    " ",
+                    "Ex: {{!}}help commands",
+                    "Ex: {{!}}help uno start"
                 ],
 
                 commands: [
-                    '{{!}}commands',
-                    ' ',
-                    'Show the list of commands.'
+                    "{{!}}commands",
+                    " ",
+                    "Show the list of commands."
                 ]
             },
 
-            commands: ['help', 'commands']
+            commands: ["help", "commands"]
         };
     }
 };
