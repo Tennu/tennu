@@ -47,28 +47,7 @@ module.exports = ActionPlugin = {
             rawf("NOTICE %s :%s", target, body);
         }
 
-        function join (channel) {
-            return new Promise(function (resolve, reject) {
-                var unsubscribe = function () {
-                    logger.debug("Join response or timeout occured.");
-                    client.off('join', onJoin);
-                };
-
-                var onJoin = function (join) {
-                    if (join.nickname !== nickname() || join.channel !== channel) {
-                        return;
-                    }
-
-                    unsubscribe();
-                    logger.debug("Resolving with join body.");
-                    resolve(join);
-                };
-
-                client.on('join', onJoin);
-
-                rawf("JOIN :%s", channel);
-            });
-        }
+        const join = require('./join')(client, rawf);
 
 
         function part (channel, reason) {
