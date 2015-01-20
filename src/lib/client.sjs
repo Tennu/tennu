@@ -172,6 +172,7 @@ Client.prototype.end = disconnect;
 Client.prototype.act                    = delegate_ret _actionExports act;
 Client.prototype.ctcp                   = delegate_ret _actionExports ctcp;
 Client.prototype.join                   = delegate_ret _actionExports join;
+Client.prototype.kick                   = delegate_ret _actionExports kick;
 Client.prototype.mode                   = delegate_ret _actionExports mode;
 Client.prototype.nick                   = delegate_ret _actionExports nick;
 Client.prototype.notice                 = delegate_ret _actionExports notice;

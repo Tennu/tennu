@@ -75,6 +75,14 @@ module.exports = ActionPlugin = {
             raw("PART " + channel + (reason ? " :" + reason: ""));
         }
 
+        function kick (channel, nickname, reason) {
+            if (reason) {
+                rawf("KICK %s %s :%s", channel, nickname, reason);
+            } else {
+                rawf("KICK %s %s", channel, nickname);
+            }
+        }
+
         function nick (newNick) {
             rawf("NICK %s", newNick);
         }
@@ -153,6 +161,7 @@ module.exports = ActionPlugin = {
                 notice: notice,
                 join: join,
                 part: part,
+                kick: kick,
                 nick: nick,
                 quit: quit,
                 mode: mode,

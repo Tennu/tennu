@@ -79,4 +79,16 @@ describe 'IRC Output Socket:' {
         out.quit('the reason');
         assert(socket.raw.calledWithExactly("QUIT :the reason"));
     }
+
+    describe "Kick" {
+        it "with a reason" {
+            out.kick("#test", "user", "naughty naughty");
+            assert(socket.raw.calledWithExactly("KICK #test user :naughty naughty"));
+        }
+
+        it "without a reason" {
+            out.kick("#test", "user");
+            assert(socket.raw.calledWithExactly("KICK #test user"));
+        }
+    }
 }
