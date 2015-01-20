@@ -70,7 +70,14 @@ var OutputSocket = function (socket, messageHandler, nickname, logger) {
             this.ctcp(target, "ACTION", message);
         },
 
-        notice: function (target, message) {
+        notice: function recur (target, message) {
+            if (Array.isArray(message)) {
+                message.forEach(function (msg) {
+                    recur.call(this, target, msg);
+                });
+
+                return;
+            }
             rawf("NOTICE %s :%s", target, message);
         },
 
