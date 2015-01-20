@@ -1,27 +1,3 @@
-/**
- * The OutputSocket is a facade for the IrcSocket's `raw` method.
- *
- * 
- * It supports the following methods:
- *
- * Public Methods
- *
- * act;
- * ctcp;
- * join;
- * mode;
- * nick;
- * notice;
- * part;
- * quit;
- * say;
- * userhost;
- * who;
- * whois;
- * raw;
- * rawf;
- */
-
 const inspect = require('util').inspect;
 const format = require('util').format;
 const chunk = require('chunk');
