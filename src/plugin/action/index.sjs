@@ -63,6 +63,11 @@ module.exports = ActionPlugin = {
         }
 
         function notice (target, body) {
+            if (Array.isArray(body)) {
+                body.forEach(λ[notice(target, #)]);
+                return;
+            }
+
             rawf("NOTICE %s :%s", target, body);
         }
 
