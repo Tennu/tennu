@@ -170,6 +170,7 @@ var extensions = {
 
     "353": function (message) {
         // :<server> 353 <me> = <channel> :<nicknames>
+        // <nickname> := ModeChar <> NickName
         // The replyname really doesn"t have an "E" in it.
         message.replyname = "RPL_NAMREPLY";
         message.channel = message.params[2];
@@ -207,6 +208,70 @@ var extensions = {
         // :<server> 405 <me> <channel> :<reason>
         message.replyname = "ERR_TOOMANYCHANNELS";
         message.channel = message.params[1];
+    },
+
+    "437": function (message) {
+        // :<server> 437 <me> <target> :Nick/channel is temporarily unavailable
+        message.replyname = "ERR_UNAVAILRESOURCE";
+
+        // TODO: Determine whether resource is channel or nickname.
+        message.channel = message.params[1];
+        message.nickname = message.params[1];
+    },
+
+    "461": function (message) {
+        // :<server> 461 <me> <command> :Not enough parameters
+        message.replyname = "ERR_NEEDMOREPARAMS";
+        message.command = message.params[1];
+    },
+
+    "471": function (message) {
+        // :server> 471 <me> <channel> :Cannot join channel (+l)
+        message.replyname = "ERR_CHANNELISFULL";
+        message.channel = message.params[1];
+    },
+
+    "473": function (message) {
+        // :server 473 <me> <channel> :Cannot join channel (+i)
+        message.replyname = "ERR_INVITEONLYCHAN";
+        message.channel = message.params[1];
+    },
+
+    "474": function (message) {
+        // :<server> 474 <me> <channel> :Cannot join channel (+b)
+        message.replyname = "ERR_BANNEDFROMCHAN";
+        message.channel = message.params[1];
+    },
+
+    "475": function (message) {
+        // :server> 475 <me> <channel> :reason
+        message.replyname = "ERR_BADCHANNELKEY";
+        message.channel = message.params[1];
+    },
+
+    "477": function (message) {
+        // :server> 477 <me> <channel> :You need a registered nick to join that channel.
+        message.replyname = "ERR_NEEDREGGEDNICK";
+        message.channel = message.params[1];
+    },
+
+    "489": function (message) {
+        // :<server> 489 <me> <channel> :Cannot join channel (SSL is required)
+        message.replyname = "ERR_SECUREONLYCHAN";
+        message.channel = message.params[1];
+    },
+
+    "520": function (message) {
+        // :server 520 <me> :Cannot join channel <channel> (IRCops only)
+        // :server 520 <me> <channel> :<reason>
+        message.replyname = "ERR_OPERONLY";
+
+        if (message.params.length === 2) {
+            // UnrealIRCd and it's stupidity.
+            message.channel = message.params[1].split(" ")[3];
+        } else {
+            message.channel = message.params[1];
+        }
     },
 
     "671": function (message) {
