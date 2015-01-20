@@ -23,7 +23,6 @@ macro delegate_ret {
 const defaultFactoryConfiguration = {
     "NetSocket" : require("net").Socket,
     "IrcSocket" : require("irc-socket"),
-    "IrcOutputSocket" : require("./output-socket.js"),
     "MessageHandler" : require("./message-handler.js"),
     "CommandHandler" : require("./command-handler.js"),
     "Plugins" : require("tennu-plugins"),
@@ -91,9 +90,6 @@ const defaultClientConfiguration = {
     // the factory function does not use `this`.
     client._nickname = di.NicknameTracker(config.nickname, client._messageHandler);
 
-    // The output socket wraps the `raw` method of the client._socket.
-    client._outputSocket = new di.IrcOutputSocket(client._socket, client._messageHandler, client._nickname, client._logger);
-
     // Create the listener to private messages from the IRCMessageEmitter
     // The commander will parse these private messages for commands, and
     // emit those commands, also parsed.
@@ -105,16 +101,19 @@ const defaultClientConfiguration = {
     client._subscriber = new di.BiSubscriber(client._messageHandler, commandHandler);
     client._subscriber.on("privmsg", function (privmsg) { commandHandler.parse(privmsg); });
 
-    // And finally, the module system.
+    // Configure the plugin system.
     client._plugins = new di.Plugins("tennu", client);
     client._plugins.addHook("handlers", function (module, handlers) {
         client._subscriber.on(handlers);
     });
     client.note("Tennu", "Loading default plugins");
-    client._plugins.use(["server", "help", "user", "channel", "startup"], __dirname);
+    client._plugins.use(["server", "action", "help", "user", "channel", "startup"], __dirname);
     client.note("Tennu", "Loading your plugins");
     client._plugins.use(config.plugins || [], process.cwd());
 
+    // Grab a reference to the "action" plugin exports, so that the client
+    // can delegate the actions to it.
+    client._actionExports = client.getPlugin("action");
 
     client.out = client._outputSocket;
     client.events = client._subscriber;
