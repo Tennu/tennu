@@ -1,11 +1,21 @@
 const lodash = require("lodash");
 const packagejson = require("../package.json")[""]
 
+// delegate x y -> function () { this.x.y.apply(this.x, arguments); return this; }
 macro delegate {
     rule { $property:ident $method:ident } => {
         function () {
             this . $property . $method . apply (this . $property , arguments);
             return this;
+        }
+    }
+}
+
+// delegate_ret x y -> function () { return this.x.y.apply(this.x, arguments); }
+macro delegate_ret {
+    rule { $property:ident $method:ident } => {
+        function () {
+            return this . $property . $method . apply (this . $property, arguments);
         }
     }
 }
@@ -160,20 +170,20 @@ Client.prototype.disconnect = disconnect;
 Client.prototype.end = disconnect;
 
 // implements IRC Output Socket
-Client.prototype.act                    = delegate _outputSocket act;
-Client.prototype.ctcp                   = delegate _outputSocket ctcp;
-Client.prototype.join                   = delegate _outputSocket join;
-Client.prototype.mode                   = delegate _outputSocket mode;
-Client.prototype.nick                   = delegate _outputSocket nick;
-Client.prototype.notice                 = delegate _outputSocket notice;
-Client.prototype.part                   = delegate _outputSocket part;
-Client.prototype.quit                   = delegate _outputSocket quit;
-Client.prototype.say                    = delegate _outputSocket say;
-Client.prototype.userhost               = delegate _outputSocket userhost;
-Client.prototype.who                    = delegate _outputSocket who;
-Client.prototype.whois                  = delegate _outputSocket whois;
-Client.prototype.raw                    = delegate _outputSocket raw;
-Client.prototype.rawf                   = delegate _outputSocket rawf;
+Client.prototype.act                    = delegate_ret _actionExports act;
+Client.prototype.ctcp                   = delegate_ret _actionExports ctcp;
+Client.prototype.join                   = delegate_ret _actionExports join;
+Client.prototype.mode                   = delegate_ret _actionExports mode;
+Client.prototype.nick                   = delegate_ret _actionExports nick;
+Client.prototype.notice                 = delegate_ret _actionExports notice;
+Client.prototype.part                   = delegate_ret _actionExports part;
+Client.prototype.quit                   = delegate_ret _actionExports quit;
+Client.prototype.say                    = delegate_ret _actionExports say;
+Client.prototype.userhost               = delegate_ret _actionExports userhost;
+Client.prototype.who                    = delegate_ret _actionExports who;
+Client.prototype.whois                  = delegate_ret _actionExports whois;
+Client.prototype.raw                    = delegate_ret _actionExports raw;
+Client.prototype.rawf                   = delegate_ret _actionExports rawf;
 
 // implements BiSubscriber
 Client.prototype.on                     = delegate _subscriber on;
@@ -181,13 +191,13 @@ Client.prototype.once                   = delegate _subscriber once;
 Client.prototype.off                    = delegate _subscriber off;
 
 // implements PluginSystem
-Client.prototype.use                    = delegate _plugins use;
-Client.prototype.getModule              = delegate _plugins getPlugin;
-Client.prototype.getPlugin              = delegate _plugins getPlugin
-Client.prototype.getRole                = delegate _plugins getRole;
-Client.prototype.initializePlugin       = delegate _plugins initialize;
-Client.prototype.isPluginInitializable  = delegate _plugins isInitializable;
-Client.prototype.addHook                = delegate _plugins addHook;
+Client.prototype.use                    = delegate     _plugins use;
+Client.prototype.getModule              = delegate_ret _plugins getPlugin;
+Client.prototype.getPlugin              = delegate_ret _plugins getPlugin
+Client.prototype.getRole                = delegate_ret _plugins getRole;
+Client.prototype.initializePlugin       = delegate     _plugins initialize;
+Client.prototype.isPluginInitializable  = delegate_ret _plugins isInitializable;
+Client.prototype.addHook                = delegate     _plugins addHook;
 
 // implements Logger
 Client.prototype.debug                  = delegate _logger debug;
