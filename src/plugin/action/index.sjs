@@ -31,7 +31,7 @@ module.exports = ActionPlugin = {
     init: function (client, imports) {
         function raw (line) {
             if (Array.isArray(line)) { line = line.join(" "); }
-            client.info("->: " + String(line));
+            client.info("->", String(line));
             client._socket.raw(line);
         }
 
