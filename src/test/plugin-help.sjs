@@ -40,6 +40,10 @@ const client = {
             return "@";
         }
 
+        if (value === "help-helpfile") {
+            return undefined;
+        }
+
         throw new Error(format("Error in testing: Plugin expects config value (%s) we don't have.", value));
     }
 };

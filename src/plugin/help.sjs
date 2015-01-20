@@ -131,7 +131,7 @@ module.exports = {
             },
 
             help: {
-                help: [
+                help: client.config("help-helpfile") || [
                     "{{!}}help <query>",
                     " ",
                     "Display the help message for the topic located at the given query.",
