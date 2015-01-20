@@ -210,7 +210,8 @@ Client.prototype.emerg                  = delegate _logger emerg;
 
 Client.prototype.log = function (level) {
     const args = Array.prototype.slice.call(arguments, 1);
-    this[level].apply(this, args);
+    this._logger[level].apply(this._logger, args);
+    return this;
 };
 
 // Export the factory.
