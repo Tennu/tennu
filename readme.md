@@ -367,9 +367,6 @@ is only the 'tennu' program described in the Command Line Utility section.
 
 The `examples` directory contains example bots, mainly used for integration testing.
 
-The `doc` directory contains documents written by Havvy. They're mostly being phased out
-for having the documentation on [https://tennu.github.io/](https://tennu.github.io/).
-
 ### Tests ###
 
 ```
