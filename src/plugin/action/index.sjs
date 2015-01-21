@@ -31,7 +31,11 @@ module.exports = ActionPlugin = {
                 return;
             }
             
-            say(target, format('\u0001%s %s\u0001', type, body));
+            if (body) {
+                say(target, format('\u0001%s %s\u0001', type, body));
+            } else {
+                say(target, format("\u0001%s\u0001", type));
+            }
         }
 
         function act (target, body) {
