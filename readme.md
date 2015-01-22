@@ -336,21 +336,18 @@ console.log(util.inspect(server.capabilities));
 
 ## Command Line Utility
 
-Install Tennu globally, and you'll gain access to the `tennu` command line tool.
+Tennu comes with a command line utility for starting Tennu bots with configuration
+located in a JSON file. The executable is called "tennu".
+
+Usage:
 
 ```bash
-> pwd
-/home/you/your-tennubot
-> ls
-node_plugins/ tennu_plugins/ config.json
-> tennu config.json
+tennu config.json
 ```
 
 The tennu command takes two optional argument, -v (--verbose) and -d (--debug),
-for adding a Logger that logs to the console (info level and above without -d).
-
-You can also use the tennu command inside your npm scripts when Tennu is installed
-locally, and if you are distributing the bot, this is a better option.
+for adding a Logger that logs all non-debug messages to the console. Add `-d` to
+also log debug messages.
 
 ## Contributing ##
 
