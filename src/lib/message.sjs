@@ -165,13 +165,15 @@ var extensions = {
         message.replyname = "RPL_TOPICWHOTIME";
         message.channel = message.params[1];
         message.who = message.params[2];
-        message.timestamp = message.params[3];
+        message.timestamp = Number(message.params[3]);
     },
 
     "353": function (message) {
-        // :<server> 353 <me> = <channel> :<nicknames>
+        // :<server> 353 <me> <sigil> <channel> :<nicknames>
         // <nickname> := ModeChar <> NickName
         // The replyname really doesn"t have an "E" in it.
+        // The sigil is either an `=` or `@`.
+        // Not sure there's any meaning behind it.
         message.replyname = "RPL_NAMREPLY";
         message.channel = message.params[2];
         message.nicknames = message.params[3].trim().split(" ");
