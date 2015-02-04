@@ -7,7 +7,10 @@ require("source-map-support").install();
 
 const debug = false;
 const logfn = debug ? console.log.bind(console) : function () {};
-const logger = {debug: logfn, info: logfn, notice: logfn, warn: logfn, error: logfn};
+const logger = {
+    debug: logfn, info: logfn, notice: logfn, warn: logfn,
+    error: function (plugin, message) {logfn(plugin, message); assert(message !== false);}
+};
 
 const channel = "#test";
 const nickname = "testbot";
@@ -28,31 +31,106 @@ describe "IRC Output Socket:" {
             _socket: socket,
             //messageHandler,
             nickname: nicknamefn,
+            debug: logfn,
             info: logfn,
             note: logfn,
-            on: function () {} // FIXME
+            error: logfn,
+            on: function (handlers) {
+                Object.keys(handlers).forEach(function (key) {
+                    messageHandler.on(key, handlers[key]);
+                });
+            },
+
+            off: function (handlers) {
+                Object.keys(handlers).forEach(function (key) {
+                    messageHandler.off(key, handlers[key]);
+                });
+            }
         }).exports;
     }
 
-    describe "Join" {
-        it "Sends the command to the server" {
-            out.join(channel);
-            assert(socket.raw.calledWithExactly(format("JOIN :%s", channel)));
-        }
+    describe only "Join" {
+        it "can join a single channel successfully" {
+            // JOIN #success
+            // :testbot!tennu@tennu.github.io JOIN :#success
+            // :irc.server.net 332 testbot #success :Topic for #success.
+            // :irc.server.net 333 testbot #success topic-changer 1333333333
+            // :irc.server.net 353 testbot @ #success :testbot @topic-changer other-user
+            // :irc.server.net 366 testbot #success :End of /NAMES list.
+            const channel = "#success";
+            const topic = "Topic for #success.";
+            const topicSetter = "topic-changer";
+            const topicSetTimestamp = 1333333333;
+            const nicknames = ["testbot", "@topic-changer", "other-user"];
 
-        it skip "On Success" (done) {
             const joinmsg = {nickname: nickname, channel: channel};
+            const topicmsg = {channel: channel, topic: topic};
+            const topicwhotimemsg = {channel: channel, who: topicSetter, timestamp: topicSetTimestamp};
+            const namesmsg = {channel: channel, nicknames: nicknames};
+            const endofnamesmsg = {channel: channel};
 
-            socket.raw = function () {
-                messageHandler.emit("join", joinmsg);
-            };
-
-            out.join(channel).then(function (join) {
-                assert(join.channel === channel);
-                assert(join.nickname === nickname);
-                done();
+            var promise = out.join(channel)
+            .then(function (result) {
+                const joinInfo = result.ok();
+                logfn(inspect(joinInfo));
+                // TODO: Is that actually the right format to raw?
+                assert(socket.raw.calledWithExactly(format("JOIN :%s", channel)));
+                assert(joinInfo.channel === channel);
+                assert(joinInfo.nickname === nickname);
+                assert(equal(joinInfo.names, nicknames));
+                assert(equal(joinInfo.topic, {
+                    topic: topic,
+                    setter: topicSetter,
+                    timestamp: topicSetTimestamp
+                }));
             });
+
+            messageHandler.emit("join", joinmsg);
+            messageHandler.emit("rpl_topic", topicmsg);
+            messageHandler.emit("rpl_topicwhotime", topicwhotimemsg);
+            messageHandler.emit("rpl_namreply", namesmsg);
+            messageHandler.emit("rpl_endofnames", endofnamesmsg);
+
+            return promise;
         }
+
+        it skip "returns a fail trying to join a non-existent channel" {
+            // JOIN not_a_channel
+            //:irc.server.net 403 testbot not_a_channel :No such channel
+        }
+
+        it skip "Sends the channel key, if present." {}
+
+        describe "timeouts" {
+            var clock;
+
+            beforeEach {
+                clock = sinon.useFakeTimers();
+            }
+
+            afterEach {
+                clock.restore();
+            }
+
+            it "cause rejection of the promise" (done) {
+                // Note: This should never happen.
+                // JOIN #channel
+                // <silence>
+
+                out.join("#channel")
+                .then(done) // done with a value fails the test.
+                .catch(function (err) {
+                    assert(err instanceof Error);
+                    done();
+                });
+
+                clock.tick(60 * 60 * 1000 + 1);
+            }
+        }
+    }
+
+    describe skip "Whois" {
+        it "can get information about a specific user" {}
     }
 
     it "can send private messages" {

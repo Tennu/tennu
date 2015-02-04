@@ -1,5 +1,8 @@
 const format = require("util").format;
 const Promise = require("bluebird");
+const ResultCtors = require("r-result");
+const Ok = ResultCtors.Ok;
+const Fail = ResultCtors.Fail;
 
 module.exports = function (client, rawf) {
     return function (channel) {
@@ -9,46 +12,63 @@ module.exports = function (client, rawf) {
                 return;
             }
 
-            const response = {
-                names: []
+            // TODO: Better name for this.
+            const joinInfo = {
+                names: [],
+                channel: channel,
+                nickname: client.nickname(),
+                topic: {}
             };
 
             // Only listen to events for the channel we care about.
             const forChannel = function (handler) {
                 return function (message) {
                     if (message.channel === channel) {
-                        handler(message);
+                        try {
+                            handler(message);
+                        } catch (e) {
+                            reject(e);
+                        }
                     }
-                }
-            }
+                };
+            };
+
+            const formatc = function (formatstr) {
+                return format(formatstr, channel);
+            };
 
             // const onJoin = forChannel(function (join) {
-            //     // Nothing?
+            //     // There's no actual data we need on the JOIN event itself.
             // });
 
             const onTopic = forChannel(function (topic) {
-                response.topic = topic.topic;
+                client.debug("PluginAction", formatc("Handling RPL_TOPIC for %s."));
+                joinInfo.topic.topic = topic.topic;
             });
 
             const onTopicWhoTime = forChannel(function (topicWhoTime) {
-                response.topicChange = {
-                    who: topicWhoTime.who,
-                    timestamp: topicWhoTime.timestamp
-                };
+                client.debug("PluginAction", formatc("Handling RPL_TOPICWHOTIME for %s."));
+                joinInfo.topic.setter = topicWhoTime.who;
+                joinInfo.topic.timestamp = topicWhoTime.timestamp;
             });
 
             const onNames = forChannel(function (names) {
-                response.names = response.names.concat(names);
+                client.debug("PluginAction", formatc("Handling RPL_NAMREPLY for %s."));
+                joinInfo.names = joinInfo.names.concat(names.nicknames);
             });
 
-            const onNamesEnd = forChannel(function (endofnames) {
+            const onNamesEnd = forChannel(function () {
+                client.debug("PluginAction", formatc("Handling RPL_ENDOFNAMES for %s."));
                 unsubscribe();
-                Promise.resolve(response);
+                resolve(Ok(joinInfo));
             });
 
-            const onJoinError = forChannel(function (err) {
+            const onJoinFail = forChannel(function (failMessage) {
+                client.debug("PluginAction", formatc("Handling Join Error for %s."));
+                client.debug("PluginAction", require('util').inspect(failMessage));
                 unsubscribe();
-                Promise.reject(err);
+                client.debug("PluginAction", formatc("Resolving Ok(...) for %s."))
+                resolve(Fail(failMessage));
             });
 
             const handlers = {
@@ -57,30 +77,33 @@ module.exports = function (client, rawf) {
                 rpl_topicwhotime: onTopicWhoTime,
                 rpl_namreply: onNames,
                 rpl_endofnames: onNamesEnd,
-                err_nosuchchannel: onJoinError,
-                err_unavailresource: onJoinError,
-                err_channelisfull: onJoinError,
-                err_toomanychannels: onJoinError,
-                err_inviteonlychan: onJoinError,
-                err_bannedfromchan: onJoinError,
-                err_badchannelkey: onJoinError,
-                err_needreggednick: onJoinError,
-                err_operonly: onJoinError
+                err_nosuchchannel: onJoinFail,
+                err_unavailresource: onJoinFail,
+                err_channelisfull: onJoinFail,
+                err_toomanychannels: onJoinFail,
+                err_inviteonlychan: onJoinFail,
+                err_bannedfromchan: onJoinFail,
+                err_badchannelkey: onJoinFail,
+                err_needreggednick: onJoinFail,
+                err_operonly: onJoinFail
             };
 
+            client.debug("PluginAction", formatc("Registering handlers for JOIN %s."));
             client.on(handlers);
 
             // Assume failure in an hour.
             setTimeout(function () {
                 unsubscribe();
-                client.error(format("Attempt to join %s failed.", channel));
+                client.error(formatc("Attempt to join %s failed."));
+                reject(new Error(formatc("Join attempt timed out for channel %s.")));
             }, 3600 * 1000);
 
-            const unsubscribe = function () {
-                client.debug("PluginAction", format("Unsubscribing events for JOIN %s", channel));
+            var unsubscribe = function () {
+                client.debug("PluginAction", formatc("Unsubscribing events for JOIN %s"));
                 client.off(handlers);
             };
 
+            client.debug("PluginAction", formatc("Attempting to join %s."));
             rawf("JOIN :%s", channel);
         });
     };
