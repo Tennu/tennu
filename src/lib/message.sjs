@@ -212,6 +212,12 @@ var extensions = {
         message.channel = message.params[1];
     },
 
+    "421": function (message) {
+        // :<server> 421 <me> <command> :Unknown command
+        message.replyname = "ERR_UNKNOWNCOMMAND";
+        message.unknownCommand = message.params[1].toLowerCase();
+    },
+
     "437": function (message) {
         // :<server> 437 <me> <target> :Nick/channel is temporarily unavailable
         message.replyname = "ERR_UNAVAILRESOURCE";
