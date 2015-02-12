@@ -2,6 +2,7 @@ var RFCMessage = require("irc-message");
 var mircColors = /\u0003\d?\d?,?\d?\d?/g;
 var util = require("util");
 
+// Note(Havvy): All numerics are listed at https://www.alien.net.au/irc/irc2numerics.html
 var extensions = {
     join: function (message) {
         message.channel = message.params[0].toLowerCase();
@@ -97,9 +98,17 @@ var extensions = {
 
     "307": function (message) {
         // :<server> 307 <me> <nick> :is a registered nick
-        // FIXME: Only accounts for Unrealircd
+        // FIXME(Havvy): Only accounts for UnrealIRCd
         message.replyname = "RPL_WHOISREGNICK";
         message.nickname = message.params[1];
+    },
+
+    "310": function (message) {
+        // :<server> 310 <me> <nick> :is available for help.
+        // FIXME(Havvy): Bahumat & AustHex use this numeric for other purposes.
+        
+        // UnrealIRCd Only
+        message.replyname = "RPL_WHOISHELPOP";
     },
 
     "311": function (message) {
@@ -118,10 +127,17 @@ var extensions = {
 
     "312": function (message) {
         // :<server> 312 <me> <nick> <server> :<info>
-        message.replyname= "RPL_WHOISSERVER";
+        message.replyname = "RPL_WHOISSERVER";
         message.nickname = message.params[1];
         message.server = message.params[2];
         message.serverInfo = message.params[3];
+    },
+
+    "313": function (message) {
+        // :<server> 313 <me> <nickname> :is a Network Administrator
+        message.replyname = "RPL_WHOISOPERATOR";
+        message.nickname = message.params[1];
+        message.permissions = message.params[2];
     },
 
     "317": function (message) {
@@ -167,6 +183,12 @@ var extensions = {
         message.channel = message.params[1];
         message.who = message.params[2];
         message.timestamp = Number(message.params[3]);
+    },
+
+    "335": function (message) {
+        // :<server> 335 <me> <nickname> :is a Bot on <network name>
+        // UnrealIRCd Only
+        message.replyname = "RPL_WHOISBOT";
     },
 
     "353": function (message) {
