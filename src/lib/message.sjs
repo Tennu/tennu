@@ -143,6 +143,7 @@ var extensions = {
         // channel format:  <power sigil>?<channel sigil><name>
         message.replyname = "RPL_WHOISCHANNELS";
         message.nickname = message.params[1];
+        message.channels = message.params[2];
     },
 
     "330": function (message) {
