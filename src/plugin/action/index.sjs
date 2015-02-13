@@ -109,19 +109,7 @@ module.exports = ActionPlugin = {
             raw(["WHO", channel]);
         }
 
-        function whois (users, server) {
-            if (typeof users === "array") {
-                if (users.length > 15) {
-                    chunk(users, 15)
-                    .map(function (users) { return users.join(','); })
-                    .map(function (users) { whois(users, server); });
-                }
-            } else if (typeof users === 'string') {
-                raw("WHOIS " + (server ? server + " " : "") + users);
-            } else {
-                throw new Error("Whois command takes either a string (a single nick) or an array (of string nicks)");
-            }
-        }
+        const whois = require('./whois')(client, rawf);
 
         /* To replace these functions...
         const join = require('./join')(client, action_plugin);
