@@ -92,7 +92,7 @@ module.exports = function (client, rawf) {
             client.on(handlers);
 
             // Assume failure in an hour.
-            setTimeout(function () {
+            var timeout = setTimeout(function () {
                 unsubscribe();
                 client.error(formatc("Attempt to join %s failed."));
                 reject(new Error(formatc("Join attempt timed out for channel %s.")));
@@ -101,6 +101,7 @@ module.exports = function (client, rawf) {
             var unsubscribe = function () {
                 client.debug("PluginAction", formatc("Unsubscribing events for JOIN %s"));
                 client.off(handlers);
+                clearTimeout(timeout);
             };
 
             client.debug("PluginAction", formatc("Attempting to join %s."));

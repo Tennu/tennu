@@ -165,14 +165,12 @@ module.exports = function (client, rawf) {
             client.debug("PluginAction", formatn("Registering handlers for WHOIS %s."));
             client.on(handlers);
 
-            const timeout = function () {
+            // Assume failure in an hour.
+            var timeout = setTimeout(timeout = function () {
                 unsubscribe();
                 client.error(formatn("Attempt to whois %s failed."));
                 reject(new Error(formatn("Whois attempt timed out for nickname %s.")));
-            };
-
-            // Assume failure in an hour.
-            setTimeout(timeout, 3600 * 1000);
+            }, 3600 * 1000);
 
             var unsubscribe = function () {
                 client.debug("PluginAction", formatn("Unsubscribing events for WHOIS %s"));
