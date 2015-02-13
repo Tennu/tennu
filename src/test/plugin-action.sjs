@@ -49,57 +49,66 @@ describe "IRC Output Socket:" {
         }).exports;
     }
 
-    describe only "Join" {
-        it "can join a single channel successfully" {
-            // JOIN #success
-            // :testbot!tennu@tennu.github.io JOIN :#success
-            // :irc.server.net 332 testbot #success :Topic for #success.
-            // :irc.server.net 333 testbot #success topic-changer 1333333333
-            // :irc.server.net 353 testbot @ #success :testbot @topic-changer other-user
-            // :irc.server.net 366 testbot #success :End of /NAMES list.
-            const channel = "#success";
-            const topic = "Topic for #success.";
-            const topicSetter = "topic-changer";
-            const topicSetTimestamp = 1333333333;
-            const nicknames = ["testbot", "@topic-changer", "other-user"];
+    describe "Join" {
+        describe "A single channel" {
+            it "resolves to Ok(JoinInfo) when succeeded" {
+                // JOIN #success
+                // :testbot!tennu@tennu.github.io JOIN :#success
+                // :irc.server.net 332 testbot #success :Topic for #success.
+                // :irc.server.net 333 testbot #success topic-changer 1333333333
+                // :irc.server.net 353 testbot @ #success :testbot @topic-changer other-user
+                // :irc.server.net 366 testbot #success :End of /NAMES list.
+                const channel = "#success";
+                const topic = "Topic for #success.";
+                const topicSetter = "topic-changer";
+                const topicSetTimestamp = 1333333333;
+                const nicknames = ["testbot", "@topic-changer", "other-user"];
 
-            const joinmsg = {nickname: nickname, channel: channel};
-            const topicmsg = {channel: channel, topic: topic};
-            const topicwhotimemsg = {channel: channel, who: topicSetter, timestamp: topicSetTimestamp};
-            const namesmsg = {channel: channel, nicknames: nicknames};
-            const endofnamesmsg = {channel: channel};
+                const joinmsg = {nickname: nickname, channel: channel};
+                const topicmsg = {channel: channel, topic: topic};
+                const topicwhotimemsg = {channel: channel, who: topicSetter, timestamp: topicSetTimestamp};
+                const namesmsg = {channel: channel, nicknames: nicknames};
+                const endofnamesmsg = {channel: channel};
 
-            var promise = out.join(channel)
-            .then(function (result) {
-                const joinInfo = result.ok();
-                logfn(inspect(joinInfo));
-                // TODO: Is that actually the right format to raw?
-                assert(socket.raw.calledWithExactly(format("JOIN :%s", channel)));
-                assert(joinInfo.channel === channel);
-                assert(joinInfo.nickname === nickname);
-                assert(equal(joinInfo.names, nicknames));
-                assert(equal(joinInfo.topic, {
-                    topic: topic,
-                    setter: topicSetter,
-                    timestamp: topicSetTimestamp
-                }));
-            });
+                var promise = out.join(channel)
+                .then(function (result) {
+                    const joinInfo = result.ok();
+                    logfn(inspect(joinInfo));
+                    // TODO: Is that actually the right format to raw?
+                    assert(socket.raw.calledWithExactly(format("JOIN :%s", channel)));
+                    assert(joinInfo.channel === channel);
+                    assert(joinInfo.nickname === nickname);
+                    assert(equal(joinInfo.names, nicknames));
+                    assert(equal(joinInfo.topic, {
+                        topic: topic,
+                        setter: topicSetter,
+                        timestamp: topicSetTimestamp
+                    }));
+                });
 
-            messageHandler.emit("join", joinmsg);
-            messageHandler.emit("rpl_topic", topicmsg);
-            messageHandler.emit("rpl_topicwhotime", topicwhotimemsg);
-            messageHandler.emit("rpl_namreply", namesmsg);
-            messageHandler.emit("rpl_endofnames", endofnamesmsg);
+                messageHandler.emit("join", joinmsg);
+                messageHandler.emit("rpl_topic", topicmsg);
+                messageHandler.emit("rpl_topicwhotime", topicwhotimemsg);
+                messageHandler.emit("rpl_namreply", namesmsg);
+                messageHandler.emit("rpl_endofnames", endofnamesmsg);
 
-            return promise;
+                return promise;
+            }
+
+            it skip "can handle multiple RPL_NAMREPLYs" {}
+
+            it skip "resolves to Fail(Numeric403Message) trying to join a non-existent channel" {
+                // JOIN not_a_channel
+                //:irc.server.net 403 testbot not_a_channel :No such channel
+            }
+            it skip "resolves to Fail(Numeric473Message) trying to join an invite only channel bot is not invited to" {}
+            it skip "resolves to Fail(Numeric474Message) trying to join a message bot is banned in" {}
+            it skip "resolves to Fail(Numeric475Message) trying to join a channel with the wrong channel key" {}
+            it skip "resolves to Fail(Numeric520Message) trying to join an oper only channel" {}
         }
 
-        it skip "returns a fail trying to join a non-existent channel" {
-            // JOIN not_a_channel
-            //:irc.server.net 403 testbot not_a_channel :No such channel
-        }
-
-        it skip "Sends the channel key, if present." {}
+        describe skip "channel keys" {}
+        describe skip "Interleaved joins" {}
 
         describe "timeouts" {
             var clock;
@@ -113,7 +122,7 @@ describe "IRC Output Socket:" {
             }
 
             it "cause rejection of the promise" (done) {
-                // Note: This should never happen.
+                // Note: This should never happen. But if it does...
                 // JOIN #channel
                 // <silence>
 
@@ -130,7 +139,19 @@ describe "IRC Output Socket:" {
     }
 
     describe skip "Whois" {
-        it "can get information about a specific user" {}
+        describe "A single user" {
+            it "resolves to Ok(WhoisInfo) when succeeded" {}
+
+            describe "Identifying" {
+                it "JoinInfo has `\"identified\": false` when user is not identified" {}
+                it "JoinInfo has `\"identified\": true, \"identifiedas\": nickname` when user is identified (307)" {}
+                it "JoinInfo has `\"identified\": true, \"identifiedas\": accountname` when user is identified (330)" {}
+            }
+            it "resolves to Fail(Numeric421Message) if WHOIS command is unrecognized (e.g. on Twitch.tv)" {}
+            it "resovles to Fail(Numeric401Message) if WHOIS non-existent nickname" {}
+        }
+
+        describe "timeouts" {}
     }
 
     it "can send private messages" {
