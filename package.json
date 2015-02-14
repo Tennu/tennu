@@ -1,6 +1,6 @@
 {
   "name": "tennu",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Tennu - Modular IRC Bot Framework for Node.js",
   "maintainers": [
     {
@@ -17,6 +17,9 @@
     },
     {
       "name": "Marc Talbot (metalbot)"
+    },
+    {
+      "name": "Dan Ugore"
     }
   ],
   "repository": {
