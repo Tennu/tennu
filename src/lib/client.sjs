@@ -135,16 +135,14 @@ Client.prototype.config = function (param) {
 // implements Runnable ;)
 
 const connect = function () {
-    this.debug("Tennu", "Trying to connect.");
-
     if (this.connected) {
-        this.warn("Tennu", "Attempted to start Tennu Client that already is connected.");
+        this.warn("Tennu", "Attempted to connect already connected client.");
         return;
     }
 
     this._socket.connect();
     this.connected = true;
-    this.debug("Tennu", "Connected");
+    this.note("Tennu", "Connected");
     return this;
 }
 
@@ -152,16 +150,14 @@ Client.prototype.connect = connect;
 Client.prototype.start = connect;
 
 const disconnect = function () {
-    this.debug("Tennu", "Trying to disconnect.");
-
     if (!this.connected) {
-        this.warn("Tennu", "Attempted to end Tennu Client that already is not connected.");
+        this.warn("Tennu", "Attempted to disconnect already disconnected client.");
         return this;
     }
 
     this._socket.end();
     this.connected = false;
-    this.debug("Tennu", "Disconnected");
+    this.note("Tennu", "Disconnected");
     return this;
 };
 
