@@ -159,7 +159,7 @@ var extensions = {
         // channel format:  <power sigil>?<channel sigil><name>
         message.replyname = "RPL_WHOISCHANNELS";
         message.nickname = message.params[1];
-        message.channels = message.params[2];
+        message.channels = message.params[2].toLowerCase();
     },
 
     "330": function (message) {
@@ -173,14 +173,14 @@ var extensions = {
     "332": function (message) {
         // :<server> 332 <me> <channel> :<topic>
         message.replyname = "RPL_TOPIC";
-        message.channel = message.params[1];
+        message.channel = message.params[1].toLowerCase();
         message.topic = message.params[2];
     },
 
     "333": function (message) {
         // :<server> 333 <me> <channel> <who> <timestamp>
         message.replyname = "RPL_TOPICWHOTIME";
-        message.channel = message.params[1];
+        message.channel = message.params[1].toLowerCase();
         message.who = message.params[2];
         message.timestamp = Number(message.params[3]);
     },
@@ -198,14 +198,14 @@ var extensions = {
         // The sigil is either an `=` or `@`.
         // Not sure there's any meaning behind it.
         message.replyname = "RPL_NAMREPLY";
-        message.channel = message.params[2];
+        message.channel = message.params[2].toLowerCase();
         message.nicknames = message.params[3].trim().split(" ");
     },
 
     "366": function (message) {
         // :<server> 366 <me> <channel> :End of /NAMES list.
         message.replyname = "RPL_ENDOFNAMES";
-        message.channel = message.params[1];
+        message.channel = message.params[1].toLowerCase();
     },
 
     "378": function (message) {
@@ -226,13 +226,13 @@ var extensions = {
     "403": function (message) {
         // :<server> 403 <me> <channel> :<reason>
         message.replyname = "ERR_NOSUCHCHANNEL";
-        message.channel = message.params[1];
+        message.channel = message.params[1].toLowerCase();
     },
 
     "405": function (message) {
         // :<server> 405 <me> <channel> :<reason>
         message.replyname = "ERR_TOOMANYCHANNELS";
-        message.channel = message.params[1];
+        message.channel = message.params[1].toLowerCase();
     },
 
     "421": function (message) {
@@ -246,8 +246,9 @@ var extensions = {
         message.replyname = "ERR_UNAVAILRESOURCE";
 
         // TODO: Determine whether resource is channel or nickname.
-        message.channel = message.params[1];
+        message.channel = message.params[1].toLowerCase();
         message.nickname = message.params[1];
+        message.resource = message.params[1];
     },
 
     "461": function (message) {
@@ -259,37 +260,37 @@ var extensions = {
     "471": function (message) {
         // :server> 471 <me> <channel> :Cannot join channel (+l)
         message.replyname = "ERR_CHANNELISFULL";
-        message.channel = message.params[1];
+        message.channel = message.params[1].toLowerCase();
     },
 
     "473": function (message) {
         // :server 473 <me> <channel> :Cannot join channel (+i)
         message.replyname = "ERR_INVITEONLYCHAN";
-        message.channel = message.params[1];
+        message.channel = message.params[1].toLowerCase();
     },
 
     "474": function (message) {
         // :<server> 474 <me> <channel> :Cannot join channel (+b)
         message.replyname = "ERR_BANNEDFROMCHAN";
-        message.channel = message.params[1];
+        message.channel = message.params[1].toLowerCase();
     },
 
     "475": function (message) {
         // :server> 475 <me> <channel> :reason
         message.replyname = "ERR_BADCHANNELKEY";
-        message.channel = message.params[1];
+        message.channel = message.params[1].toLowerCase();
     },
 
     "477": function (message) {
         // :server> 477 <me> <channel> :You need a registered nick to join that channel.
         message.replyname = "ERR_NEEDREGGEDNICK";
-        message.channel = message.params[1];
+        message.channel = message.params[1].toLowerCase();
     },
 
     "489": function (message) {
         // :<server> 489 <me> <channel> :Cannot join channel (SSL is required)
         message.replyname = "ERR_SECUREONLYCHAN";
-        message.channel = message.params[1];
+        message.channel = message.params[1].toLowerCase();
     },
 
     "520": function (message) {
@@ -298,10 +299,10 @@ var extensions = {
         message.replyname = "ERR_OPERONLY";
 
         if (message.params.length === 2) {
-            // UnrealIRCd and it's stupidity.
-            message.channel = message.params[1].split(" ")[3];
+            // UnrealIRCd being stupid.
+            message.channel = message.params[1].split(" ")[3].toLowerCase();
         } else {
-            message.channel = message.params[1];
+            message.channel = message.params[1].toLowerCase();
         }
     },
 
