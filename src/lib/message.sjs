@@ -191,6 +191,24 @@ var extensions = {
         message.replyname = "RPL_WHOISBOT";
     },
 
+    "346": function (message) {
+        // :<server> 346 <me> <channel> <hostmaskPattern> <setter> <timestamp>
+        message.replyname = "RPL_INVITELIST";
+        message.channel = message.params[1];
+        message.hostmaskPattern = message.params[2];
+        message.setter = message.params[3];
+        message.timestamp = message.params[4];
+    },
+    
+    "348": function (message) {
+        // :<server> 348 <me> <channel> <hostmaskPattern> <setter> <timestamp>
+        message.replyname = "RPL_EXCEPTLIST";
+        message.channel = message.params[1];
+        message.hostmaskPattern = message.params[2];
+        message.setter = message.params[3];
+        message.timestamp = message.params[4];
+    },
+
     "353": function (message) {
         // :<server> 353 <me> <sigil> <channel> :<nicknames>
         // <nickname> := ModeChar <> NickName
@@ -206,6 +224,15 @@ var extensions = {
         // :<server> 366 <me> <channel> :End of /NAMES list.
         message.replyname = "RPL_ENDOFNAMES";
         message.channel = message.params[1].toLowerCase();
+    },
+
+    "367": function (message) {
+        // :<server> 367 <me> <channel> <hostmaskPattern> <setter> <timestamp>
+        message.replyname = "RPL_BANLIST";
+        message.channel = message.params[1];
+        message.hostmaskPattern = message.params[2];
+        message.setter = message.params[3];
+        message.timestamp = message.params[4];
     },
 
     "378": function (message) {
