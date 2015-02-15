@@ -76,7 +76,7 @@ module.exports = ActionPlugin = {
         }
 
         function mode (target, plus, minus, inArgs) {
-            var args = " :";
+            var args = ":";
 
             if (plus) {
                 args += "+" + plus;
@@ -87,7 +87,7 @@ module.exports = ActionPlugin = {
             }
 
             if (inArgs) {
-                args += " " + util.isArray(inArgs) ? inArgs.join(' ') : inArgs;
+                args += " " + (Array.isArray(inArgs) ? inArgs.join(' ') : inArgs);
             }
 
             raw(["MODE", target, args]);

@@ -138,20 +138,28 @@ describe "IRC Output Socket:" {
         }
     }
 
-    describe skip "Whois" {
+    describe "Whois" {
         describe "A single user" {
-            it "resolves to Ok(WhoisInfo) when succeeded" {}
+            it skip "resolves to Ok(WhoisInfo) when succeeded" {}
 
             describe "Identifying" {
-                it "JoinInfo has `\"identified\": false` when user is not identified" {}
-                it "JoinInfo has `\"identified\": true, \"identifiedas\": nickname` when user is identified (307)" {}
-                it "JoinInfo has `\"identified\": true, \"identifiedas\": accountname` when user is identified (330)" {}
+                it skip "JoinInfo has `\"identified\": false` when user is not identified" {}
+                it skip "JoinInfo has `\"identified\": true, \"identifiedas\": nickname` when user is identified (307)" {}
+                it skip "JoinInfo has `\"identified\": true, \"identifiedas\": accountname` when user is identified (330)" {}
             }
             it "resolves to Fail(Numeric421Message) if WHOIS command is unrecognized (e.g. on Twitch.tv)" {}
             it "resovles to Fail(Numeric401Message) if WHOIS non-existent nickname" {}
         }
 
         describe "timeouts" {}
+    }
+
+    describe "Mode" {
+        it "can set a single mode with an argument" {
+            out.mode("#test", "v", "", "SomeUser");
+            logfn(format(format("'%s'", socket.raw.firstCall.args.join("', '"))));
+            assert(socket.raw.calledWithExactly("MODE #test :+v SomeUser"));
+        }
     }
 
     it "can send private messages" {
