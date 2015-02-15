@@ -122,7 +122,7 @@ var OutputSocket = function (socket, messageHandler, nickname, logger) {
             }
 
             if (inArgs) {
-                args += " " + util.isArray(inArgs) ? inArgs.join(' ') : inArgs;
+                args += " " + Array.isArray(inArgs) ? inArgs.join(' ') : inArgs;
             }
 
             raw(["MODE", target, args]);
