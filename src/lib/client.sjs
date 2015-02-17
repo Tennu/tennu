@@ -34,6 +34,7 @@ const defaultFactoryConfiguration = {
 const defaultClientConfiguration = {
     // IrcSocket Config
     "server": undefined,
+    "daemon": undefined,
     "port": 6667,
     "ipv6": undefined,
     "localAddress": undefined,
