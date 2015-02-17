@@ -318,7 +318,7 @@ var extensions = {
     },
 
     "475": function (message) {
-        // :server> 475 <me> <channel> :reason
+        // :server> 475 <me> <channel> :Cannot join channel (+k)
         message.replyname = "ERR_BADCHANNELKEY";
         message.channel = message.params[1].toLowerCase();
     },

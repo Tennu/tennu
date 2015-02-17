@@ -96,9 +96,55 @@ describe "IRC Output Socket:" {
                 return promise;
             }
 
-            it skip "can handle multiple RPL_NAMREPLYs" {}
+            it "can handle multiple RPL_NAMREPLYs" {
+                // JOIN #success
+                // :testbot!tennu@tennu.github.io JOIN :#success
+                // :irc.server.net 332 testbot #success :Topic for #success.
+                // :irc.server.net 333 testbot #success topic-changer 1333333333
+                // :irc.server.net 353 testbot @ #success :testbot
+                // :irc.server.net 353 testbot @ #success :@topic-changer
+                // :irc.server.net 353 testbot @ #success :other-user
+                // :irc.server.net 366 testbot #success :End of /NAMES list.
+                const channel = "#success";
+                const topic = "Topic for #success.";
+                const topicSetter = "topic-changer";
+                const topicSetTimestamp = 1333333333;
+                const nicknames = ["testbot", "@topic-changer", "other-user"];
 
-            it skip "resolves to Fail(Numeric403Message) trying to join a non-existent channel" {
+                const joinmsg = {nickname: nickname, channel: channel};
+                const topicmsg = {channel: channel, topic: topic};
+                const topicwhotimemsg = {channel: channel, who: topicSetter, timestamp: topicSetTimestamp};
+                const endofnamesmsg = {channel: channel};
+
+                var promise = out.join(channel)
+                .then(function (result) {
+                    assert(result.isOk());
+                    const joinInfo = result.ok();
+                    logfn(inspect(joinInfo));
+                    // TODO: Is that actually the right format to raw?
+                    assert(socket.raw.calledWithExactly(format("JOIN :%s", channel)));
+                    assert(joinInfo.channel === channel);
+                    assert(joinInfo.nickname === nickname);
+                    assert(equal(joinInfo.names, nicknames));
+                    assert(equal(joinInfo.topic, {
+                        topic: topic,
+                        setter: topicSetter,
+                        timestamp: topicSetTimestamp
+                    }));
+                });
+
+                messageHandler.emit("join", joinmsg);
+                messageHandler.emit("rpl_topic", topicmsg);
+                messageHandler.emit("rpl_topicwhotime", topicwhotimemsg);
+                nicknames.forEach(function (nickname) {
+                    messageHandler.emit("rpl_namreply", {channel: channel, nicknames: [nickname] });
+                });
+                messageHandler.emit("rpl_endofnames", endofnamesmsg);
+
+                return promise;
+            }
+
+            it "resolves to Fail(Numeric403Message) trying to join a non-existent channel" {
                 // JOIN not_a_channel
                 //:irc.server.net 403 testbot not_a_channel :No such channel
                 const channel = "not_a_channel";
@@ -117,10 +163,107 @@ describe "IRC Output Socket:" {
 
                 return promise;
             }
-            it skip "resolves to Fail(Numeric473Message) trying to join an invite only channel bot is not invited to" {}
-            it skip "resolves to Fail(Numeric474Message) trying to join a message bot is banned in" {}
-            it skip "resolves to Fail(Numeric475Message) trying to join a channel with the wrong channel key" {}
-            it skip "resolves to Fail(Numeric520Message) trying to join an oper only channel" {}
+
+            it "resolves to Fail(Numeric471Message) trying to join a full channel" {
+                // JOIN #full
+                // :irc.server.net 471 testbot #full :Cannot join channel (+i)
+                const channel = "#full";
+
+                const fullmsg = {nickname: nickname, channel: channel};
+
+                var promise = out.join(channel)
+                .then(function (result) {
+                    assert(result.isFail());
+                    const failMessage = result.fail();
+                    logfn(inspect(failMessage));
+                    assert(failMessage === fullmsg);
+                });
+
+                messageHandler.emit("err_channelisfull", fullmsg);
+
+                return promise;
+            }
+
+            it "resolves to Fail(Numeric473Message) trying to join an invite only channel bot is not invited to" {
+                // JOIN #invite_only
+                // :irc.server.net 473 testbot #invite_only :Cannot join channel (+i)
+                const channel = "#invite_only";
+
+                const inviteonlymsg = {nickname: nickname, channel: channel};
+
+                var promise = out.join(channel)
+                .then(function (result) {
+                    assert(result.isFail());
+                    const failMessage = result.fail();
+                    logfn(inspect(failMessage));
+                    assert(failMessage === inviteonlymsg);
+                });
+
+                messageHandler.emit("err_inviteonlychan", inviteonlymsg);
+
+                return promise;
+            }
+
+            it "resolves to Fail(Numeric474Message) trying to join a message bot is banned in" {
+                // JOIN #banned
+                // :irc.server.net 474 testbot #banned :Cannot join channel (+b)
+                const channel = "#banned";
+
+                const bannedmsg = {nickname: nickname, channel: channel};
+
+                var promise = out.join(channel)
+                .then(function (result) {
+                    assert(result.isFail());
+                    const failMessage = result.fail();
+                    logfn(inspect(failMessage));
+                    assert(failMessage === bannedmsg);
+                });
+
+                messageHandler.emit("err_bannedfromchan", bannedmsg);
+
+                return promise;
+            }
+
+            it "resolves to Fail(Numeric475Message) trying to join a channel with the wrong channel key" {
+                // JOIN #private
+                // :irc.server.net 475 testbot #private :Cannot join channel (+k)
+                const channel = "#private";
+
+                const badkeymsg = {nickname: nickname, channel: channel};
+
+                var promise = out.join(channel)
+                .then(function (result) {
+                    assert(result.isFail());
+                    const failMessage = result.fail();
+                    logfn(inspect(failMessage));
+                    assert(failMessage === badkeymsg);
+                });
+
+                messageHandler.emit("err_badchannelkey", badkeymsg);
+
+                return promise;
+            }
+
+            it "resolves to Fail(Numeric520Message) trying to join an oper only channel" {
+                // JOIN #oper
+                // :irc.server.net 520 testbot :Cannot join channel #oper (IRCops only)
+
+                const channel = "#oper";
+
+                const openonlymsg = {nickname: nickname, channel: channel};
+
+                var promise = out.join(channel)
+                .then(function (result) {
+                    assert(result.isFail());
+                    const failMessage = result.fail();
+                    logfn(inspect(failMessage));
+                    assert(failMessage === openonlymsg);
+                });
+
+                messageHandler.emit("err_operonly", openonlymsg);
+
+                return promise;
+            }
         }
 
         it "also emits the resolved promise as an event" (done) {
