@@ -1,13 +1,15 @@
 module.exports = {
     init: function (client) {
-        const nick = client.config('nick');
+        const nickname = client.config('nickname');
         const authPassword = client.config('auth-password');
         const nickserv = client.config('nickserv');
         const autojoinChannels = client.config('channels');
 
-        client._socket.on('ready', function () {
-            // RAWR! I'm a <s>monster</s> Bot!
-            client.mode(nick, 'B');
+        client.on("rpl_endofmotd", function () {
+            if (client.config("daemon") === "unreal") {
+                // Mode +B on Unreal signifies a bot.
+                client.mode(nickname, 'B');
+            }
 
             if (authPassword) {
                 client.log('notice', 'Tennu', 'Identifying to services.');
