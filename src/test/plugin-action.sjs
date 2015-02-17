@@ -211,8 +211,14 @@ describe "IRC Output Socket:" {
     describe "Mode" {
         it "can set a single mode with an argument" {
             out.mode("#test", "v", "", "SomeUser");
-            logfn(format(format("'%s'", socket.raw.firstCall.args.join("', '"))));
+            logfn(format("'%s'", socket.raw.firstCall.args.join("', '")));
             assert(socket.raw.calledWithExactly("MODE #test :+v SomeUser"));
+        }
+
+        it "can set a single usermode without an argument" {
+            out.mode("myself", "B");
+            logfn(format("'%s'", socket.raw.firstCall.args.join("', '")));
+            assert(socket.raw.calledWithExactly("MODE myself :+B"));
         }
     }
 
