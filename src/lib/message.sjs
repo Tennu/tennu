@@ -235,6 +235,21 @@ var extensions = {
         message.timestamp = message.params[4];
     },
 
+    "372": function (message) {
+        //:<server> 372 <me> :<motdLine>
+        message.replyname = "RPL_MOTD";
+    },
+
+    "375": function (message) {
+        //:<server> 375 <me> :<arbitrary>
+        message.replyname = "RPL_STARTOFMOTD";
+    },
+
+    "376": function (message) {
+        //:<server> 376 <me> :End of /MOTD command.
+        message.replyname = "RPL_ENDOFMOTD";
+    },
+
     "378": function (message) {
         // :<server> 378 <me> <nickname> :is connecting from <hostmask> <ip>
         message.replyname = "RPL_WHOISHOST";
