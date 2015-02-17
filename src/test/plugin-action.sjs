@@ -72,6 +72,7 @@ describe "IRC Output Socket:" {
 
                 var promise = out.join(channel)
                 .then(function (result) {
+                    assert(result.isOk());
                     const joinInfo = result.ok();
                     logfn(inspect(joinInfo));
                     // TODO: Is that actually the right format to raw?
@@ -100,11 +101,64 @@ describe "IRC Output Socket:" {
             it skip "resolves to Fail(Numeric403Message) trying to join a non-existent channel" {
                 // JOIN not_a_channel
                 //:irc.server.net 403 testbot not_a_channel :No such channel
+                const channel = "not_a_channel";
+
+                const nosuchchannelmsg = {nickname: nickname, channel: channel};
+
+                var promise = out.join(channel)
+                .then(function (result) {
+                    assert(result.isFail());
+                    const failMessage = result.fail();
+                    logfn(inspect(failMessage));
+                    assert(failMessage === nosuchchannelmsg);
+                });
+
+                messageHandler.emit("err_nosuchchannel", nosuchchannelmsg);
+
+                return promise;
             }
             it skip "resolves to Fail(Numeric473Message) trying to join an invite only channel bot is not invited to" {}
             it skip "resolves to Fail(Numeric474Message) trying to join a message bot is banned in" {}
             it skip "resolves to Fail(Numeric475Message) trying to join a channel with the wrong channel key" {}
             it skip "resolves to Fail(Numeric520Message) trying to join an oper only channel" {}
+        }
+
+        it "also emits the resolved promise as an event" (done) {
+            const emitter = out.emitter;
+
+            emitter.on("join", function (joinInfoResult) {
+                assert(joinInfoResult.isOk());
+                done();
+            });
+
+            // The rest of this was copied from
+            // "resolves to Ok(JoinInfo) when succeeded"
+            // with the Promise based code removed.
+
+            // JOIN #success
+            // :testbot!tennu@tennu.github.io JOIN :#success
+            // :irc.server.net 332 testbot #success :Topic for #success.
+            // :irc.server.net 333 testbot #success topic-changer 1333333333
+            // :irc.server.net 353 testbot @ #success :testbot @topic-changer other-user
+            // :irc.server.net 366 testbot #success :End of /NAMES list.
+            const channel = "#success";
+            const topic = "Topic for #success.";
+            const topicSetter = "topic-changer";
+            const topicSetTimestamp = 1333333333;
+            const nicknames = ["testbot", "@topic-changer", "other-user"];
+
+            const joinmsg = {nickname: nickname, channel: channel};
+            const topicmsg = {channel: channel, topic: topic};
+            const topicwhotimemsg = {channel: channel, who: topicSetter, timestamp: topicSetTimestamp};
+            const namesmsg = {channel: channel, nicknames: nicknames};
+            const endofnamesmsg = {channel: channel};
+
+            out.join(channel);
+            messageHandler.emit("join", joinmsg);
+            messageHandler.emit("rpl_topic", topicmsg);
+            messageHandler.emit("rpl_topicwhotime", topicwhotimemsg);
+            messageHandler.emit("rpl_namreply", namesmsg);
+            messageHandler.emit("rpl_endofnames", endofnamesmsg);
         }
 
         describe skip "channel keys" {}

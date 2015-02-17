@@ -4,7 +4,7 @@ const ResultCtors = require("r-result");
 const Ok = ResultCtors.Ok;
 const Fail = ResultCtors.Fail;
 
-module.exports = function (client, rawf) {
+module.exports = function (client, rawf, emitter) {
     return function (channel) {
         return new Promise(function (resolve, reject) {
             if (channel === undefined || channel === "") {
@@ -106,6 +106,9 @@ module.exports = function (client, rawf) {
 
             client.debug("PluginAction", formatc("Attempting to join %s."));
             rawf("JOIN :%s", channel);
+        })
+        .tap(function (result) {
+            emitter.emit("join", result);
         });
     };
 };

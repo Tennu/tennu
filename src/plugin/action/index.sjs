@@ -1,10 +1,13 @@
-const inspect = require('util').inspect;
-const format = require('util').format;
-const chunk = require('chunk');
-const Promise = require('bluebird');
+const inspect = require("util").inspect;
+const format = require("util").format;
+const chunk = require("chunk");
+const Promise = require("bluebird");
+const EventEmitter = require("events").EventEmitter;
 
 module.exports = ActionPlugin = {
     init: function (client, imports) {
+        const emitter = new EventEmitter();
+
         function raw (line) {
             if (Array.isArray(line)) { line = line.join(" "); }
             client.info("->", String(line));
@@ -32,7 +35,7 @@ module.exports = ActionPlugin = {
             }
             
             if (body) {
-                say(target, format('\u0001%s %s\u0001', type, body));
+                say(target, format("\u0001%s %s\u0001", type, body));
             } else {
                 say(target, format("\u0001%s\u0001", type));
             }
@@ -51,7 +54,7 @@ module.exports = ActionPlugin = {
             rawf("NOTICE %s :%s", target, body);
         }
 
-        const join = require('./join')(client, rawf);
+        const join = require("./join")(client, rawf, emitter);
 
 
         function part (channel, reason) {
@@ -87,18 +90,18 @@ module.exports = ActionPlugin = {
             }
 
             if (inArgs) {
-                args += " " + (Array.isArray(inArgs) ? inArgs.join(' ') : inArgs);
+                args += " " + (Array.isArray(inArgs) ? inArgs.join(" ") : inArgs);
             }
 
             raw(["MODE", target, args]);
         }
 
         function userhost (users) {
-            if (typeof users === 'string') {
+            if (typeof users === "string") {
                 rawf("USERHOST:%s", users);
-            } else if (typeof users === 'array') {
+            } else if (typeof users === "array") {
                 chunk(users, 5)
-                .map(function (hosts) { return hosts.join(' '); })
+                .map(function (hosts) { return hosts.join(" "); })
                 .map(userhost);
             } else {
                 throw new Error("Userhost command takes either a string (a single nick) or an array (of string nicks)");
@@ -109,23 +112,24 @@ module.exports = ActionPlugin = {
             raw(["WHO", channel]);
         }
 
-        const whois = require('./whois')(client, rawf);
+        const whois = require("./whois")(client, rawf, emitter);
 
         /* To replace these functions...
-        const join = require('./join')(client, action_plugin);
-        const part = require('./part')(client, action_plugin);
-        const quit = require('./quit')(client, action_plugin);
-        const nick = require('./nick')(client, action_plugin);
-        const mode = require('./mode')(client, action_plugin);
-        const userhost = require('./userhost')(client, action_plugin);
-        const whois = require('./whois)(client, action_plugin);
-        const who = require('./who')(client, action_plugin);
+        const part = require("./part")(client, action_plugin);
+        const quit = require("./quit")(client, action_plugin);
+        const nick = require("./nick")(client, action_plugin);
+        const mode = require("./mode")(client, action_plugin);
+        const userhost = require("./userhost")(client, action_plugin);
+        const who = require("./who")(client, action_plugin);
         */
 
         return {
             exports: {
+                emitter: emitter,
+
                 raw: raw,
                 rawf: rawf,
+                
                 say: say,
                 ctcp: ctcp,
                 act: act,
@@ -141,7 +145,5 @@ module.exports = ActionPlugin = {
                 whois: whois
             }
         };
-    }//,
-
-    //requires: "server";
+    }
 };

@@ -180,6 +180,9 @@ module.exports = function (client, rawf) {
 
             client.debug("PluginAction", formatn("Attempting to whois %s."));
             rawf("WHOIS %s", nickname);
+        })
+        .tap(function (result) {
+            emitter.emit("join", result);
         });
     };
 };
