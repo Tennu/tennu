@@ -7,7 +7,7 @@ module.exports = {
         return {
             handlers: {
                 '005': function (isupportMessage) {
-                    isupportMessage.params.map(function (param) {
+                    isupportMessage.params.slice(1, -1).map(function (param) {
                         return param.split('=');
                     }).forEach(function {
                         ([supported]) => isupport[supported] = true,
