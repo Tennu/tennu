@@ -8,7 +8,13 @@ Tennu is an IRC bot framework written in Node.js
 
 ## Basic Usage ##
 
-With Tennu, you create an irc client, require your plugins or subscribe to your event listeners, and then connect.
+### As a framework ###
+
+See [Getting Started](https://tennu.github.io/documentation/getting-started).
+
+### Library Usage ###
+
+With Tennu as a library, you create an irc client, require your plugins or subscribe to your event listeners, and then connect.
 
 ```javascript
 var tennu = require('tennu');
@@ -46,26 +52,32 @@ See [https://tennu.github.io/](tennu.github.io) for the full documentation.
 
 ## Configuration ##
 
-A network configuration object has the following properties:
+The network configuration object contains all of the properties of
+[https://npmjs.org/package/irc-socket](an irc-socket) except for "socket"
+plus the following configuration options:
+
+* tls             - Boolean that if true, upgrades the NetSocket to a TLS socket.
+* auth-password   - Password for identifying to services
+* nickserv        - Nickname of nickserv service. Defaults to `"nickserv"`.
+* command-trigger - Command character to trigger commands with. By default, `"!"`.
+* channels        - Array of channels to autojoin. _Example:_ `["#help", "#tennu"]`
+* plugins         - An array of plugin names that the bot requires.
+* disable-help    - Boolean that when true, disables the built-in help plugin.
+* daemon          - The IRCd you are connecting to. Optional, but useful for "unreal" and "twitch".
+
+The irc-socket configuration values are as follows:
 
 * server          - IRC server to connect to. _Example:_ _irc.mibbit.net_
 * port            - Port to connect to. Defaults to 6667.
-* secure          - Use a TLS socket (Throws away the NetSocket)
-* ipv6            - Whether you are connecting over ipv6 or not.
-* localAddress    - See net.Socket documentation. ;)
-* capab           - IRC3 CAP support. (Untested)
-* password        - Password for IRC Network (most networks do not have a password)
-* nickname        - Nickname the bot will use. Defaults to "tennubot"
-* username        - Username the bot will use. Defaults to "user"
-* realname        - Realname for the bot. Defaults to "tennu v0.3"
-* auth-password   - Password for identifying to services.
-* nickserv        - Nickname of nickserv service. Defaults to "nickserv".
-* command-trigger - Command character to trigger commands with. By default, '!'.
-* channels        - Array of channels to autojoin. _Example:_ ["#help", "#tennu"]
-* plugins         - An array of plugin names that the bot requires.
-* disable-help    - Disables the built-in help plugin.
+* nicknames       - Array of nicknames to try to use in order.
+* username        - Username part of the hostmask.
+* realname        - "Real name" to send with the USER command.
+* password        - Password used to connect to the network. Most networks don't have one.
+* proxy           - WEBIRC details if your connection is acting as a (probably web-based) proxy.
+* capabilities    - IRCv3 capabilities required or wanted. Tennu requires 
+* connectOptions  - Options passed to the wrapped socket's connect method. Options port and host are ignored.
 
-Other plugins may add additional properties.
+Other plugins may add additional properties. See their respective docume
 
 Configuration objects are JSON encodable.
 
@@ -83,6 +95,12 @@ replace the factories that the Client uses by default.
 * Logger
 
 These functions will always be called as constructors (with `new`).
+
+Note: BiSubscriber, MessageHandler, and CommandHandler are all moving
+into plugins eventually. Replacing their module is as such, deprecated.
+Logging may also be moved into a plugin, but that's a ways off, and
+wrapping a Logger object in a plugin is trivial. If and when it happens,
+there'll be an article on how to do so.
 
 ### Logging ###
 
@@ -288,7 +306,7 @@ You may access the plugin system's methods via the Client.plugins property
 or by using one of the following methods:
 
 * client.require()
-* client.getModule()
+* client.getPlugin()
 * client.getRole()
 * client.use()
 * client.initializePlugin()
@@ -318,9 +336,14 @@ Unimplemented. Currently being worked on by Dan_Ugore.
 
 #### users ####
 
-This plugin has a single method exported: isIdentifedAs(nickname, nickname_identified, callback)
+This plugin has a single method exported: `isIdentifedAs(nickname, nickname_identified)`
 
 See [User Module Documentation](https://tennu.github.io/plugins/user).
+
+#### self ####
+
+This plugin exports a single function: `nickname()` that gives the client's current nickname. The
+function is also accessible as a method on the client object directly.
 
 #### server ####
 
@@ -330,7 +353,7 @@ capabilities map listing the information from the 005 raw numeric.
 See [Server Plugin Documentation](https://tennu.github.io/plugins/server).
 
 ```javascript
-var server = tennu.use("server");
+var server = tennu.getPlugin("server");
 console.log(util.inspect(server.capabilities));
 ```
 

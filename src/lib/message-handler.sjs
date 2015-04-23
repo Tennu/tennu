@@ -14,31 +14,31 @@
  *  005
  *  rpl_endofwhois
  *
- * All messages can be listened to with the '*' event.
+ * All messages can be listened to with the "*" event.
  *
  * The constructor takes three arguments:
  *   1. client - The nominal client of the message.
  *   2. logger - Logger object.
- *   3. socket - <Optional> EventEmitter emitting ('data', RFC1459Message)
+ *   3. socket - <Optional> EventEmitter emitting ("data", RFC1459Message)
  *
  * MessageParser.parse(raw: String): irc-message-extended.Message
  *   Parses the message, 
- *   emits the message event, and the '*' event,
+ *   emits the message event, and the "*" event,
  *   and returns the message.
  *
  * MessageParser#listen(socket: Socket): void
  *   Subscribes the message parser to the socket, parsing anything sent
- *   through the 'data' event.
+ *   through the "data" event.
  *
  * MessageParser#toString(): String
- *   Returns '[Object MessageParser]'.
+ *   Returns "[Object MessageParser]".
  */
 
-var util = require('util');
-var EventEmitter = require('after-events');
-var Message = require('./message');
-var Promise = require('bluebird');
-var Response = require('./response');
+var format = require("util").format;
+var EventEmitter = require("after-events");
+var Message = require("./message");
+var Promise = require("bluebird");
+var Response = require("./response");
 
 var MessageParser = function MP (client, logger, socket) {
     var parser = Object.create(EventEmitter());
@@ -52,19 +52,22 @@ var MessageParser = function MP (client, logger, socket) {
             return null;
         }
 
+        logger.debug("MessageHandler", format("Emitting '%s'.", message.command.toLowerCase()));
         this.emit(message.command.toLowerCase(), message);
 
         if (message.replyname) {
+            logger.debug("MessageHandler", format("Emitting '%s'.", message.replyname.toLowerCase()));
             this.emit(message.replyname.toLowerCase(), message);
         }
 
+        logger.debug("MessageHandler", "Emitting '*'");
         this.emit("*", message);
-
+        
         return message;
     };
 
     parser.listen = function (socket) {
-        socket.on('data', this.parse.bind(this));
+        socket.on("data", this.parse.bind(this));
     };
 
     parser.after(function (err, res, type, message) {
@@ -79,8 +82,8 @@ var MessageParser = function MP (client, logger, socket) {
         // message := Message
 
         if (err) {
-            logger.error('MessageHandler', 'Error thrown in message handler!');
-            logger.error('MessageHandler', err.stack);
+            logger.error("MessageHandler", "Error thrown in message handler!");
+            logger.error("MessageHandler", err.stack);
             return;
         }
 
@@ -92,7 +95,7 @@ var MessageParser = function MP (client, logger, socket) {
         }
 
         function logBadResponseError (err) {
-            logger.error('MessageHandler', format(badResponseFormat, message.message, inspect(res)));
+            logger.error("MessageHandler", format(badResponseFormat, message.message, inspect(res)));
         }
     });
 

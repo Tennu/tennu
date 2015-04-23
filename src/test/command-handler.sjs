@@ -25,8 +25,6 @@ const nickname = 'testbot';
 const arg1 = 'arg-1';
 const arg2 = 'arg-2';
 
-const nicknamefn = function () { return nickname; };
-
 const chanmsg = function (message) {
     return format(format(':%s PRIVMSG %s :%s', prefix, channel, message));
 };
@@ -54,10 +52,11 @@ describe 'Command Handler' {
 
     beforeEach {
         client = {
-            say: sinon.spy()
+            say: sinon.spy(),
+            nickname: function () { return nickname; }
         };
 
-        handler = CommandHandler(config, client, nicknamefn, logger);
+        handler = CommandHandler(config, client, logger);
     }
 
     describe 'command detection:' {

@@ -1,5 +1,5 @@
 const lodash = require("lodash");
-const packagejson = require("../package.json")[""]
+const TlsSocket = require("tls").TLSSocket;
 
 // delegate x y -> function () { this.x.y.apply(this.x, arguments); return this; }
 macro delegate {
@@ -23,29 +23,32 @@ macro delegate_ret {
 const defaultFactoryConfiguration = {
     "NetSocket" : require("net").Socket,
     "IrcSocket" : require("irc-socket"),
-    "MessageHandler" : require("./message-handler.js"),
-    "CommandHandler" : require("./command-handler.js"),
     "Plugins" : require("tennu-plugins"),
-    "BiSubscriber" : require("./bisubscriber.js"),
     "Logger": require("./null-logger.js"),
-    "NicknameTracker": require("./nickname-tracker.js")
+
+    // TODO(Havvy): Make this a plugin.
+    "MessageHandler" : require("./message-handler.js"),
+
+    // TODO(Havvy): Make this a plugin.
+    "CommandHandler" : require("./command-handler.js"),
+
+    // TODO(Havvy): Make this a plugin.
+    "BiSubscriber" : require("./bisubscriber.js"),
 };
 
 const defaultClientConfiguration = {
     // IrcSocket Config
     "server": undefined,
-    "daemon": undefined,
     "port": 6667,
-    "ipv6": undefined,
-    "localAddress": undefined,
-    "secure": false,
     "password": undefined,
-    "capab": false,
-    "nickname": "tennubot",
+    "capabilities": undefined,
+    "nicknames": ["tennubot"],
     "username": "tennu",
     "realname": "tennu " + require("../package.json")["version"],
+    "connectOptions": undefined,
 
     // Tennu Config
+    "tls": false,
     "channels": [],
     "nickserv": "nickserv",
     "auth-password": undefined,
@@ -58,16 +61,13 @@ const defaultClientConfiguration = {
  * _config
  * _socket
  * _logger
- * out      (_outputSocket)
+ * _messageHandler
+ * _actionExports
+ * _selfExports
  * events   (_subscriber)
  * plugins  (_plugins)
- * nickname (_nickname)
  */
  const Client = function (config, dependencies) {
-    if (config.nick || config.user) {
-        throw new Error("Please use \"nickname\" and \"username\" instead of \"nick\" and \"user\" in your configuration.");
-    }
-
     const client = Object.create(Client.prototype);
 
     // Parse the configuration object. Make it immutable.
@@ -78,23 +78,23 @@ const defaultClientConfiguration = {
     // Default logger is a bunch of NOOPs.
     client._logger = new di.Logger();
 
+    var netSocket = new di.NetSocket();
+    if (config.tls) {
+        netSocket = new TlsSocket(netSocket, {rejectUnauthorized: false});
+    }
+
     // The socket reads and sends messages from/to the IRC server.
-    client._socket = new di.IrcSocket(config, di.NetSocket);
+    client._socket = new di.IrcSocket(config, netSocket);
 
     // Create the listener to the socket.
     // This listener will parse the raw messages of the socket, and
     // emits specific events to listen to.
     client._messageHandler = new di.MessageHandler(client, client._logger, client._socket);
 
-    // Create the object that tracks the nickname of the client.
-    // Because this object is a function, it is expected that
-    // the factory function does not use `this`.
-    client._nickname = di.NicknameTracker(config.nickname, client._messageHandler);
-
     // Create the listener to private messages from the IRCMessageEmitter
     // The commander will parse these private messages for commands, and
     // emit those commands, also parsed.
-    const commandHandler = new di.CommandHandler(config, client, client._nickname, client._logger);
+    const commandHandler = new di.CommandHandler(config, client, client._logger);
 
     // The subscriber handles event subscriptions to the Client object,
     // determining whether they should be handled by the IrcMessageEmitter
@@ -108,18 +108,17 @@ const defaultClientConfiguration = {
         client._subscriber.on(handlers);
     });
     client.note("Tennu", "Loading default plugins");
-    client._plugins.use(["server", "action", "help", "user", "channel", "startup"], __dirname);
+    client._plugins.use(["server", "action", "help", "user", "channel", "startup", "self"], __dirname);
     client.note("Tennu", "Loading your plugins");
     client._plugins.use(config.plugins || [], process.cwd());
 
-    // Grab a reference to the "action" plugin exports, so that the client
-    // can delegate the actions to it.
+    // Grab a reference to various plugin exports
+    // so that the client can delegate the actions to it.
     client._actionExports = client.getPlugin("action");
+    client._selfExports = client.getPlugin("self");
 
-    client.out = client._outputSocket;
     client.events = client._subscriber;
     client.plugins = client._plugins;
-    client.nickname = client._nickname;
 
     client.connected = false;
 
@@ -182,7 +181,10 @@ Client.prototype.whois                  = delegate_ret _actionExports whois;
 Client.prototype.raw                    = delegate_ret _actionExports raw;
 Client.prototype.rawf                   = delegate_ret _actionExports rawf;
 
-// implements BiSubscriber
+// implements Self Plugin Exports
+Client.prototype.nickname               = delegate_ret _selfExports nickname;
+
+// implements Subscriber
 Client.prototype.on                     = delegate _subscriber on;
 Client.prototype.once                   = delegate _subscriber once;
 Client.prototype.off                    = delegate _subscriber off;

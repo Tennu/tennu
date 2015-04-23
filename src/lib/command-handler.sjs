@@ -21,8 +21,7 @@ function startsWith(str, prefix) {
     return str.substring(0, prefix.length) === prefix;
 }
 
-// nickname is a function that returns the nickname of the client.
-function CommandParser (config, client, nickname, logger) {
+function CommandParser (config, client, logger) {
     var trigger = config['command-trigger'] || '!';
 
     function getMaybeCommandString (privmsg) {
@@ -38,7 +37,7 @@ function CommandParser (config, client, nickname, logger) {
             return privmsg.message;
         }
 
-        if (startsWith(privmsg.message.toLowerCase(), nickname().toLowerCase())) {
+        if (startsWith(privmsg.message.toLowerCase(), client.nickname().toLowerCase())) {
             // Trimming in case of multiple spaces. e.g. (raw message)
             // nick!user@host PRIVMSG #chan botname:   do something
             const message = privmsg.message.substring(privmsg.message.indexOf(' ') + 1).trim();

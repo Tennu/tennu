@@ -5,7 +5,9 @@ module.exports = {
         const nickserv = client.config("nickserv");
         const autojoinChannels = client.config("channels");
 
-        client.on("rpl_endofmotd", function () {
+        client._socket.startupPromise.then(function () {
+            client.note("Tennu", "Server connection started.");
+
             if (client.config("daemon") === "unreal") {
                 // Mode +B on Unreal signifies a bot.
                 client.mode(nickname, "B");
