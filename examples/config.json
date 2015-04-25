@@ -1,7 +1,7 @@
 {
     "server" : "irc.example.net",
-    "nick" : "tennu",
-    "user" : "tennu",
+    "nickname" : "tennu",
+    "username" : "tennu",
     "port" : 6667,
     "password" : "password",
     "nickserv" : "nickserv",
