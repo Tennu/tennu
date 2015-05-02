@@ -191,7 +191,6 @@ Client.prototype.off                    = delegate _subscriber off;
 
 // implements PluginSystem
 Client.prototype.use                    = delegate     _plugins use;
-Client.prototype.getModule              = delegate_ret _plugins getPlugin;
 Client.prototype.getPlugin              = delegate_ret _plugins getPlugin
 Client.prototype.getRole                = delegate_ret _plugins getRole;
 Client.prototype.initializePlugin       = delegate     _plugins initialize;
