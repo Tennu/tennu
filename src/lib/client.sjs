@@ -43,7 +43,7 @@ const defaultClientConfiguration = {
     "server": undefined,
     "port": 6667,
     "password": undefined,
-    "capabilities": undefined,
+    "capabilities": {},
     "nicknames": ["tennubot"],
     "username": "tennu",
     "realname": "tennu " + require("../package.json")["version"],
@@ -75,7 +75,22 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
     const client = Object.create(Client.prototype);
 
     // Parse the configuration object. Make it immutable.
-    client._config = config = Object.freeze(lodash.defaults({}, config, defaultClientConfiguration));
+    client._config = config = lodash.defaults({}, config, defaultClientConfiguration);
+    // TODO(Havvy): Handle the logic in here better.
+    if (!config.capabilities) {
+        config.capabilities = { requires: ["multi-prefix", "userhost-in-names"] };
+    } else if (!config.capabilities.requires) {
+        config.capabilities.requires = ["multi-prefix", "userhost-in-names"];
+    } else {
+        if (config.capabilities.requires.indexOf("multi-prefix") === -1) {
+            config.capabilities.requires.push("multi-prefix");
+        }
+
+        if (config.capabilities.requires.indexOf("userhost-in-names") === -1) {
+            config.capabilities.requires.push("userhost-in-names");
+        }
+    }
+
     di = lodash.defaults({}, dependencies || {}, defaultFactoryConfiguration);
 
     // Create a logger.

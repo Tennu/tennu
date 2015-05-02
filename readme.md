@@ -74,7 +74,7 @@ The irc-socket configuration values are as follows:
 * realname        - "Real name" to send with the USER command.
 * password        - Password used to connect to the network. Most networks don't have one.
 * proxy           - WEBIRC details if your connection is acting as a (probably web-based) proxy.
-* capabilities    - IRCv3 capabilities required or wanted. Tennu requires 
+* capabilities    - IRCv3 capabilities required or wanted. Tennu requires `multi-prefix` and `userhost-in-names`.
 * connectOptions  - Options passed to the wrapped socket's connect method. Options port and host are ignored.
 
 Other plugins may add additional properties. See their respective docume
