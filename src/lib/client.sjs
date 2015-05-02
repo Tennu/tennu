@@ -1,5 +1,7 @@
 const lodash = require("lodash");
 const TlsSocket = require("tls").TLSSocket;
+const format = require("util").format;
+const inspect = require("util").inspect;
 
 // delegate x y -> function () { this.x.y.apply(this.x, arguments); return this; }
 macro delegate {
@@ -57,6 +59,8 @@ const defaultClientConfiguration = {
     "disable-help": false
 };
 
+const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "alert", "emerg"];
+
 /** Fields
  * _config
  * _socket
@@ -77,6 +81,12 @@ const defaultClientConfiguration = {
     // Create a logger.
     // Default logger is a bunch of NOOPs.
     client._logger = new di.Logger();
+    var missingLoggerMethods = loggerMethods.filter(function (method) {
+        return typeof client._logger[method] !== "function";
+    });
+    if (missingLoggerMethods.length !== 0) {
+        throw new Error(format("Logger passed to tennu.Client is missing the following methods: %s", inspect(missingLoggerMethods)));
+    }
 
     var netSocket = new di.NetSocket();
     if (config.tls) {

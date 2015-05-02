@@ -8,7 +8,7 @@ const defaults = require("lodash").defaults;
 
 const debug = false;
 const logfn = debug ? console.log.bind(console) : function () {};
-const logger = {debug: logfn, info: logfn, notice: logfn, warn: logfn, error: logfn};
+const logger = {debug: logfn, info: logfn, notice: logfn, warn: logfn, error: logfn, crit: logfn, alert: logfn, emerg: logfn};
 
 const Client = require("../lib/client.js");
 const NetSocket = require("@havvy/mock-net-socket");
@@ -19,10 +19,6 @@ const networkConfig = {
     "username": "testuser",
     "realname": "tennu irc bot"
 };
-
-    // "nickserv" : "nickserv",
-    // "auth-password" : "testpass",
-    // "channels" : ["#test"],
 
 const messages = {
     rpl_welcome: ":irc.test.net 001 testbot :Welcome to the Test IRC Network testbot!testuser@localhost\r\n",
@@ -165,6 +161,25 @@ describe "Tennu Client:" {
                     assert(spyCall.calledWithExactly("PRIVMSG nickserv :identify 123456\r\n", "utf-8"));
                     done();
                 });
+            }
+        }
+    }
+
+    describe "Error handling" {
+        it "tells you which methods are missing on the logger" {
+            var config = networkConfig
+
+            try {
+                Client(networkConfig, {
+                    Logger: function () {
+                        return {debug: logfn, info: logfn, notice: logfn, warn: logfn, error: logfn};
+                    }
+                });
+
+                assert(false);
+            } catch (e) {
+                logfn(e.message);
+                assert(e.message === "Logger passed to tennu.Client is missing the following methods: [ 'crit', 'alert', 'emerg' ]");
             }
         }
     }
