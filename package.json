@@ -68,6 +68,7 @@
   },
   "scripts": {
     "test": "gulp build && mocha -R spec",
+    "test-only": "mocha -R spec",
     "build": "gulp build"
   },
   "bin": {
