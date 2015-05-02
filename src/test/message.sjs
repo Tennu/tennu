@@ -168,6 +168,15 @@ describe "Message" {
             }
         }
 
+        describe "mode:" {
+            it skip "Setting a flag" {}
+            it skip "Unsetting a flag" {}
+            it skip "Setting a parametized value" {}
+            it skip "Unsetting a parametized value" {}
+            it skip "Setting a nicklist value" {}
+            it skip "Unsetting a nicklist value" {}
+        }
+
         describe "353:" {
             it "creates correct nicknames array" {
                 var message = Message(messages.a_353_with_whitespace);
