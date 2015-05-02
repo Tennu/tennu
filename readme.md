@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Tennu/tennu.png?branch=master)](https://travis-ci.org/Tennu/tennu)
+[![Travis Status](https://img.shields.io/travis/Tennu/tennu.svg)](https://travis-ci.org/Tennu/tennu) [![NPM Downloads](https://img.shields.io/npm/dm/tennu.svg)](https://npmjs.org/package/tennu) [![Version](https://img.shields.io/npm/v/tennu.svg)](https://npmjs.org/package/tennu) [![ISC Licensed](https://img.shields.io/npm/l/tennu.svg)](http://opensource.org/licenses/ISC) [![Github Issue Count](https://img.shields.io/github/issues/tennu/tennu.svg)](https://github.com/Tennu/tennu/issues) [![Github Stars](https://img.shields.io/github/stars/Tennu/tennu.svg)](https://github.com/Tennu/tennu/stargazers)
 
 Tennu is an IRC bot framework written in Node.js
 
