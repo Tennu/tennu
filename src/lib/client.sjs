@@ -78,16 +78,12 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
     client._config = config = lodash.defaults({}, config, defaultClientConfiguration);
     // TODO(Havvy): Handle the logic in here better.
     if (!config.capabilities) {
-        config.capabilities = { requires: ["multi-prefix", "userhost-in-names"] };
+        config.capabilities = { requires: ["multi-prefix"] };
     } else if (!config.capabilities.requires) {
-        config.capabilities.requires = ["multi-prefix", "userhost-in-names"];
+        config.capabilities.requires = ["multi-prefix"];
     } else {
         if (config.capabilities.requires.indexOf("multi-prefix") === -1) {
             config.capabilities.requires.push("multi-prefix");
-        }
-
-        if (config.capabilities.requires.indexOf("userhost-in-names") === -1) {
-            config.capabilities.requires.push("userhost-in-names");
         }
     }
 
@@ -105,7 +101,10 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
 
     var netSocket = new di.NetSocket();
     if (config.tls) {
-        netSocket = new TlsSocket(netSocket, {rejectUnauthorized: false});
+        netSocket = new TlsSocket(netSocket, {
+            rejectUnauthorized: false,
+            isServer: false
+        });
     }
 
     // The socket reads and sends messages from/to the IRC server.

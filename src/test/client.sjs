@@ -22,8 +22,8 @@ const networkConfig = {
 
 const messages = {
     rpl_welcome: ":irc.test.net 001 testbot :Welcome to the Test IRC Network testbot!testuser@localhost\r\n",
-    rpl_cap_ls: ":irc.test.net CAP * LS :multi-prefix userhost-in-names\r\n",
-    rpl_ack_default_capabilities: ":irc.test.net CAP * ACK :multi-prefix userhost-in-names\r\n",
+    rpl_cap_ls: ":irc.test.net CAP * LS :multi-prefix\r\n",
+    rpl_ack_default_capabilities: ":irc.test.net CAP * ACK :multi-prefix\r\n",
     _: ""
 };
 
@@ -78,10 +78,11 @@ describe "Tennu Client:" {
         it "tracks its initial nickname" (done) {
             assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_cap_ls);
-            assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix userhost-in-names\r\n", "utf-8"));
+            assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
-            assert(client._socket.impl.write.getCall(2).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
-            assert(client._socket.impl.write.getCall(3).calledWithExactly("NICK testbot\r\n", "utf-8"));
+            assert(client._socket.impl.write.getCall(2).calledWithExactly("CAP END\r\n", "utf-8"));
+            assert(client._socket.impl.write.getCall(3).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
+            assert(client._socket.impl.write.getCall(4).calledWithExactly("NICK testbot\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_welcome);
 
             client._socket.startupPromise.then(function () {
@@ -95,17 +96,18 @@ describe "Tennu Client:" {
         it "tracks its changed nick" {
             assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_cap_ls);
-            assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix userhost-in-names\r\n", "utf-8"));
+            assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
-            assert(client._socket.impl.write.getCall(2).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
-            assert(client._socket.impl.write.getCall(3).calledWithExactly("NICK testbot\r\n", "utf-8"));
+            assert(client._socket.impl.write.getCall(2).calledWithExactly("CAP END\r\n", "utf-8"));
+            assert(client._socket.impl.write.getCall(3).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
+            assert(client._socket.impl.write.getCall(4).calledWithExactly("NICK testbot\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_welcome);
 
             return client._socket.startupPromise
             .then(function () {}) // skip a turn.
             .then(function () {
                 client.nick("changed-nick")
-                assert(client._socket.impl.write.getCall(4).calledWithExactly("NICK changed-nick\r\n", "utf-8"));
+                assert(client._socket.impl.write.getCall(5).calledWithExactly("NICK changed-nick\r\n", "utf-8"));
                 client._socket.impl.acceptData(":testbot!testuser@user.isp.net NICK changed-nick\r\n");
             })
             .then(function () {})
@@ -135,13 +137,14 @@ describe "Tennu Client:" {
                 client._socket.impl.acceptConnect();
                 assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
                 client._socket.impl.acceptData(messages.rpl_cap_ls);
-                assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix userhost-in-names\r\n", "utf-8"));
+                assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
                 client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
-                assert(client._socket.impl.write.getCall(2).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
-                assert(client._socket.impl.write.getCall(3).calledWithExactly("NICK testbot\r\n", "utf-8"));
+                assert(client._socket.impl.write.getCall(2).calledWithExactly("CAP END\r\n", "utf-8"));
+                assert(client._socket.impl.write.getCall(3).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
+                assert(client._socket.impl.write.getCall(4).calledWithExactly("NICK testbot\r\n", "utf-8"));
                 client._socket.impl.acceptData(messages.rpl_welcome);
 
-                client._socket.impl.write.on("4", function (spyCall) {
+                client._socket.impl.write.on(5, function (spyCall) {
                     assert(spyCall.calledWithExactly("JOIN :#test\r\n", "utf-8"));
                     // client._socket.impl.acceptData(messages.join_test);
                     // client._socket.impl.acceptData(messages.rpl_topic_test);
@@ -170,18 +173,23 @@ describe "Tennu Client:" {
                 client._socket.impl.acceptConnect();
                 assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
                 client._socket.impl.acceptData(messages.rpl_cap_ls);
-                assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix userhost-in-names\r\n", "utf-8"));
+                assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
                 client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
-                assert(client._socket.impl.write.getCall(2).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
-                assert(client._socket.impl.write.getCall(3).calledWithExactly("NICK testbot\r\n", "utf-8"));
+                assert(client._socket.impl.write.getCall(2).calledWithExactly("CAP END\r\n", "utf-8"));
+                assert(client._socket.impl.write.getCall(3).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
+                assert(client._socket.impl.write.getCall(4).calledWithExactly("NICK testbot\r\n", "utf-8"));
                 client._socket.impl.acceptData(messages.rpl_welcome);
 
-                client._socket.impl.write.on("4", function (spyCall) {
+                client._socket.impl.write.on(5, function (spyCall) {
                     assert(spyCall.calledWithExactly("PRIVMSG nickserv :identify 123456\r\n", "utf-8"));
                     done();
                 });
             }
         }
+
+        // When ERROR is sent before 001.
+        it skip "does not do post-startup tasks if server never started" {}
+        it skip "tells you why startup failed when it fails" {}
     }
 
     describe "Error handling" {
@@ -203,7 +211,7 @@ describe "Tennu Client:" {
         }
     }
 
-    describe "Capabilities always has multi-prefix and userhost-in-names required" {
+    describe "Capabilities always requires `multi-prefix`" {
         it "even when no capabilities passed" {
             var client = Client(networkConfig, {
                 NetSocket: boxfn(netsocket),
@@ -215,7 +223,7 @@ describe "Tennu Client:" {
             client._socket.impl.acceptConnect();
             assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_cap_ls);
-            assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix userhost-in-names\r\n", "utf-8"));
+            assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
         }
 
@@ -230,7 +238,7 @@ describe "Tennu Client:" {
             client._socket.impl.acceptConnect();
             assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_cap_ls);
-            assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix userhost-in-names\r\n", "utf-8"));
+            assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
         }
 
@@ -245,7 +253,7 @@ describe "Tennu Client:" {
             client._socket.impl.acceptConnect();
             assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_cap_ls);
-            assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix userhost-in-names\r\n", "utf-8"));
+            assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
         }
     }
