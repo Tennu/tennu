@@ -5,7 +5,7 @@ const Ok = ResultCtors.Ok;
 const Fail = ResultCtors.Fail;
 const chunk = require("chunk");
 
-module.exports = function (client, rawf) {
+module.exports = function (client, rawf, emitter) {
     // NOTE(Havvy): `multiple` should not be set by the user, it is used as a recusion flag.
     // TODO(Havvy) Figure out what the `server` parameter does.
     // TODO(Havvy) Move the multiple case to `whoisAll` or return a Promise<[Result<WhoisInfo, WhoisFailureMessage>], Error>`?
