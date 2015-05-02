@@ -1,11 +1,16 @@
 {
-    "server" : "irc.example.net",
-    "nickname" : "tennu",
-    "username" : "tennu",
-    "port" : 6667,
-    "password" : "password",
-    "nickserv" : "nickserv",
-    "trigger" : "!",
-    "channels" : ["#test", "#example"],
-    "modules" : []
+    "server": "irc.network.net",
+    "port": 6667,
+    "nicknames": ["tennu-bot"],
+    "username": "tennu",
+    "realname": "tennu",
+
+    "plugins": [],
+    "command-trigger": "!",
+
+    "channels": ["#channel"],
+    "nickserv": "nickserv",
+    "auth-password": null,
+
+    "tls": false,
 }

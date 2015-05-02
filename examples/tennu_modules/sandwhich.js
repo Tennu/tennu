@@ -1,4 +1,5 @@
-var types = ['ham', 'pb&b'];
+var format = require("util").format;
+var types = ["ham", "pb&b"];
 
 module.exports = function (tennu) {
     return {
@@ -13,7 +14,7 @@ module.exports = function (tennu) {
                 var requester = command.nickname;
                 var type = types[Math.floor(Math.random() * types.length)];
 
-                return requester + ": Have a " + type + " sandwhich.";
+                return format("%s: Have a %s sandwhich.", requester, type);
             }
         }
     };
