@@ -207,10 +207,6 @@ For example, a command of "!do-it ARG1 ARG2" will have args be ["ARG1", "ARG2"] 
 
 All of the following are methods on Tennu that can be used once connected.
 
-These methods are also available on the client's 'out' property.
-In Tennu 0.9.0, the 'out' property will go away, and the 'actions' plugin
-will export these methods.
-
 ### say(channel, message) ###
 
 * channel is either a channel ("#chan") or a user ("nick").
