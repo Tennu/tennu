@@ -1,8 +1,8 @@
 module.exports = {
-    init: function (client, imports) {
+    init: function (client, deps) {
         const isupport = {};
 
-        client._messageHandler.isupport(isupport);
+        deps.messages.isupport(isupport);
 
         return {
             handlers: {
@@ -20,5 +20,7 @@ module.exports = {
                 isupport: isupport
             }
         };
-    }
+    },
+
+    requires: ["messages"]
 };

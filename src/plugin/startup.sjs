@@ -43,12 +43,16 @@ module.exports = {
             client.info("<-", line);
         });
 
-        // Standard event for IRC quitting.
-        client.on("error", function () {
-            client.note("Tennu", "Closing IRC Connection.");
-            client.disconnect();
-        });
+        return {
+            handlers: {
+                // Standard event for IRC quitting.
+                "error": function () {
+                    client.note("Tennu", "Closing IRC Connection.");
+                    client.disconnect();
+                }
+            }
+        };
+    },
 
-        return {};
-    }
+    requires: ["messages"]
 }

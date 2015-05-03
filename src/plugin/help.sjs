@@ -151,5 +151,7 @@ module.exports = {
 
             commands: ["help", "commands"]
         };
-    }
+    },
+
+    requires: ["commands"]
 };

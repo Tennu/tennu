@@ -88,19 +88,10 @@ replace the factories that the Client uses by default.
 
 * NetSocket
 * IrcSocket
-* MessageHandler
-* CommandHandler
 * Plugins
-* BiSubscriber
 * Logger
 
-These functions will always be called as constructors (with `new`).
-
-Note: BiSubscriber, MessageHandler, and CommandHandler are all moving
-into plugins eventually. Replacing their module is as such, deprecated.
-Logging may also be moved into a plugin, but that's a ways off, and
-wrapping a Logger object in a plugin is trivial. If and when it happens,
-there'll be an article on how to do so.
+These functions will always be called as constructors (a.k.a. with `new`).
 
 ### Logging ###
 
@@ -128,7 +119,7 @@ Note: Tennu uses a custom event handler. Listeners are placed at the end of the
 node event queue (with setImmediate), insead of happening in the same turn.
 Errors are currently logged to console, but otherwise swallowed.
 
-### Respond Functionality ###
+### Response Functionality ###
 
 Commands and Messages that have a channel property take a return value. Currently, the
 return value must be a string or array that is then said to the channel the message
