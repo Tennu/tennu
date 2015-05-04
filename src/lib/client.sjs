@@ -1,7 +1,7 @@
-const lodash = require("lodash");
 const TlsSocket = require("tls").TLSSocket;
 const format = require("util").format;
 const inspect = require("util").inspect;
+const defaults = require("lodash.defaults");
 
 // delegate x y -> function () { this.x.y.apply(this.x, arguments); return this; }
 macro delegate {
@@ -66,7 +66,7 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
     const client = Object.create(Client.prototype);
 
     // Parse the configuration object. Make it immutable.
-    client._config = config = lodash.defaults({}, config, defaultClientConfiguration);
+    client._config = config = defaults({}, config, defaultClientConfiguration);
     // TODO(Havvy): Handle the logic in here better.
     if (!config.capabilities) {
         config.capabilities = { requires: ["multi-prefix"] };
@@ -78,7 +78,7 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
         }
     }
 
-    di = lodash.defaults({}, dependencies || {}, defaultFactoryConfiguration);
+    di = defaults({}, dependencies || {}, defaultFactoryConfiguration);
 
     // Create a logger.
     // Default logger is a bunch of NOOPs.

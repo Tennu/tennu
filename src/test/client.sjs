@@ -4,7 +4,7 @@ const equal = require("deep-eql");
 const inspect = require("util").inspect;
 const format = require("util").format;
 require("source-map-support").install();
-const defaults = require("lodash").defaults;
+const defaults = require("lodash.defaults");
 
 const debug = false;
 const logfn = debug ? console.log.bind(console) : function () {};

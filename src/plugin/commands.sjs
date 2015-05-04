@@ -1,6 +1,6 @@
 const inspect = require("util").inspect;
 const format = require("util").format;
-const lodash = require("lodash");
+const create = require("lodash.create");
 
 const badResponseFormat = "Command handler for %s returned with invalid value: %s";
 
@@ -8,7 +8,7 @@ function Command (privmsg, command_text) {
     const args = command_text.split(/ +/);
     const commandName = args.shift().toLowerCase();
 
-    return lodash.create(privmsg, {
+    return create(privmsg, {
         args: args,
         command: commandName
     });
