@@ -40,6 +40,8 @@ const messages = {
     },
     args:                     privmsg(format("%s %s %s",      commandname, arg1, arg2)),
     args_oddspacing:          privmsg(format("%s  %s   %s  ", commandname, arg1, arg2)),
+    ignore:                   privmsg(format("%s",           "ignored")),
+    _: ""
 };
 
 describe "Commands Plugin" {
@@ -56,6 +58,8 @@ describe "Commands Plugin" {
             config: function (value) {
                 if (value === "command-trigger") {
                     return "!";
+                } else if (value === "command-ignore-list") {
+                    return ["ignored"];
                 } else {
                     throw new Error(format("Unknown config value (%s) requested by Commands Plugin.", value));
                 }
@@ -201,6 +205,14 @@ describe "Commands Plugin" {
             });
 
             assert(acceptPrivmsg(messages.detect.trigger) === returnSetinel);
+        }
+
+        it "ignores commands on the ignore-list" {
+            emitter.on("ignored", function () {
+                throw new Error("Ignored command still handled.");
+            });
+
+            acceptPrivmsg(messages.ignore);
         }
 
         describe "Triggers" {

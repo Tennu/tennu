@@ -23,6 +23,8 @@ module.exports = {
         var trigger = client.config("command-trigger");
         trigger = typeof trigger === "string" ? trigger : "!";
 
+        const ignoreList = (client.config("command-ignore-list") || []).map(λ[#.toLowerCase()]);
+
         // invariant: keys must be normalized to lower case.
         const registry = {};
 
@@ -66,6 +68,12 @@ module.exports = {
 
                     if (registry[command.command]) {
                         client.debug("PluginCommand", "Command handler found.");
+
+                        if (ignoreList.indexOf(command.command) !== -1) {
+                            client.debug("PluginCommand", "But command is ignored.");
+                            return;
+                        }
+
                         return registry[command.command](command);
                     } else {
                         client.debug("PluginCommand", "Command handler not found.")

@@ -56,14 +56,15 @@ The network configuration object contains all of the properties of
 [https://npmjs.org/package/irc-socket](an irc-socket) except for "socket"
 plus the following configuration options:
 
-* tls             - Boolean that if true, upgrades the NetSocket to a TLS socket.
-* auth-password   - Password for identifying to services
-* nickserv        - Nickname of nickserv service. Defaults to `"nickserv"`.
-* command-trigger - Command character to trigger commands with. By default, `"!"`.
-* channels        - Array of channels to autojoin. _Example:_ `["#help", "#tennu"]`
-* plugins         - An array of plugin names that the bot requires.
-* disable-help    - Boolean that when true, disables the built-in help plugin.
-* daemon          - The IRCd you are connecting to. Optional, but useful for "unreal" and "twitch".
+* tls                 - Boolean that if true, upgrades the NetSocket to a TLS socket.
+* auth-password       - Password for identifying to services
+* nickserv            - Nickname of nickserv service. Defaults to `"nickserv"`.
+* command-trigger     - Command character to trigger commands with. By default, `"!"`.
+* command-ignore-list - List of commands not to fire a handler for. By default, `[]`. _Example:_ `["commands", "help"]`
+* channels            - Array of channels to autojoin. _Example:_ `["#help", "#tennu"]`
+* plugins             - An array of plugin names that the bot requires.
+* disable-help        - [Deprecated] Boolean that when true, disables the built-in help plugin.
+* daemon              - The IRCd you are connecting to. Optional, but useful for "unreal" and "twitch".
 
 The irc-socket configuration values are as follows:
 
@@ -158,7 +159,7 @@ on({
 })
 ```
 
-You can also unsubscribe non-once events with `off`, taking the same parameters as `on`.
+You can also unsubscribe non-once message events with `off`, taking the same parameters as `on`.
 
 ### Listener Parameters ###
 
