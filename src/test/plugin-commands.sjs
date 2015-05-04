@@ -52,7 +52,8 @@ describe "Commands Plugin" {
     beforeEach {
         client = {
             // Logger
-            note: sinon.spy(logfn),
+            debug: logfn, 
+            note: logfn,
             error: logfn,
 
             // Base
@@ -73,7 +74,7 @@ describe "Commands Plugin" {
 
         emitter = commands.subscribe.emitter;
         acceptPrivmsg = function (privmsg) {
-            commands.handlers["privmsg"](Message(privmsg));
+            return commands.handlers["privmsg"](Message(privmsg));
         }
     }
 
@@ -83,6 +84,7 @@ describe "Commands Plugin" {
         }
 
         it "does nothing with privmsgs that aren't commands" {
+            client.note = sinon.spy(client.note);
             acceptPrivmsg(messages.noncommand);
             assert(!client.note.called);
         }
@@ -180,6 +182,27 @@ describe "Commands Plugin" {
 
                 acceptPrivmsg(messages.command);
             }
+        }
+
+        it "disallows multiple handlers to the same command" {
+            emitter.on(commandname, function () {});
+
+            try {
+                emitter.on(commandname, function () {});
+                assert(false);
+            } catch (e) {
+                // catch block required by lexical grammar.
+            }
+        }
+
+        it "command handler return values are returned to the messages emitter" {
+            const returnSetinel = {};
+
+            emitter.on(commandname, function () {
+                return returnSetinel;
+            });
+
+            assert(acceptPrivmsg(messages.detect.trigger) === returnSetinel);
         }
     }
 }

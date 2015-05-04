@@ -1,19 +1,16 @@
-const EventEmitter = require("after-events");
 const inspect = require("util").inspect;
 const format = require("util").format;
 const lodash = require("lodash");
-const Response = require("../lib/response");
-const Promise = require("bluebird");
 
 const badResponseFormat = "Command handler for %s returned with invalid value: %s";
 
 function Command (privmsg, command_text) {
     const args = command_text.split(/ +/);
-    const commandname = args.shift().toLowerCase();
+    const commandName = args.shift().toLowerCase();
 
     return lodash.create(privmsg, {
         args: args,
-        command: commandname
+        command: commandName
     });
 }
 
@@ -24,6 +21,9 @@ function startsWith(string, prefix) {
 module.exports = {
     init: function (client, deps) {
         const trigger = client.config("command-trigger") || "!";
+
+        // invariant: keys must be normalized to lower case.
+        const registry = {};
 
         // Returns false if privmsg is *not* a command query.
         // Otherwise, returns the string that is the command query.
@@ -51,59 +51,49 @@ module.exports = {
             return false;
         };
 
-        const parser = Object.create(EventEmitter());
-
-        parser.parse = function (privmsg) {
-            const maybeCommand = tryParseCommandString(privmsg);
-
-            if (maybeCommand) {
-                const command = Command(privmsg, maybeCommand);
-                client.note("Command Handler", "Emitting command:", command.command);
-
-                this.emit(command.command, command);
-            }
-        };
-
-        parser.after(function (err, res, type, command) {
-            // Intent := "say" | "act" | "ctcp" | "notice" | "none"
-            // Target: NickName | ChannelName
-            // ReturnResponse := {message: String | [CtcpType, CtcpBody], intent: Intent, target: Target, query: Boolean}
-            // Result = undefined | string | [string] | ReturnResponse
-
-            // err := Error
-            // res := Result | Promise<Result>
-            // type := string
-            // command := Command
-
-            if (err) {
-                client.error("CommandHandler", "Error thrown in message handler!");
-                client.error("CommandHandler", err.stack);
-                return;
-            }
-
-            if (command.channel !== undefined) {
-                Promise.resolve(res)
-                .then(λ[Response.create(#, command)])
-                .then(λ[Response.send(#, client)])
-                .catch(logBadResponseError)
-            }
-
-            function logBadResponseError (err) {
-                client.error("CommandHandler", format(badResponseFormat, command.message, inspect(res)));
-            }
-        });
-
         return {
             handlers: {
                 "privmsg": function (privmsg) {
-                    parser.parse(privmsg);
+                    const maybeCommand = tryParseCommandString(privmsg);
+
+                    if (!maybeCommand) {
+                        return;
+                    }
+
+                    const command = Command(privmsg, maybeCommand);
+                    client.note("PluginCommand", "Command detected:", command.command);
+
+                    if (registry[command.command]) {
+                        client.debug("PluginCommand", "Command handler found.");
+                        return registry[command.command](command);
+                    } else {
+                        client.debug("PluginCommand", "Command handler not found.")
+                    }
                 }
             },
 
             subscribe: {
                 prefix: trigger,
-                emitter: parser
-            },
+                emitter: {
+                    on: function (commandName, handler) {
+                        commandName = commandName.toLowerCase();
+
+                        if (commandName in registry) {
+                            throw new Error(format("Command '%s' already has a handler.", commandName));
+                        }
+
+                        registry[commandName] = handler;
+                    },
+
+                    off: function () {
+                        throw new Error("Cannot remove command handlers once attached.");
+                    },
+
+                    once: function () {
+                        throw new Error("Cannot only listen to a command once.");
+                    }
+                }
+            }
         };
     },
 
