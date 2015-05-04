@@ -114,7 +114,6 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
     client._self = client.getPlugin("self");
     client._subscriber = client.getPlugin("subscriber");
 
-    client.events = client._subscriber;
     client.plugins = client._plugins;
 
     client.connected = false;
