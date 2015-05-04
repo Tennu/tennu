@@ -220,5 +220,15 @@ describe "Commands Plugin" {
             it skip "does not trigger for message: ' ' when trigger is empty string" {}
             it skip "can be multiple characters long" {}
         }
+
+        describe "isCommand" {
+            it "returns true for commands" {
+                assert(commands.exports.isCommand(Message(messages.command)) === true);
+            }
+
+            it "returns false for non-commands" {
+                assert(commands.exports.isCommand(Message(messages.noncommand)) === false);
+            }
+        }
     }
 }

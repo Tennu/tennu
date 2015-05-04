@@ -102,6 +102,12 @@ module.exports = {
                         throw new Error("Cannot only listen to a command once.");
                     }
                 }
+            },
+
+            exports: {
+                isCommand: function (message) {
+                    return tryParseCommandString(message) !== false;
+                }
             }
         };
     },
