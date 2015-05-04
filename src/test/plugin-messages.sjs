@@ -17,14 +17,25 @@ const command = "generic";
 const arg1 = "arg1";
 const arg2 = "arg2";
 const argr = "rest args";
-const raw = format(":%s %s %s %s :%s", prefix, command, arg1, arg2, argr);
+
+const hostmask = "nick!user@host.net";
+const channel = "#channel";
+
+const raws = {
+    generic: format(":%s %s %s %s :%s", prefix, command, arg1, arg2, argr),
+    generic_upper: format(":%s %s %s %s :%s", prefix, command.toUpperCase(), arg1, arg2, argr),
+    join: format(":%s JOIN %s", hostmask, channel),
+    welcome: ":irc.test.net 001 tennu :Welcome to the Test Network tennu!tennu@tennu.net",
+    _: ""
+};
 
 describe "Messages Plugin" {
-    var client, messages, emitter, acceptData, defaultPrefix, deps;
+    var defaultPrefix, client, deps, messages, emitter, afterEmit, acceptData;
 
     beforeEach {
         defaultPrefix = {}
         client = {
+            say: logfn,
             debug: logfn,
             error: logfn,
             _socket: new EventEmitter()
@@ -34,6 +45,7 @@ describe "Messages Plugin" {
         messages = MessagePluginFactory.init(client, deps);
 
         emitter = messages.subscribe.emitter;
+        afterEmit = messages.exports.afterEmit;
         acceptData = function (data) {
             client._socket.emit("data", data);
         };
@@ -43,24 +55,66 @@ describe "Messages Plugin" {
         assert(messages.subscribe.prefix === defaultPrefix);
     }
 
-    it "parses socket data events into Message and emits the Message.command name" {
-        emitter.on("generic", function (message) {
-            assert(evtval.prefix === prefix);
-            assert(evtval.command === command);
-            assert(evtval.params[0] === arg1);
-            assert(evtval.params[1] === arg2);
-            assert(evtval.params[2] === argr);
-            done();
-        });
+    describe "Parsing Socket Data Events" {
+        it "Emits the Message.command name" {
+            emitter.on("generic", function (message) {
+                assert(evtval.prefix === prefix);
+                assert(evtval.command === command);
+                assert(evtval.params[0] === arg1);
+                assert(evtval.params[1] === arg2);
+                assert(evtval.params[2] === argr);
+                done();
+            });
 
-        acceptData(raw);
-    }
+            acceptData(raws.generic);
+        }
 
-    describe skip "`*` event" {
-        it "is called with every function" (done) {
+        it "Emits Message.command in lower case" {
+            emitter.on("generic", function (message) {
+                assert(evtval.prefix === prefix);
+                assert(evtval.command === command);
+                assert(evtval.params[0] === arg1);
+                assert(evtval.params[1] === arg2);
+                assert(evtval.params[2] === argr);
+                done();
+            });
+
+            acceptData(raws.generic_upper);
+        }
+
+        it "subscribes command names case insenitively" {
+            emitter.on("GENERIC", function (message) {
+                assert(evtval.prefix === prefix);
+                assert(evtval.command === command);
+                assert(evtval.params[0] === arg1);
+                assert(evtval.params[1] === arg2);
+                assert(evtval.params[2] === argr);
+                done();
+            });
+
+            acceptData(raws.generic);
+        }
+
+        it "Emits the Replyname too" {
+            emitter.on("rpl_welcome", function (message) {
+                done();
+            });
+
+            acceptData(raws.welcome);
+        }
+
+        it "subscribes replyname case insenitively" {
+            emitter.on("RPL_WELCOME", function (message) {
+                done();
+            });
+
+            acceptData(raws.welcome);
+        }
+
+        it "emits '*'" (done) {
             var count = 0;
 
-            parser.on("*", function (message) {
+            emitter.on("*", function (message) {
                 count += 1;
 
                 if (count === 2) {
@@ -68,18 +122,17 @@ describe "Messages Plugin" {
                 }
             });
 
-            parser.parse(raw);
-            parser.parse(raw);
+            acceptData(raws.generic);
+            acceptData(raws.generic);
         }
     }
 
-    // TODO(Havvy): Make these work with Messages, not commands.
-    //              Need to create raw messages to work with too.
-    describe skip "Response handling" {
+    describe "Response handling" {
         it "no response" (done) {
-            emitter.after(function () {
+            client.say = sinon.spy(client.say);
+
+            afterEmit(function () {
                 try {
-                    logfn("After function called.");
                     assert(!client.say.called);
                     done();
                 } catch (e) {
@@ -87,17 +140,17 @@ describe "Messages Plugin" {
                 }
             });
 
-            emitter.on(commandname, function () {
+            emitter.on("join", function () {
                 return undefined;
             });
 
-            acceptData(messages.command);
+            acceptData(raws.join);
         }
 
         it "string response" (done) {
-            client.say = function (_sender, response) {
+            client.say = function (target, response) {
                 try {
-                    assert(sender === _sender);
+                    assert(channel === target);
                     assert(response === "response");
                     assert(arguments.length === 2);
                     done();   
@@ -106,17 +159,17 @@ describe "Messages Plugin" {
                 }
             };
 
-            emitter.on(commandname, function () {
+            emitter.on("join", function () {
                 return "response";
             });
 
-            acceptData(messages.command);
+            acceptData(raws.join);
         }
 
         it "[string] response" (done) {
-            client.say = function (_sender, response) {
+            client.say = function (target, response) {
                 try {
-                    assert(sender === _sender);
+                    assert(channel === target);
                     assert(equal(response, ["response"]));
                     assert(arguments.length === 2);
                     done();   
@@ -125,17 +178,17 @@ describe "Messages Plugin" {
                 }
             };
 
-            emitter.on(commandname, function () {
+            emitter.on("join", function () {
                 return ["response"];
             });
 
-            acceptData(messages.command);
+            acceptData(raws.join);
         }
 
         it "Promise<string> response" (done) {
-            client.say = function (_sender, response) {
+            client.say = function (target, response) {
                 try {
-                    assert(sender === _sender);
+                    assert(channel === target);
                     assert(response === "response");
                     assert(arguments.length === 2);
                     done();   
@@ -144,17 +197,17 @@ describe "Messages Plugin" {
                 }
             };
 
-            emitter.on(commandname, function () {
+            emitter.on("join", function () {
                 return Promise.resolve("response");
             });
 
-            acceptData(messages.command);
+            acceptData(raws.join);
         }
 
         it "Promise<[string]> response" (done) {
-            client.say = function (_sender, response) {
+            client.say = function (target, response) {
                 try {
-                    assert(sender === _sender);
+                    assert(channel === target);
                     assert(equal(response, ["response"]));
                     assert(arguments.length === 2);
                     done();   
@@ -163,11 +216,11 @@ describe "Messages Plugin" {
                 }
             };
 
-            emitter.on(commandname, function () {
+            emitter.on("join", function () {
                 return Promise.resolve(["response"]);
             });
 
-            acceptData(messages.command);
+            acceptData(raws.join);
         }
 
         it "Promise<string> after Promise#catch()" (done) {
@@ -175,12 +228,12 @@ describe "Messages Plugin" {
                 return Promise
                 .reject(new Error())
                 .catch(function (err) {
-                    console.log("Returning sorry!");
+                    logfn("Returning sorry!");
                     return "Sorry!";
                 });
             };
 
-            client.say = function (sender, response) {
+            client.say = function (channel, response) {
                 try {
                     assert(response === "Sorry!");
                     done();   
@@ -189,9 +242,9 @@ describe "Messages Plugin" {
                 }
             };
 
-            emitter.on(commandname, failHandler);
+            emitter.on("join", failHandler);
 
-            acceptData(messages.command);
+            acceptData(raws.join);
         }
     }
 }

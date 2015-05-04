@@ -6,10 +6,10 @@ const Response = require("../lib/response");
 
 module.exports = {
     init: function (client, deps) {
-        const parser = Object.create(EventEmitter());
+        const emitter = Object.create(EventEmitter());
         var isupport;
 
-        parser.parse = function (raw) {
+        const parse = function (raw) {
             const message = new Message(raw, isupport);
 
             if (message === null) {
@@ -18,20 +18,20 @@ module.exports = {
             }
 
             client.debug("MessageHandler", format("Emitting '%s'.", message.command.toLowerCase()));
-            parser.emit(message.command.toLowerCase(), message);
+            emitter.emit(message.command.toLowerCase(), message);
 
             if (message.replyname) {
                 client.debug("MessageHandler", format("Emitting '%s'.", message.replyname.toLowerCase()));
-                parser.emit(message.replyname.toLowerCase(), message);
+                emitter.emit(message.replyname.toLowerCase(), message);
             }
 
             client.debug("MessageHandler", "Emitting '*'");
-            parser.emit("*", message);
+            emitter.emit("*", message);
             
             return message;
         };
 
-        parser.after(function (err, res, type, message) {
+        emitter.after(function (err, res, type, message) {
             // Intent := "say" | "act" | "ctcp" | "notice" | "none"
             // Target: NickName | ChannelName
             // ReturnResponse := {message: String | [CtcpType, CtcpBody], intent: Intent, target: Target, query: Boolean}
@@ -56,16 +56,17 @@ module.exports = {
             }
         });
 
-        client._socket.on("data", parser.parse.bind(this));
+        client._socket.on("data", parse);
 
         return {
             subscribe: {
                 prefix: deps.subscriber.defaultPrefix,
-                emitter: parser
+                emitter: emitter
             },
 
             exports: {
-                isupport: λ[isupport = #]
+                isupport: λ[isupport = #],
+                afterEmit: emitter.after.bind(emitter)
             }
         };
     },
