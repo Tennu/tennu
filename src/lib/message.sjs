@@ -96,6 +96,10 @@ var extensions = {
         }
     },
 
+    "001": function (message) {
+        message.replyname = "RPL_WELCOME";
+    },
+
     "307": function (message) {
         // :<server> 307 <me> <nick> :is a registered nick
         // FIXME(Havvy): Only accounts for UnrealIRCd
