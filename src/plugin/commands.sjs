@@ -20,7 +20,8 @@ function startsWith(string, prefix) {
 
 module.exports = {
     init: function (client, deps) {
-        const trigger = client.config("command-trigger") || "!";
+        var trigger = client.config("command-trigger");
+        trigger = typeof trigger === "string" ? trigger : "!";
 
         // invariant: keys must be normalized to lower case.
         const registry = {};

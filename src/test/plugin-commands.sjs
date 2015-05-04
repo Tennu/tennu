@@ -12,10 +12,6 @@ const CommandsPluginFactory = require("../tennu_plugins/commands");
 const Message = require("../lib/message");
 const Promise = require("bluebird");
 
-const config = {
-    "command-trigger": "!"
-};
-
 const prefix = "sender!user@localhost";
 const commandname = "command";
 const channel = "#test";
@@ -88,6 +84,8 @@ describe "Commands Plugin" {
             acceptPrivmsg(messages.noncommand);
             assert(!client.note.called);
         }
+
+        it skip "does not detect a command for ' ' in query" {}
 
         describe "Recognition Types:" {
             it "Trigger" (done) {
@@ -203,6 +201,12 @@ describe "Commands Plugin" {
             });
 
             assert(acceptPrivmsg(messages.detect.trigger) === returnSetinel);
+        }
+
+        describe "Triggers" {
+            it skip "can be the empty string" {}
+            it skip "does not trigger for message: ' ' when trigger is empty string" {}
+            it skip "can be multiple characters long" {}
         }
     }
 }
