@@ -65,7 +65,6 @@ module.exports = {
         return {
             handlers: {
                 "!help": function (command) {
-                    client.notice("ModHelp", "!help being handled.");
                     // Default to showing the help for the help module if no args given.
                     const query = command.args.length === 0 ? ["help"] : command.args.slice();
                     var response = helpResponseMessage(query);
@@ -78,8 +77,6 @@ module.exports = {
                 },
 
                 "!commands": function (command) {
-                    client.notice("ModHelp", "!commands being handled.");
-
                     const start = ["List of known commands:"];
                     return start.concat(commandset.array().join(", "));
                 }

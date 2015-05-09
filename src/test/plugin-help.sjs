@@ -80,8 +80,7 @@ describe "Help plugin" {
 
     const config = function (opts) {
         client = {
-            config: opts.config || defaultConfigFn,
-            notice: logfn
+            config: opts.config || defaultConfigFn
         };
 
         instance = HelpPlugin.init(client, {});
