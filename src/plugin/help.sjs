@@ -19,7 +19,9 @@ module.exports = {
             return {};
         }
 
-        const commandTrigger = client.config("command-trigger");
+        const commandTrigger = client.config("command-trigger") || "!";
+        const commandIgnoreList = client.config("command-ignore-list") || [];
+
         // (string | [string]) -> string | [string]
         function replaceCommandTrigger (response) {
             if (typeof response === "string") {
@@ -123,6 +125,10 @@ module.exports = {
                     commands.forEach(function (command) {
                         if (typeof command !== "string") {
                             throw new TypeError(format("Commands property for module %s is invalid.", module));
+                        }
+
+                        if (commandIgnoreList.indexOf(command) !== -1) {
+                            return;
                         }
 
                         commandset.add(command);
