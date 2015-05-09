@@ -27,10 +27,6 @@ const messages = {
     _: ""
 };
 
-const boxfn = function (value) {
-    return function () { return value; };
-};
-
 describe "Tennu Client:" {
     var netsocket, client;
 
@@ -40,8 +36,8 @@ describe "Tennu Client:" {
 
     it "Basic Connecting and Disconnecting" {
         client = Client(networkConfig, {
-            NetSocket: boxfn(netsocket),
-            Logger: boxfn(logger)
+            NetSocket: netsocket,
+            Logger: logger
         });
 
         assert(client.connected === false);
@@ -51,145 +47,6 @@ describe "Tennu Client:" {
         assert(client.connected === true);
         client.disconnect();
         assert(client.connected === false);
-    }
-
-    // TODO(Havvy): Move this to a test for the Self plugin.
-    describe "Self plugin:" {
-        beforeEach (done) {
-            client = Client(networkConfig, {
-                NetSocket: boxfn(netsocket),
-                Logger: boxfn(logger)
-            });
-
-            netsocket.on("connect", done);
-            client.connect();
-            client._socket.impl.acceptConnect();
-        }
-
-        afterEach (done) {
-            netsocket.on("close", done);
-            client.disconnect();
-        }
-
-        it "does not know its nickname until startup finishes" {
-            assert(client.nickname() === undefined);
-        }
-
-        it "tracks its initial nickname" (done) {
-            assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
-            client._socket.impl.acceptData(messages.rpl_cap_ls);
-            assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
-            client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
-            assert(client._socket.impl.write.getCall(2).calledWithExactly("CAP END\r\n", "utf-8"));
-            assert(client._socket.impl.write.getCall(3).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
-            assert(client._socket.impl.write.getCall(4).calledWithExactly("NICK testbot\r\n", "utf-8"));
-            client._socket.impl.acceptData(messages.rpl_welcome);
-
-            client._socket.startupPromise.then(function () {
-                setImmediate(function () {
-                    assert(client.nickname() === "testbot");
-                    done();
-                });
-            });
-        }
-
-        it "tracks its changed nick" {
-            assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
-            client._socket.impl.acceptData(messages.rpl_cap_ls);
-            assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
-            client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
-            assert(client._socket.impl.write.getCall(2).calledWithExactly("CAP END\r\n", "utf-8"));
-            assert(client._socket.impl.write.getCall(3).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
-            assert(client._socket.impl.write.getCall(4).calledWithExactly("NICK testbot\r\n", "utf-8"));
-            client._socket.impl.acceptData(messages.rpl_welcome);
-
-            return client._socket.startupPromise
-            .then(function () {}) // skip a turn.
-            .then(function () {
-                client.nick("changed-nick")
-                assert(client._socket.impl.write.getCall(5).calledWithExactly("NICK changed-nick\r\n", "utf-8"));
-                client._socket.impl.acceptData(":testbot!testuser@user.isp.net NICK changed-nick\r\n");
-            })
-            .then(function () {})
-            .then(function () {
-                assert(client.nickname() === "changed-nick");
-            });
-        }
-    }
-
-    // TODO(havvy): Move to own file.
-    describe "Startup Plugin" {
-
-        afterEach (done) {
-            netsocket.on("close", done);
-            client.disconnect();
-        }
-
-        describe "autojoin" {
-            it "automatically joins specified channels." (done) {
-                client = Client(defaults({channels: ["#test"]}, networkConfig), {
-                    NetSocket: boxfn(netsocket),
-                    Logger: boxfn(logger)
-                });
-
-                client.connect();
-
-                client._socket.impl.acceptConnect();
-                assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
-                client._socket.impl.acceptData(messages.rpl_cap_ls);
-                assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
-                client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
-                assert(client._socket.impl.write.getCall(2).calledWithExactly("CAP END\r\n", "utf-8"));
-                assert(client._socket.impl.write.getCall(3).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
-                assert(client._socket.impl.write.getCall(4).calledWithExactly("NICK testbot\r\n", "utf-8"));
-                client._socket.impl.acceptData(messages.rpl_welcome);
-
-                client._socket.impl.write.on(5, function (spyCall) {
-                    assert(spyCall.calledWithExactly("JOIN :#test\r\n", "utf-8"));
-                    // client._socket.impl.acceptData(messages.join_test);
-                    // client._socket.impl.acceptData(messages.rpl_topic_test);
-                    // client._socket.impl.acceptData(messages.rpl_topicwhotime_test);
-                    // client._socket.impl.acceptData(messages.rpl_names_test);
-                    // client._socket.impl.acceptData(messages.rpl_endofnames_test);
-                    done();
-                });
-            }
-        }
-
-        describe "autoidentify" {
-            it "automatically identifies to services." (done) {
-                var config = defaults({
-                    "nickserv": "nickserv",
-                    "auth-password": "123456"
-                }, networkConfig);
-
-                client = Client(config, {
-                    NetSocket: boxfn(netsocket),
-                    Logger: boxfn(logger)
-                });
-
-                client.connect();
-
-                client._socket.impl.acceptConnect();
-                assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
-                client._socket.impl.acceptData(messages.rpl_cap_ls);
-                assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
-                client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
-                assert(client._socket.impl.write.getCall(2).calledWithExactly("CAP END\r\n", "utf-8"));
-                assert(client._socket.impl.write.getCall(3).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
-                assert(client._socket.impl.write.getCall(4).calledWithExactly("NICK testbot\r\n", "utf-8"));
-                client._socket.impl.acceptData(messages.rpl_welcome);
-
-                client._socket.impl.write.on(5, function (spyCall) {
-                    assert(spyCall.calledWithExactly("PRIVMSG nickserv :identify 123456\r\n", "utf-8"));
-                    done();
-                });
-            }
-        }
-
-        // When ERROR is sent before 001.
-        it skip "does not do post-startup tasks if server never started" {}
-        it skip "tells you why startup failed when it fails" {}
     }
 
     describe "Error handling" {
@@ -214,8 +71,8 @@ describe "Tennu Client:" {
     describe "Capabilities always requires `multi-prefix`" {
         it "even when no capabilities passed" {
             var client = Client(networkConfig, {
-                NetSocket: boxfn(netsocket),
-                Logger: boxfn(logger)
+                NetSocket: netsocket,
+                Logger: logger
             });
 
             client.connect();
@@ -230,8 +87,8 @@ describe "Tennu Client:" {
         it "even when capabilities is passed without a requires property" {
             var config = defaults({capabilities: {}}, networkConfig);
             var client = Client(config, {
-                NetSocket: boxfn(netsocket),
-                Logger: boxfn(logger)
+                NetSocket: netsocket,
+                Logger: logger
             });
 
             client.connect();
@@ -245,8 +102,8 @@ describe "Tennu Client:" {
         it "event when capabilities is passed a requires array property without them" {
             var config = defaults({ capabilities: { requires: [] } }, networkConfig);
             var client = Client(config, {
-                NetSocket: boxfn(netsocket),
-                Logger: boxfn(logger)
+                NetSocket: netsocket,
+                Logger: logger
             });
 
             client.connect();

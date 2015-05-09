@@ -48,6 +48,7 @@
     "irc-socket": "^3.0.5",
     "lodash.create": "^3.1.0",
     "lodash.defaults": "^3.1.1",
+    "lodash.mapvalues": "^3.0.1",
     "prefix-event-subscriber": "^1.0.0",
     "r-result": "^1.0.0",
     "simplesets": "^1.2.0",

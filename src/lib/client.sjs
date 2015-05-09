@@ -2,6 +2,7 @@ const TlsSocket = require("tls").TLSSocket;
 const format = require("util").format;
 const inspect = require("util").inspect;
 const defaults = require("lodash.defaults");
+const mapValues = require("lodash.mapvalues");
 
 // delegate x y -> function () { this.x.y.apply(this.x, arguments); return this; }
 macro delegate {
@@ -78,6 +79,13 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
         }
     }
 
+    dependencies = mapValues(dependencies, function (dep) {
+        if (typeof dep === "object") {
+            return function () { return dep; };
+        } else {
+            return dep;
+        }
+    });
     di = defaults({}, dependencies || {}, defaultFactoryConfiguration);
 
     // Create a logger.
