@@ -165,11 +165,30 @@ describe "Help plugin" {
         assert(equal(help(["f"]), ["@", "@"]));
     }
 
-    it "doesn't tell us ignored commands" {
-        config({config: makeConfigFn({"command-ignore-list": ["ignored"]})});
+    describe "!commands" {
+        it "shows installed commands" {
+            config({});
 
-        instance.hooks.commands("test", ["a", "b", "ignored"]);
+            instance.hooks.commands("help", instance.commands);
 
-        assert(equal(instance.handlers["!commands"](), ["List of known commands: ", "a, b"]));
+            assert(equal(instance.handlers["!commands"](), ["List of known commands:", "help, commands"]));
+        }
+
+        it "shows installed commands from all plugins" {
+            config({});
+
+            instance.hooks.commands("help", instance.commands);
+            instance.hooks.commands("test", ["a", "b"]);
+
+            assert(equal(instance.handlers["!commands"](), ["List of known commands:", "help, commands, a, b"]));
+        }
+
+        it "doesn't show ignored commands" {
+            config({config: makeConfigFn({"command-ignore-list": ["ignored"]})});
+
+            instance.hooks.commands("test", ["a", "b", "ignored"]);
+
+            assert(equal(instance.handlers["!commands"](), ["List of known commands:", "a, b"]));
+        }
     }
 }
