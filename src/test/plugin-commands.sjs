@@ -174,61 +174,61 @@ describe "Commands Plugin" {
                 acceptPrivmsg(messages.args_oddspacing);
             }
         }
+    }
 
-        describe "events are emitted" {
-            it "of the command name" (done) {
-                emitter.on(commandname, function (command) {
-                    assert(command.command === commandname);
-                    done();
-                });
+    describe "events are emitted" {
+        it "of the command name" (done) {
+            emitter.on(commandname, function (command) {
+                assert(command.command === commandname);
+                done();
+            });
 
-                acceptPrivmsg(messages.command);
-            }
+            acceptPrivmsg(messages.command);
         }
+    }
 
-        it "disallows multiple handlers to the same command" {
+    it "disallows multiple handlers to the same command" {
+        emitter.on(commandname, function () {});
+
+        try {
             emitter.on(commandname, function () {});
+            assert(false);
+        } catch (e) {
+            // catch block required by lexical grammar.
+        }
+    }
 
-            try {
-                emitter.on(commandname, function () {});
-                assert(false);
-            } catch (e) {
-                // catch block required by lexical grammar.
-            }
+    it "command handler return values are returned to the messages emitter" {
+        const returnSetinel = {};
+
+        emitter.on(commandname, function () {
+            return returnSetinel;
+        });
+
+        assert(acceptPrivmsg(messages.detect.trigger) === returnSetinel);
+    }
+
+    it "ignores commands on the ignore-list" {
+        emitter.on("ignored", function () {
+            throw new Error("Ignored command still handled.");
+        });
+
+        acceptPrivmsg(messages.ignore);
+    }
+
+    describe "Triggers" {
+        it skip "can be the empty string" {}
+        it skip "does not trigger for message: ' ' when trigger is empty string" {}
+        it skip "can be multiple characters long" {}
+    }
+
+    describe "isCommand" {
+        it "returns true for commands" {
+            assert(commands.exports.isCommand(Message(messages.command)) === true);
         }
 
-        it "command handler return values are returned to the messages emitter" {
-            const returnSetinel = {};
-
-            emitter.on(commandname, function () {
-                return returnSetinel;
-            });
-
-            assert(acceptPrivmsg(messages.detect.trigger) === returnSetinel);
-        }
-
-        it "ignores commands on the ignore-list" {
-            emitter.on("ignored", function () {
-                throw new Error("Ignored command still handled.");
-            });
-
-            acceptPrivmsg(messages.ignore);
-        }
-
-        describe "Triggers" {
-            it skip "can be the empty string" {}
-            it skip "does not trigger for message: ' ' when trigger is empty string" {}
-            it skip "can be multiple characters long" {}
-        }
-
-        describe "isCommand" {
-            it "returns true for commands" {
-                assert(commands.exports.isCommand(Message(messages.command)) === true);
-            }
-
-            it "returns false for non-commands" {
-                assert(commands.exports.isCommand(Message(messages.noncommand)) === false);
-            }
+        it "returns false for non-commands" {
+            assert(commands.exports.isCommand(Message(messages.noncommand)) === false);
         }
     }
 }
