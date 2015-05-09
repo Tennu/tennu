@@ -143,7 +143,14 @@ module.exports = ActionPlugin = {
                 userhost: userhost,
                 who: who,
                 whois: whois
+            },
+
+            subscribe: {
+                emitter: emitter,
+                prefix: "action:"
             }
         };
-    }
+    },
+
+    requires: ["subscriber"]
 };

@@ -17,17 +17,17 @@ const nickname = "testbot";
 
 const nicknamefn = function () { return nickname; };
 
-const ActionPlugin = require("../tennu_plugins/action");
+const ActionPluginFactory = require("../tennu_plugins/action");
 const EventEmitter = require("after-events");
 
 describe "IRC Output Socket:" {
-    var socket, out, messageHandler;
+    var socket, actionPlugin, out, messageHandler;
 
     beforeEach {
         logfn(/* newline */);
         messageHandler = new EventEmitter();
         socket = { raw: sinon.spy() };
-        out = ActionPlugin.init({
+        actionPlugin = ActionPluginFactory.init({
             _socket: socket,
             //messageHandler,
             nickname: nicknamefn,
@@ -46,7 +46,9 @@ describe "IRC Output Socket:" {
                     messageHandler.off(key, handlers[key]);
                 });
             }
-        }).exports;
+        });
+
+        out = actionPlugin.exports;
     }
 
     describe "Join" {
@@ -266,44 +268,6 @@ describe "IRC Output Socket:" {
             }
         }
 
-        it "also emits the resolved promise as an event" (done) {
-            const emitter = out.emitter;
-
-            emitter.on("join", function (joinInfoResult) {
-                assert(joinInfoResult.isOk());
-                done();
-            });
-
-            // The rest of this was copied from
-            // "resolves to Ok(JoinInfo) when succeeded"
-            // with the Promise based code removed.
-
-            // JOIN #success
-            // :testbot!tennu@tennu.github.io JOIN :#success
-            // :irc.server.net 332 testbot #success :Topic for #success.
-            // :irc.server.net 333 testbot #success topic-changer 1333333333
-            // :irc.server.net 353 testbot @ #success :testbot @topic-changer other-user
-            // :irc.server.net 366 testbot #success :End of /NAMES list.
-            const channel = "#success";
-            const topic = "Topic for #success.";
-            const topicSetter = "topic-changer";
-            const topicSetTimestamp = 1333333333;
-            const nicknames = ["testbot", "@topic-changer", "other-user"];
-
-            const joinmsg = {nickname: nickname, channel: channel};
-            const topicmsg = {channel: channel, topic: topic};
-            const topicwhotimemsg = {channel: channel, who: topicSetter, timestamp: topicSetTimestamp};
-            const namesmsg = {channel: channel, nicknames: nicknames};
-            const endofnamesmsg = {channel: channel};
-
-            out.join(channel);
-            messageHandler.emit("join", joinmsg);
-            messageHandler.emit("rpl_topic", topicmsg);
-            messageHandler.emit("rpl_topicwhotime", topicwhotimemsg);
-            messageHandler.emit("rpl_namreply", namesmsg);
-            messageHandler.emit("rpl_endofnames", endofnamesmsg);
-        }
-
         describe skip "channel keys" {}
         describe skip "Interleaved joins" {}
 
@@ -333,6 +297,10 @@ describe "IRC Output Socket:" {
                 clock.tick(60 * 60 * 1000 + 1);
             }
         }
+
+        describe "Multiple channels" {
+            it skip "returns an array of Result<JoinInfo, JoinFailureMessage>s" {}
+        }
     }
 
     describe "Whois" {
@@ -344,8 +312,8 @@ describe "IRC Output Socket:" {
                 it skip "JoinInfo has `\"identified\": true, \"identifiedas\": nickname` when user is identified (307)" {}
                 it skip "JoinInfo has `\"identified\": true, \"identifiedas\": accountname` when user is identified (330)" {}
             }
-            it "resolves to Fail(Numeric421Message) if WHOIS command is unrecognized (e.g. on Twitch.tv)" {}
-            it "resovles to Fail(Numeric401Message) if WHOIS non-existent nickname" {}
+            it skip "resolves to Fail(Numeric421Message) if WHOIS command is unrecognized (e.g. on Twitch.tv)" {}
+            it skip "resovles to Fail(Numeric401Message) if WHOIS non-existent nickname" {}
         }
 
         describe "timeouts" {}
@@ -399,6 +367,51 @@ describe "IRC Output Socket:" {
         it "without a reason" {
             out.kick("#test", "user");
             assert(socket.raw.calledWithExactly("KICK #test user"));
+        }
+    }
+
+    describe "EventEmitter" {
+        it "emits the resolved promise as an event" (done) {
+            const emitter = out.emitter;
+
+            emitter.on("join", function (joinInfoResult) {
+                assert(joinInfoResult.isOk());
+                done();
+            });
+
+            // The rest of this was copied from
+            // "resolves to Ok(JoinInfo) when succeeded"
+            // with the Promise based code removed.
+
+            // JOIN #success
+            // :testbot!tennu@tennu.github.io JOIN :#success
+            // :irc.server.net 332 testbot #success :Topic for #success.
+            // :irc.server.net 333 testbot #success topic-changer 1333333333
+            // :irc.server.net 353 testbot @ #success :testbot @topic-changer other-user
+            // :irc.server.net 366 testbot #success :End of /NAMES list.
+            const channel = "#success";
+            const topic = "Topic for #success.";
+            const topicSetter = "topic-changer";
+            const topicSetTimestamp = 1333333333;
+            const nicknames = ["testbot", "@topic-changer", "other-user"];
+
+            const joinmsg = {nickname: nickname, channel: channel};
+            const topicmsg = {channel: channel, topic: topic};
+            const topicwhotimemsg = {channel: channel, who: topicSetter, timestamp: topicSetTimestamp};
+            const namesmsg = {channel: channel, nicknames: nicknames};
+            const endofnamesmsg = {channel: channel};
+
+            out.join(channel);
+            messageHandler.emit("join", joinmsg);
+            messageHandler.emit("rpl_topic", topicmsg);
+            messageHandler.emit("rpl_topicwhotime", topicwhotimemsg);
+            messageHandler.emit("rpl_namreply", namesmsg);
+            messageHandler.emit("rpl_endofnames", endofnamesmsg);
+        }
+
+        it "annouces itself as part of the 'subscribe' hook" {
+            assert(actionPlugin.subscribe.emitter === out.emitter);
+            assert(actionPlugin.subscribe.prefix === "action:");
         }
     }
 }
