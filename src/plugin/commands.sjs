@@ -67,16 +67,16 @@ module.exports = {
                     client.note("PluginCommand", "Command detected:", command.command);
 
                     if (registry[command.command]) {
-                        client.debug("PluginCommand", "Command handler found.");
+                        client.note("PluginCommand", "Command handler found.");
 
                         if (ignoreList.indexOf(command.command) !== -1) {
-                            client.debug("PluginCommand", "But command is ignored.");
+                            client.note("PluginCommand", "But command is ignored.");
                             return;
                         }
 
                         return registry[command.command](command);
                     } else {
-                        client.debug("PluginCommand", "Command handler not found.")
+                        client.note("PluginCommand", "Command handler not found.")
                     }
                 }
             },

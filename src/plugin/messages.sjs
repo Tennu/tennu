@@ -1,4 +1,5 @@
 const format = require("util").format;
+const inspect = require("util").inspect;
 const EventEmitter = require("after-events");
 const Message = require("../lib/message");
 const Promise = require("bluebird");
@@ -52,7 +53,7 @@ module.exports = {
                 Promise.resolve(res)
                 .then(λ[Response.create(#, message)])
                 .then(λ[Response.send(#, client)])
-                .catch(λ[client.error("MessageHandler", format(badResponseFormat, message.message, inspect(res)))])
+                .catch(λ[client.error("MessageHandler", format("MessageHandler for '%s' returned invalid response `%s`.", message.message, inspect(res)))])
             }
         });
 

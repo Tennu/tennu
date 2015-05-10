@@ -246,5 +246,9 @@ describe "Messages Plugin" {
 
             acceptData(raws.join);
         }
+
+        it skip "Invalid response (string includes newlines)" {
+            // Response = "abc\ndef"
+        }
     }
 }
