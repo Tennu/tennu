@@ -170,7 +170,12 @@ Client.prototype.end = disconnect;
 
 // implements IRC Output Socket
 Client.prototype.act                    = delegate_ret _action act;
+
+// Deprecated(4.2.x)
 Client.prototype.ctcp                   = delegate_ret _action ctcp;
+
+Client.prototype.ctcpRequest            = delegate_ret _action ctcpRequest;
+Client.prototype.ctcpRespond            = delegate_ret _action ctcpRespond;
 Client.prototype.join                   = delegate_ret _action join;
 Client.prototype.kick                   = delegate_ret _action kick;
 Client.prototype.mode                   = delegate_ret _action mode;

@@ -28,21 +28,35 @@ module.exports = ActionPlugin = {
             rawf("PRIVMSG %s :%s", target, body);
         }
 
-        function ctcp (target, type, body) {
-            if (Array.isArray(body)) {
-                body.forEach(λ[ctcp(target, type, #)]);
-                return;
-            }
-            
-            if (body) {
-                say(target, format("\u0001%s %s\u0001", type, body));
-            } else {
-                say(target, format("\u0001%s\u0001", type));
+        // CTCP Spec: https://web.archive.org/web/20080907101719/http://www.invlogic.com/irc/ctcp2_3.html
+        function makeCtcpFn (responseFn) {
+            return function ctcpRequest (target, tag, body) {
+                if (Array.isArray(body)) {
+                    body.forEach(λ[ctcpRequest(target, tag, #)]);
+                    return;
+                }
+
+                tag = tag.toUpperCase();
+                
+                if (body) {
+                    responseFn(target, format("\u0001%s %s\u0001", tag, body));
+                } else {
+                    responseFn(target, format("\u0001%s\u0001", tag));
+                }
             }
         }
 
+        var ctcpRequest = makeCtcpFn(say);
+        var ctcpRespond = makeCtcpFn(notice);
+
+        // Deprecated(4.2.x)
+        function ctcp () {
+            client.warn("PluginAction", "Action 'ctcp' is deprecated. Use 'ctcpRequest' or 'ctcpRespond' instead. Assuming usage is a request.");
+            ctcpRequest.apply(null, arguments);
+        }
+
         function act (target, body) {
-            ctcp(target, "ACTION", body);
+            ctcpRequest(target, "ACTION", body);
         }
 
         function notice (target, body) {
@@ -131,7 +145,12 @@ module.exports = ActionPlugin = {
                 rawf: rawf,
                 
                 say: say,
+
+                // Deprecated(4.2.x)
                 ctcp: ctcp,
+
+                ctcpRequest: ctcpRequest,
+                ctcpRespond: ctcpRespond,
                 act: act,
                 notice: notice,
                 join: join,
