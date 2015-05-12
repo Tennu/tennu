@@ -172,4 +172,35 @@ describe "Integration tests:" {
         it skip "does not do post-startup tasks if server never started" {}
         it skip "tells you why startup failed when it fails" {}
     }
+
+    it "CTCP VERSION handling" (done) {
+        client = Client(networkConfig, {
+            NetSocket: netsocket,
+            Logger: logger
+        });
+
+        client.connect();
+
+        client._socket.impl.acceptConnect();
+        assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
+        client._socket.impl.acceptData(messages.rpl_cap_ls);
+        assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
+        client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
+        assert(client._socket.impl.write.getCall(2).calledWithExactly("CAP END\r\n", "utf-8"));
+        assert(client._socket.impl.write.getCall(3).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
+        assert(client._socket.impl.write.getCall(4).calledWithExactly("NICK testbot\r\n", "utf-8"));
+        client._socket.impl.acceptData(messages.rpl_welcome);
+
+        client._socket.impl.acceptData(":IRC!IRC@irc.test.net PRIVMSG testbot :\u0001VERSION\u0001\r\n");
+
+        client._socket.impl.write.on(5, function (spyCall) {
+            try {
+                const versionResponseRegexp = /^NOTICE IRC :\u0001VERSION Tennu \d+\.\d+\.\d+ \(https:\/\/tennu\.github\.io\)\u0001\r\n$/;
+                assert(spyCall.calledWith(sinon.match(versionResponseRegexp), "utf-8"));
+                done();
+            } catch (e) {
+                done(e);
+            }
+        });
+    }
 }
