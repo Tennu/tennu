@@ -112,7 +112,7 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
     // Configure the plugin system.
     client._plugins = new di.Plugins("tennu", client);
     client.note("Tennu", "Loading default plugins");
-    client._plugins.use(["subscriber", "messages", "commands", "server", "action", "help", "user", "channel", "startup", "self"], __dirname);
+    client._plugins.use(["subscriber", "messages", "commands", "server", "action", "ctcp", "help", "user", "channel", "startup", "self"], __dirname);
     client.note("Tennu", "Loading your plugins");
     client._plugins.use(config.plugins || [], process.cwd());
 
