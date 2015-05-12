@@ -11,7 +11,7 @@ const logfn = debug ? console.log.bind(console) : function () {};
 const logger = {debug: logfn, info: logfn, notice: logfn, warn: logfn, error: logfn, crit: logfn, alert: logfn, emerg: logfn};
 
 const Client = require("../lib/client.js");
-const NetSocket = require("@havvy/mock-net-socket");
+const NetSocket = require("@havvy/mock-net-socket")(sinon);
 
 const networkConfig = {
     "server": "irc.test.net",
