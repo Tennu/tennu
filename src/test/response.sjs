@@ -113,7 +113,9 @@ describe "Response" {
                 notice: sinon.spy(),
                 say: sinon.spy(),
                 act: sinon.spy(),
-                ctcp: sinon.spy()
+                ctcpRequest: sinon.spy(),
+                ctcpRespond: sinon.spy(),
+                warn: sinon.spy()
             }
         }
 
@@ -127,7 +129,8 @@ describe "Response" {
             assert(!client.notice.called);
             assert(!client.say.called);
             assert(!client.act.called);
-            assert(!client.ctcp.called);
+            assert(!client.ctcpRequest.called);
+            assert(!client.ctcpRespond.called);
         }
 
         it "with intent of 'notice'" {
@@ -139,7 +142,8 @@ describe "Response" {
             
             assert(!client.say.called);
             assert(!client.act.called);
-            assert(!client.ctcp.called);
+            assert(!client.ctcpRequest.called);
+            assert(!client.ctcpRespond.called);
 
             assert(client.notice.calledOnce);
             assert(client.notice.calledWithExactly("sender", "Do you really want to know?"));
@@ -154,7 +158,8 @@ describe "Response" {
             
             assert(!client.notice.called);
             assert(!client.act.called);
-            assert(!client.ctcp.called);
+            assert(!client.ctcpRequest.called);
+            assert(!client.ctcpRespond.called);
 
             assert(client.say.calledOnce);
             assert(client.say.calledWithExactly("#channel", "Your bot greets you!"));
@@ -169,13 +174,14 @@ describe "Response" {
             
             assert(!client.notice.called);
             assert(!client.say.called);
-            assert(!client.ctcp.called);
+            assert(!client.ctcpRequest.called);
+            assert(!client.ctcpRespond.called);
 
             assert(client.act.calledOnce);
             assert(client.act.calledWithExactly("#channel", "dances wildly!"));
         }
 
-        it "with intent of 'ctcp'" {
+        it "with intent of 'ctcp' with body" {
             Response.send({
                 intent: "ctcp",
                 message: ["FINGER", "gives you the index finger!"],
@@ -185,9 +191,63 @@ describe "Response" {
             assert(!client.notice.called);
             assert(!client.say.called);
             assert(!client.act.called);
+            assert(!client.ctcpRequest.called);
 
-            assert(client.ctcp.calledOnce);
-            assert(client.ctcp.calledWithExactly("sender", "FINGER", "gives you the index finger!"));
+            assert(client.ctcpRespond.calledOnce);
+            assert(client.ctcpRespond.calledWithExactly("sender", "FINGER", "gives you the index finger!"));
+
+            // Because this intent is deprecated.
+            assert(client.warn.calledOnce);
+        }
+
+        it "with intent of 'ctcp' without body" {
+            Response.send({
+                intent: "ctcp",
+                message: ["VERSION"],
+                target: "sender"
+            }, client);
+            
+            assert(!client.notice.called);
+            assert(!client.say.called);
+            assert(!client.act.called);
+            assert(!client.ctcpRespond.called);
+
+            assert(client.ctcpRequest.calledOnce);
+            assert(client.ctcpRequest.calledWithExactly("sender", "VERSION"));
+
+            assert(client.warn.calledOnce);
+        }
+
+        it "with intent of 'ctcpRespond'" {
+            Response.send({
+                intent: "ctcp",
+                message: ["FINGER", "gives you the index finger!"],
+                target: "sender"
+            }, client);
+            
+            assert(!client.notice.called);
+            assert(!client.say.called);
+            assert(!client.act.called);
+            assert(!client.ctcpRequest.called);
+
+            assert(client.ctcpRespond.calledOnce);
+            assert(client.ctcpRespond.calledWithExactly("sender", "FINGER", "gives you the index finger!"));
+        }
+
+        it "with intent of 'ctcpRequest'" {
+            Response.send({
+                intent: "ctcp",
+                message: ["VERSION"],
+                target: "sender"
+            }, client);
+            
+            assert(!client.notice.called);
+            assert(!client.say.called);
+            assert(!client.act.called);
+            assert(!client.ctcpRespond.called);
+
+            assert(client.ctcpRequest.calledOnce);
+            assert(client.ctcpRequest.calledWithExactly("sender", "VERSION"));
         }
     }
 }

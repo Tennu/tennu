@@ -68,7 +68,22 @@ module.exports = {
             notice: λ[client.notice(#, #)],
             none: λ[undefined],
             ctcp: function {
-                (target, [ctcpType, message]) => client.ctcp(target, ctcpType, message)
+                (target, [tag, message]) => {
+                    client.warn("Tennu", "Received response with deprecated intent 'ctcp'. Change to 'ctcpRespond'.");
+                    client.ctcpRespond(target, tag, message);
+                },
+
+                (target, [tag]) => {
+                    client.warn("Tennu", "Received response with deprecated intent 'ctcp'. Change to 'ctcpRespond'.");
+                    client.ctcpRequest(target, tag);
+                }
+            },
+            ctcpRespond: function {
+                (target, [tag, message]) => client.ctcpRespond(target, tag, message)
+            },
+            ctcpRequest: function {
+                (target, [tag, message]) => client.ctcpRequest(target, tag, message),
+                (target, [tag]) => client.ctcpRequest(target, tag)
             }
         };
 

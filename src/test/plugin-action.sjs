@@ -372,13 +372,18 @@ describe "IRC Output Socket:" {
 
     describe "Ctcp" {
         it "can send a ctcp request" {
-            out.ctcpRequest("user", "version");
+            out.ctcpRequest("user", "VERSION");
             assert(socket.raw.calledWithExactly("PRIVMSG user :\u0001VERSION\u0001"));
         }
 
         it "can send a ctcp response" {
-            out.ctcpRespond("user", "version", "Tennu test version");
+            out.ctcpRespond("user", "VERSION", "Tennu test version");
             assert(socket.raw.calledWithExactly("NOTICE user :\u0001VERSION Tennu test version\u0001"));
+        }
+
+        it "capitalizes the CTCP tag" {
+            out.ctcpRequest("user", "version");
+            assert(socket.raw.calledWithExactly("PRIVMSG user :\u0001VERSION\u0001"));
         }
     }
 
