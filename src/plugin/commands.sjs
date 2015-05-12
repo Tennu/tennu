@@ -36,14 +36,23 @@ module.exports = {
                 return string.slice(trigger.length);
             }
 
+            // Message is a CTCP (probably)
+            // BTW, This prevents actions from being commands.
+            if (privmsg.message[0] === "\u0001") {
+                return false;
+            }
+
+            // Message starts with the command trigger.
             if (startsWith(privmsg.message, trigger)) {
                 return removeTrigger(privmsg.message);
             }
 
+            // Message is in a query.
             if (privmsg.isQuery) {
                 return privmsg.message;
             }
 
+            // Message starts with my nickname.
             if (startsWith(privmsg.message.toLowerCase(), client.nickname().toLowerCase())) {
                 // Trimming in case of multiple spaces. e.g. (raw message)
                 // nick!user@host PRIVMSG #chan botname:   do something

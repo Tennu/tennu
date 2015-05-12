@@ -29,6 +29,7 @@ const privmsg = function (message) {
 
 const messages = {
     noncommand:               chanmsg("hello"),
+    noncommand_ctcp:          privmsg("\u0001VERSION\u0001"),
     command:                  privmsg(format("%s",            commandname)),
     detect: {
         trigger:              chanmsg(format("!%s",           commandname)),
@@ -74,6 +75,7 @@ describe "Commands Plugin" {
 
         emitter = commands.subscribe.emitter;
         acceptPrivmsg = function (privmsg) {
+            assert(typeof privmsg === "string");
             return commands.handlers["privmsg"](Message(privmsg));
         }
     }
@@ -90,6 +92,12 @@ describe "Commands Plugin" {
         }
 
         it skip "does not detect a command for ' ' in query" {}
+
+        it "does not consider CTCPs commands" {
+            client.note = sinon.spy(client.note);
+            acceptPrivmsg(messages.noncommand_ctcp);
+            assert(!client.note.called);
+        }
 
         describe "Recognition Types:" {
             it "Trigger" (done) {
