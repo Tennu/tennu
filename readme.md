@@ -46,7 +46,7 @@ myClient.use(['admin', 'last-seen']);
 myClient.connect();
 ```
 
-See [https://tennu.github.io/](tennu.github.io) for the full documentation.
+See [https://tennu.github.io/](https://tennu.github.io) for the full documentation.
 
 ----------
 
