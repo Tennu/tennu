@@ -203,4 +203,47 @@ describe "Integration tests:" {
             }
         });
     }
+
+    it "Add plugin with command that returns a String response and is then called" (done) {
+        client = Client(networkConfig, {
+            NetSocket: netsocket,
+            Logger: logger
+        });
+
+        client.initializePlugin({
+            name: "test-plugin",
+            init: function (client, deps) {
+                return {
+                    handlers: {
+                        "!foo": function (command) {
+                            return "bar";
+                        }
+                    }
+                };
+            }
+        });
+
+        client.connect();
+
+        client._socket.impl.acceptConnect();
+        assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
+        client._socket.impl.acceptData(messages.rpl_cap_ls);
+        assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
+        client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
+        assert(client._socket.impl.write.getCall(2).calledWithExactly("CAP END\r\n", "utf-8"));
+        assert(client._socket.impl.write.getCall(3).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
+        assert(client._socket.impl.write.getCall(4).calledWithExactly("NICK testbot\r\n", "utf-8"));
+        client._socket.impl.acceptData(messages.rpl_welcome);
+
+        client._socket.impl.write.on(5, function (spyCall) {
+            try {
+                assert(spyCall.calledWithExactly("PRIVMSG user :bar\r\n", "utf-8"));
+                done();
+            } catch (e) {
+                done(e);
+            }
+        });
+
+        client._socket.impl.acceptData(":user!user@user.net PRIVMSG user :!foo\r\n");
+    }
 }
