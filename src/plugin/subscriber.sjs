@@ -1,4 +1,5 @@
 const Subscriber = require("prefix-event-subscriber");
+const format = require("util").format;
 
 module.exports = {
     init: function (client, deps) {
@@ -9,8 +10,9 @@ module.exports = {
                 subscribe: function (plugin, data) {
                     const prefix = data.prefix;
                     const emitter = data.emitter;
-                    const acceptsMetadata = data.emitter.acceptsMetadata || false;
+                    const acceptsMetadata = data.acceptsMetadata || false;
 
+                    client.note("Tennu", format("Subscriber '%s' registered for plugin '%s'.", typeof prefix === "string" ? prefix : "(no-prefix)", plugin));
                     subscriber.addEmitter(prefix, emitter, acceptsMetadata);
                 },
 

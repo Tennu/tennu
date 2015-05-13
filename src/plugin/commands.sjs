@@ -73,34 +73,56 @@ module.exports = {
                     }
 
                     const command = Command(privmsg, maybeCommand);
-                    client.note("PluginCommand", "Command detected:", command.command);
+                    const commandName = command.command;
+                    client.note("PluginCommands", format("Command detected: %s", commandName));
 
-                    if (registry[command.command]) {
-                        client.note("PluginCommand", "Command handler found.");
+                    const commandRegistryEntry = registry[command.command];
 
-                        if (ignoreList.indexOf(command.command) !== -1) {
-                            client.note("PluginCommand", "But command is ignored.");
-                            return;
-                        }
-
-                        return registry[command.command](command);
-                    } else {
-                        client.note("PluginCommand", "Command handler not found.")
+                    if (!commandRegistryEntry) {
+                        client.note("PluginCommands", format("Handler for '%s' not found.", commandName));
                     }
+
+                    const handler = commandRegistryEntry.handler;
+                    const plugin = commandRegistryEntry.plugin;
+
+                    client.note("PluginCommands", format("Handler '%s:%s' found.", plugin, commandName));
+
+                    // TODO(Havvy): Move to CommandPlugin.exports.subscribe.emitter.on.
+                    if (ignoreList.indexOf(commandName) !== -1) {
+                        client.note("PluginCommands", format("But command '%s' is ignored.", commandName));
+                        return;
+                    }
+
+                    return handler(command);
                 }
             },
 
             subscribe: {
                 prefix: trigger,
+                acceptsMetadata: true,
                 emitter: {
-                    on: function (commandName, handler) {
+                    on: function (commandName, handler, metadata) {
                         commandName = commandName.toLowerCase();
 
-                        if (commandName in registry) {
-                            throw new Error(format("Command '%s' already has a handler.", commandName));
+                        var plugin;
+                        if (metadata && metadata.plugin) {
+                            plugin = metadata.plugin;
+                        } else {
+                            plugin = "UnknownSource";
                         }
 
-                        registry[commandName] = handler;
+                        if (commandName in registry) {
+                            const errorMessage = format("Command '%s' already has a handler from plugin '%s'.", commandName, registry[commandName].plugin);
+                            client.error("PluginCommands", errorMessage);
+                            throw new Error(errorMessage);
+                        }
+
+                        client.note("PluginCommands", format("Registering '%s:%s'.", plugin, commandName));
+
+                        registry[commandName] = {
+                            handler: handler,
+                            plugin: plugin
+                        };
                     },
 
                     off: function () {
