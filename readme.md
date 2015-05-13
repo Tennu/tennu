@@ -332,13 +332,13 @@ looking for any way to help.
 
 ### Directory Structure ###
 
-The `lib`, `tennu_plugins`, and `test` directories are all auto-generated files,
+The `lib`, `tennu_plugins`, `bin`, and `test` directories are all auto-generated files,
 with the actual source in subdirectories in the `src` directory.
 
 The `bin` directory contains the executables that the package provides. Right now this
 is only the 'tennu' program described in the Command Line Utility section.
 
-The `examples` directory contains example bots, mainly used for integration testing.
+The `examples` directory contains example bots, which may or may not work.
 
 ### Tests ###
 
@@ -348,14 +348,14 @@ npm test
 
 This command will rebuild the test files and then run the test suite.
 
-Between all projects (tennu, tennu-plugins, irc-socket, after-events),
-there are over 100 tests, but more are always appreciated, especially
-if they are failing with an actual bug. ;)
+Between all projects (tennu, tennu-plugins, irc-socket, after-events,
+prefix-event-emitter), there are over 200 tests, but more are always
+appreciated, especially if they are failing with an actual bug. ;)
 
 ### Building Files ###
 
 ```
-npm run-script build
+npm run build
 ```
 
 Tennu is written using the Sweet.js dialect of JavaScript. If you've never
