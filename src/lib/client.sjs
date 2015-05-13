@@ -69,13 +69,19 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
     // Parse the configuration object. Make it immutable.
     client._config = config = defaults({}, config, defaultClientConfiguration);
     // TODO(Havvy): Handle the logic in here better.
-    if (!config.capabilities) {
-        config.capabilities = { requires: ["multi-prefix"] };
-    } else if (!config.capabilities.requires) {
-        config.capabilities.requires = ["multi-prefix"];
+
+    if (config.daemon === "twitch") {
+        // Twitch.tv doesn't allow capabilities.
+        config.capabilities = undefined;
     } else {
-        if (config.capabilities.requires.indexOf("multi-prefix") === -1) {
-            config.capabilities.requires.push("multi-prefix");
+        if (!config.capabilities) {
+            config.capabilities = { requires: ["multi-prefix"] };
+        } else if (!config.capabilities.requires) {
+            config.capabilities.requires = ["multi-prefix"];
+        } else {
+            if (config.capabilities.requires.indexOf("multi-prefix") === -1) {
+                config.capabilities.requires.push("multi-prefix");
+            }
         }
     }
 
