@@ -53,7 +53,7 @@ See [https://tennu.github.io/](https://tennu.github.io) for the full documentati
 ## Configuration ##
 
 The network configuration object contains all of the properties of
-[https://npmjs.org/package/irc-socket](an irc-socket) except for "socket"
+[an irc-socket](https://npmjs.org/package/irc-socket) except for "socket"
 plus the following configuration options:
 
 * tls                 - Boolean that if true, upgrades the NetSocket to a TLS socket.
@@ -78,7 +78,7 @@ The irc-socket configuration values are as follows:
 * capabilities    - IRCv3 capabilities required or wanted. Tennu requires `multi-prefix`.
 * connectOptions  - Options passed to the wrapped socket's connect method. Options port and host are ignored.
 
-Other plugins may add additional properties. See their respective docume
+Other plugins may add additional properties. See their respective documentation.
 
 Configuration objects are JSON encodable.
 
@@ -140,10 +140,12 @@ tennu.on('privmsg', function (privmsg) {
 
 ### Subscribing Options ###
 
+See [Subscriber Plugin docs](https://tennu.github.io/plugin/subscriber)
+
 Subscribing to events in Tennu is more flexible than most event listeners.
 
 You register a single handler on multiple events at once by separating the events with a space,
-for example `.on("x y", fn)` is equivalent to `.on('x', fn); .on('y', fn)`. Furthermore, an object
+for example `client.on("x y", fn)` is equivalent to `client.on('x', fn); client.on('y', fn)`. Furthermore, an object
 can be passed, where each key is passed as the first parameter and its value, the second.
 
 ```javascript
@@ -231,10 +233,16 @@ botnick does something!
 tennu.act('#example', "does something!");
 ```
 
-### ctcp(channel, type, message) ###
+### ctcpRequest(channel, tag, message) ###
 
 ```javascript
-tennu.ctcp('havvy', 'ping', 'PINGMESSAGE');
+tennu.ctcpRequest('havvy', 'PING', 'ping message');
+```
+
+### ctcpRespond(channel, tag, message) ###
+
+```javascript
+tennu.ctcpRespond('Havvy', 'VERSION', 'Tennu v4.2.0 (https://tennu.github.io)');
 ```
 
 ### nick(newNick) ###
