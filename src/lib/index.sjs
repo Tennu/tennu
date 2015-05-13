@@ -1,9 +1,7 @@
 var index = {
     Client: "client",
-    Message : 'message',
-    //MessageHandler : 'message-handler',
-    CommandHandler : 'command-handler',
-    //Bisubscriber : 'bisubscriber'
+    Message : "message",
+    Response: "response"
 };
 
 for (var m in index) {
