@@ -38,7 +38,7 @@ myClient.on('!join', function (command) {
 });
 
 // Load a plugin.
-myClient.initialize(require('./yourModule'));
+myClient.initialize(require('./yourPlugin'));
 
 // Or just use a plugin from tennu_plugins/%f or node_plugins/tennu-%f
 myClient.use(['admin', 'last-seen']);
@@ -306,44 +306,9 @@ See [Creating Your Own Plugins](https://github.com/Havvy/tennu/blob/master/doc/c
 
 See [Getting Started](http://tennu.github.io/documentation/getting-started).
 
-### Built-In Modules ###
+### Built-In Plugins ###
 
-Only the help plugin is currently fully implemented.
-
-#### help ####
-
-Handles the two commands "!commands" and "!help".
-
-See [Help Module Documentation](https://tennu.github.io/plugins/help).
-
-If you don't want this functionality, set `disable-help` to `true` in your configuration object.
-
-#### channels ####
-
-Unimplemented. Currently being worked on by Dan_Ugore.
-
-#### users ####
-
-This plugin has a single method exported: `isIdentifedAs(nickname, nickname_identified)`
-
-See [User Module Documentation](https://tennu.github.io/plugins/user).
-
-#### self ####
-
-This plugin exports a single function: `nickname()` that gives the client's current nickname. The
-function is also accessible as a method on the client object directly.
-
-#### server ####
-
-Information about the server. For now, the only thing this plugin offers is a
-capabilities map listing the information from the 005 raw numeric.
-
-See [Server Plugin Documentation](https://tennu.github.io/plugins/server).
-
-```javascript
-var server = tennu.getPlugin("server");
-console.log(util.inspect(server.capabilities));
-```
+See [Plugins documentation](https://tennu.github.io/plugins).
 
 ## Command Line Utility
 
