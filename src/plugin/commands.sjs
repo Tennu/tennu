@@ -82,7 +82,7 @@ module.exports = {
             },
 
             subscribe: {
-                prefix: trigger,
+                prefix: "!",
                 emitter: {
                     on: function (commandName, handler) {
                         commandName = commandName.toLowerCase();
