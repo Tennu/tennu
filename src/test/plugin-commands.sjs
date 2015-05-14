@@ -58,6 +58,7 @@ describe "Commands Plugin" {
             // Base
             config: function (value) {
                 if (value === "command-trigger") {
+                    // TODO(Havvy): Change this to `"*"` or something.
                     return "!";
                 } else if (value === "command-ignore-list") {
                     return ["ignored"];

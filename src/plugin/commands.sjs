@@ -98,7 +98,7 @@ module.exports = {
             },
 
             subscribe: {
-                prefix: trigger,
+                prefix: "!",
                 acceptsMetadata: true,
                 emitter: {
                     on: function (commandName, handler, metadata) {
