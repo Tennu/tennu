@@ -225,6 +225,8 @@ describe "Commands Plugin" {
         acceptPrivmsg(messages.ignore);
     }
 
+    it skip "privmsg of identified command with no handler" {}
+
     describe "Triggers" {
         it skip "can be the empty string" {}
         it skip "does not trigger for message: ' ' when trigger is empty string" {}

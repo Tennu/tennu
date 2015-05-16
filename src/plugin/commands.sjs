@@ -80,6 +80,7 @@ module.exports = {
 
                     if (!commandRegistryEntry) {
                         client.note("PluginCommands", format("Handler for '%s' not found.", commandName));
+                        return;
                     }
 
                     const handler = commandRegistryEntry.handler;
