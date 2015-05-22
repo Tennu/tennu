@@ -12,7 +12,6 @@ module.exports = function (client, rawf, emitter) {
                 return;
             }
 
-            // TODO: Better name for this.
             const joinInfo = {
                 names: [],
                 channel: channel,
