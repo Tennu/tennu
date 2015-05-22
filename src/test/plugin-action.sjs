@@ -338,16 +338,6 @@ describe "IRC Output Socket:" {
         assert(socket.raw.calledWithExactly("PRIVMSG #test :Hi"));
     }
 
-    it "can part without a reason" {
-        out.part("#test");
-        assert(socket.raw.calledWithExactly("PART #test"));
-    }
-
-    it "can part with a reason" {
-        out.part("#test", "the reason");
-        assert(socket.raw.calledWithExactly("PART #test :the reason"));
-    }
-
     it "can quit without a reason" {
         out.quit();
         assert(socket.raw.calledWithExactly("QUIT"));
@@ -356,6 +346,26 @@ describe "IRC Output Socket:" {
     it "can quit with a reason" {
         out.quit("the reason");
         assert(socket.raw.calledWithExactly("QUIT :the reason"));
+    }
+
+    describe "Part" {
+        it "can part without a reason" {
+            var promise = out.part("#test");
+            assert(socket.raw.calledWithExactly("PART #test"));
+            messageHandler.emit("part", {channel: "#test", nickname: "testbot"});
+            return promise;
+        }
+
+        it "can part with a reason" {
+            var promise = out.part("#test", "the reason");
+            assert(socket.raw.calledWithExactly("PART #test :the reason"));
+            messageHandler.emit("part", {channel: "#test", nickname: "testbot"});
+            return promise;
+        }
+
+        it skip "parting successfully resolves to Ok(PartInfo)" {}
+        it skip "parting non-existent channel resolves to Fail(NoSuchChannelMessage)" {}
+        it skip "parting channel not in resolves to Fail(NotInChannelMessage)" {}
     }
 
     describe "Kick" {

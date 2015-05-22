@@ -69,11 +69,7 @@ module.exports = ActionPlugin = {
         }
 
         const join = require("./join")(client, rawf, emitter);
-
-
-        function part (channel, reason) {
-            raw("PART " + channel + (reason ? " :" + reason: ""));
-        }
+        const part = require("./part")(client, rawf, emitter);
 
         function kick (channel, nickname, reason) {
             if (reason) {
