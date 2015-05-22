@@ -297,6 +297,13 @@ var extensions = {
         message.resource = message.params[1];
     },
 
+    "442": function (message) {
+        // :<server> 442 <me> <channel> :You're not on that channel
+        message.replyname = "ERR_NOTONCHANNEL";
+        message.channel = message.params[1].toLowerCase();
+        message.reason = message.params[2];
+    },
+
     "461": function (message) {
         // :<server> 461 <me> <command> :Not enough parameters
         message.replyname = "ERR_NEEDMOREPARAMS";
