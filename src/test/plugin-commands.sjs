@@ -32,20 +32,21 @@ const messages = {
     noncommand_ctcp:          privmsg("\u0001VERSION\u0001"),
     command:                  privmsg(format("%s",            commandname)),
     detect: {
-        trigger:              chanmsg(format("!%s",           commandname)),
+        trigger:              chanmsg(format("*%s",           commandname)),
         highlight:            chanmsg(format("%s: %s",        nickname, commandname)),
         case_insensitive_highlight: chanmsg(format("%s: %s",  nickname.toUpperCase(), commandname)),
         query:                privmsg(format("%s",            commandname)),
-        query_with_trigger:   privmsg(format("!%s",           commandname)),
+        query_with_trigger:   privmsg(format("*%s",           commandname)),
         highlight_oddspacing: chanmsg(format("  %s:   %s   ", nickname, commandname)),
     },
     args:                     privmsg(format("%s %s %s",      commandname, arg1, arg2)),
     args_oddspacing:          privmsg(format("%s  %s   %s  ", commandname, arg1, arg2)),
-    ignore:                   privmsg(format("%s",           "ignored")),
+    ignore:                   privmsg(format("%s",            "ignored")),
+    spaceQuery:               privmsg(format("%s",            " ")),
     _: ""
 };
 
-describe "Commands Plugin" {
+describe only "Commands Plugin" {
     var client, deps, commands, emitter, acceptPrivmsg;
 
     beforeEach {
@@ -58,8 +59,7 @@ describe "Commands Plugin" {
             // Base
             config: function (value) {
                 if (value === "command-trigger") {
-                    // TODO(Havvy): Change this to `"*"` or something.
-                    return "!";
+                    return "*";
                 } else if (value === "command-ignore-list") {
                     return ["ignored"];
                 } else {
@@ -92,7 +92,11 @@ describe "Commands Plugin" {
             assert(!client.note.called);
         }
 
-        it skip "does not detect a command for ' ' in query" {}
+        it "does not detect a command for ' ' in query" {
+            client.note = sinon.spy(client.note);
+            acceptPrivmsg(messages.spaceQuery);
+            assert(!client.note.called);
+        }
 
         it "does not consider CTCPs commands" {
             client.note = sinon.spy(client.note);
