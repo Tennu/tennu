@@ -242,4 +242,20 @@ describe "Commands Plugin" {
             assert(commands.exports.isCommand(Message(messages.noncommand)) === false);
         }
     }
+
+    describe "isHandledCommand" {
+        it "returns true for commands that are handled" {
+            emitter.on(commandname, function () {});
+
+            assert(commands.exports.isHandledCommand(Message(messages.detect.trigger)) === true);
+        }
+
+        it "returns false for commands that are not handled" {
+            assert(commands.exports.isHandledCommand(Message(messages.detect.trigger)) === false);
+        }
+
+        it "returns false for non-commands" {
+            assert(commands.exports.isHandledCommand(Message(messages.noncommand)) === false);
+        }
+    }
 }
