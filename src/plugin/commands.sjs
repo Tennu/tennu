@@ -139,6 +139,20 @@ module.exports = {
             exports: {
                 isCommand: function (message) {
                     return tryParseCommandString(message) !== false;
+                },
+
+                isHandledCommand: function (message) {
+                    const maybeCommand = tryParseCommandString(message);
+
+                    if (!maybeCommand) {
+                        return false;
+                    }
+
+                    const command = Command(message, maybeCommand);
+                    const commandName = command.command;
+                    const commandRegistryEntry = registry[command.command];
+
+                    return commandRegistryEntry !== undefined;
                 }
             }
         };
