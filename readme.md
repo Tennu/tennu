@@ -38,7 +38,7 @@ myClient.on('!join', function (command) {
 });
 
 // Load a plugin.
-myClient.initialize(require('./yourPlugin'));
+myClient.initializePlugin(require('./yourPlugin'));
 
 // Or just use a plugin from tennu_plugins/%f or node_plugins/tennu-%f
 myClient.use(['admin', 'last-seen']);
