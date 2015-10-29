@@ -46,7 +46,7 @@ const messages = {
     _: ""
 };
 
-describe only "Commands Plugin" {
+describe "Commands Plugin" {
     var client, deps, commands, emitter, acceptPrivmsg;
 
     beforeEach {

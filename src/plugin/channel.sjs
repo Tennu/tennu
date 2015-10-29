@@ -185,7 +185,7 @@ var channel_plugin = {
     init: function (client, imports) {
         var Channels = function Channels(name) {
             if (typeof name === "undefined") return Channels.toArray();
-            if (typeof name === "string") return Channels.getChan(name);
+            if (typeof name === "string") return Channels.get(name);
         }
         Channels.channels = {};
         Channels.get = function (name) {
@@ -195,7 +195,7 @@ var channel_plugin = {
             return Object.keys(Channels.channels).sort(sortFn)
         }
         Channels.chans = function (sortFn) {
-            return Object.keys(Channels.channels).map(Channels.getChan).sort(sortFn);
+            return Object.keys(Channels.channels).map(Channels.get).sort(sortFn);
         }
         Channels.add = function (name) {
             Channels.channels[name] = Channel(name);
@@ -219,14 +219,14 @@ var channel_plugin = {
             'quit': function (msg) { // client.on('quit') Remove user from all channels and from user list
                 var nick = msg.nickname;
                 var reason = msg.reason;
-                Channels.toChanArray().forEach(function (chan) {
+                Channels.chans().forEach(function (chan) {
                     if (nick in chan.users) chan.removeUser(nick);
                 });
             },
             'part': function (msg) { // client.on('part') Remove user from parted channel
                 var isSelf = client.nickname() === msg.nickname;
                 if (isSelf) {
-                    delete Channels.removeChannel(msg.channel);
+                    delete Channels.remove(msg.channel);
                 } else {
                     Channels(msg.channel).removeUser(msg.nickname);
                 }
@@ -234,7 +234,7 @@ var channel_plugin = {
             'kick': function (msg) { // client.on('kick') Remove kicked user from channel
                 var isSelf = client.nickname() === msg.kicked;
                 if (isSelf) {
-                    delete Channels.removeChannel(msg.channel);
+                    delete Channels.remove(msg.channel);
                 } else {
                     Channels(msg.channel).removeUser(msg.kicked);
                 }
@@ -242,7 +242,7 @@ var channel_plugin = {
             'nick': function (msg) { // client.on('nick') Update nick across channels
                 var nick = msg.old;
                 var newNick = msg.new;
-                Channels.toChanArray().forEach(function (chan) {
+                Channels.chans().forEach(function (chan) {
                     if (nick in chan.users) chan.renameUser(nick, newNick);
                 });
             },
