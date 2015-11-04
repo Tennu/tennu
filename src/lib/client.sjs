@@ -24,7 +24,9 @@ macro delegate_ret {
 }
 
 const deepClone = function (obj) {
-    if (Array.isArray(obj)) {
+    if (obj === null) {
+        return null;
+    } else if (Array.isArray(obj)) {
         return obj.map(deepClone);
     } else if (typeof obj === "object") {
         const ret = Object.create(Object.getPrototypeOf(obj));
