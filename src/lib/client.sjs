@@ -96,18 +96,12 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
  const Client = function (config, dependencies) {
     const client = Object.create(Client.prototype);
 
-    console.log(require("util").inspect(config));
-    console.log(require("util").inspect(defaultClientConfiguration));
-
     // Parse the configuration object. Make it immutable.
     client._config = config = clonedDefaults({}, config, defaultClientConfiguration);
-    console.log(require("util").inspect(config));
     // TODO(Havvy): Handle the logic in here better.
 
     if (config.daemon === "twitch" || config.daemon === "irc2") {
         if (config.capabilities && config.capabilities.requires && config.capabilities.requires.length > 0) {
-            console.log(config.capabilities.requires.length);
-            console.log(config.capabilities.requires);
             throw new Error("IRCd doesn't support capabilities. Cannot require them. Fix your configuration.");
         }
         // Twitch.tv doesn't allow capabilities.
