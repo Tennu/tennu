@@ -51,7 +51,7 @@ describe "Tennu Client:" {
 
     describe "Error handling" {
         it "tells you which methods are missing on the logger" {
-            var config = networkConfig
+            var config = networkConfig;
 
             try {
                 Client(networkConfig, {
@@ -136,6 +136,34 @@ describe "Tennu Client:" {
             client.connect();
             client._socket.impl.acceptConnect();
             assert(client._socket.impl.write.getCall(0).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
+        }
+    }
+
+    describe "misc" {
+        it only "with a complex config file" {
+            const config = {
+                "server": "irc.irc2.net",
+                "password": null,
+                "port": 6697,
+                "tls": true,
+                "nickname": "nicky",
+                "username": "testuser",
+                "realname": "bot in tennu",
+                "channels": ["#aChannel"],
+                "nickserv": "AuthServ@Services.irc2.net",
+                "auth-password": "REDACTED",
+                "plugins": [],
+                "command-trigger": "!",
+                "disable-help": false,
+                "daemon": "irc2"
+            };
+
+            console.log(inspect(netsocket));
+
+            client = Client(config, {
+                NetSocket: netsocket,
+                Logger: logger
+            });
         }
     }
 }
