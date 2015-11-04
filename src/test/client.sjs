@@ -116,6 +116,20 @@ describe "Tennu Client:" {
 
         it "except when the daemon is 'twitch'" {
             var config = defaults({ daemon: "twitch" }, networkConfig);
+            console.log(require("util").inspect(config));
+            var client = Client(config, {
+                NetSocket: netsocket,
+                Logger: logger
+            });
+
+            client.connect();
+            client._socket.impl.acceptConnect();
+            assert(client._socket.impl.write.getCall(0).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
+        }
+
+        it "except when the daemon is 'irc2'" {
+            var config = defaults({ daemon: "irc2" }, networkConfig);
+            console.log(require("util").inspect(config));
             var client = Client(config, {
                 NetSocket: netsocket,
                 Logger: logger
