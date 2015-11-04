@@ -116,7 +116,6 @@ describe "Tennu Client:" {
 
         it "except when the daemon is 'twitch'" {
             var config = defaults({ daemon: "twitch" }, networkConfig);
-            console.log(require("util").inspect(config));
             var client = Client(config, {
                 NetSocket: netsocket,
                 Logger: logger
@@ -129,7 +128,6 @@ describe "Tennu Client:" {
 
         it "except when the daemon is 'irc2'" {
             var config = defaults({ daemon: "irc2" }, networkConfig);
-            console.log(require("util").inspect(config));
             var client = Client(config, {
                 NetSocket: netsocket,
                 Logger: logger
