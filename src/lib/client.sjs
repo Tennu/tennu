@@ -23,6 +23,36 @@ macro delegate_ret {
     }
 }
 
+const deepClone = function (obj) {
+    if (Array.isArray(obj)) {
+        return obj.map(deepClone);
+    } else if (typeof obj === "object") {
+        const ret = Object.create(Object.getPrototypeOf(obj));
+        Object.keys(obj).forEach(function (key) {
+            ret[key] = deepClone(obj[key]);
+        });
+        return ret;
+    } else {
+        return obj;
+    }
+};
+
+// Because lodash.defaults doesn't clone.
+const clonedDefaults = function () {
+    const source = arguments[0];
+    const templates = Array.prototype.slice.call(arguments, 1);
+
+    templates.forEach(function (template) {
+        Object.keys(template).forEach(function (key) {
+            if (!source[key]) {
+                source[key] = deepClone(template[key]);
+            }
+        });
+    });
+
+    return source;
+};
+
 const defaultFactoryConfiguration = {
     "NetSocket" : require("net").Socket,
     "IrcSocket" : require("irc-socket"),
@@ -30,7 +60,7 @@ const defaultFactoryConfiguration = {
     "Logger": require("./null-logger.js"),
 };
 
-const defaultClientConfiguration = {
+const defaultClientConfiguration = Object.freeze({
     // IrcSocket Config
     "server": undefined,
     "port": 6667,
@@ -49,7 +79,7 @@ const defaultClientConfiguration = {
     "plugins": [],
     "command-trigger": "!",
     "disable-help": false
-};
+});
 
 const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "alert", "emerg"];
 
@@ -66,12 +96,22 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
  const Client = function (config, dependencies) {
     const client = Object.create(Client.prototype);
 
+    console.log(require("util").inspect(config));
+    console.log(require("util").inspect(defaultClientConfiguration));
+
     // Parse the configuration object. Make it immutable.
-    client._config = config = defaults({}, config, defaultClientConfiguration);
+    client._config = config = clonedDefaults({}, config, defaultClientConfiguration);
+    console.log(require("util").inspect(config));
     // TODO(Havvy): Handle the logic in here better.
 
-    if (config.daemon === "twitch") {
+    if (config.daemon === "twitch" || config.daemon === "irc2") {
+        if (config.capabilities && config.capabilities.requires && config.capabilities.requires.length > 0) {
+            console.log(config.capabilities.requires.length);
+            console.log(config.capabilities.requires);
+            throw new Error("IRCd doesn't support capabilities. Cannot require them. Fix your configuration.");
+        }
         // Twitch.tv doesn't allow capabilities.
+        // GameSurge doesn't support capabilities.
         config.capabilities = undefined;
     } else {
         if (!config.capabilities) {
@@ -117,8 +157,13 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
 
     // Configure the plugin system.
     client._plugins = new di.Plugins("tennu", client);
-    client.note("Tennu", "Loading default plugins");
-    client._plugins.use(["subscriber", "messages", "commands", "server", "action", "ctcp", "help", "user", "channel", "startup", "self"], __dirname);
+    client.note("Tennu", "Loading base plugins");
+    var basePlugins = ["subscriber", "messages", "commands", "server", "action", "ctcp", "help", "user", "channel", "startup", "self"];
+    if (config.daemon === "twitch" || config.daemon === "irc2") {
+        // The channel plugin requires certain capabilities that these networks cannot provide.
+        basePlugins = basePlugins.filter(function (plugin) { return plugin !== "channel"; });
+    }
+    client._plugins.use(basePlugins, __dirname);
     client.note("Tennu", "Loading your plugins");
     client._plugins.use(config.plugins || [], process.cwd());
 
