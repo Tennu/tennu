@@ -123,13 +123,17 @@ module.exports = {
                             return;
                         }
                         
-                        ignoreCommandInSpecificPluginList.some(function (element, index, array) {
+                        var ignoreMatchFound = ignoreCommandInSpecificPluginList.some(function (element, index, array) {
                             if(element[0] === commandName && element.slice(1, element.length).indexOf(plugin) !== -1)
                             {
                                 client.note("PluginCommands", format("Ignoring '%s:%s'.", plugin, commandName));
-                                return;
+                                return true;
                             }
                         });
+                        if(ignoreMatchFound)
+                        {
+                            return;
+                        }
                                             
                         if (commandName in registry) {
                             const errorMessage = format("Command '%s' already has a handler from plugin '%s'.", commandName, registry[commandName].plugin);

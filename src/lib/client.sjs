@@ -70,14 +70,14 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
     client._config = config = defaults({}, config, defaultClientConfiguration);
     // TODO(Havvy): Handle the logic in here better. Maybe move config validation to seperate module?
 
-    if(config['ignore-command-list'])
+    if(config['command-ignore-list'])
     {
-        var arrayItems = config['ignore-command-list'].filter(function (item) {
+        var arrayItems = config['command-ignore-list'].filter(function (item) {
             return Array.isArray(item);
         }).filter(function (arrayItem) {
             return arrayItem.length < 2;
         });
-        if(element.length < 2)
+        if(arrayItems.length > 0)
         {
             throw new Error("Invalid command-ignore-list configuration option value. Arrays in command-ignore-list must have more than 1 object.");
         }        
