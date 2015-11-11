@@ -123,25 +123,16 @@ module.exports = {
                             return;
                         }
                         
-                        for(var i = 0; i < ignoreCommandInSpecificPluginList.length; i++)
-                        {
-                            var specificIgnore = ignoreCommandInSpecificPluginList[i];
-                            if(specificIgnore.length < 2)
-                            {
-                                var errorMessage = format("Invalid ignore-command-list configuration option value.");
-                                client.error("PluginCommands", errorMessage);
-                                throw new Error(errorMessage);                                
-                            }
-                            
-                            if(specificIgnore[0] === commandName && specificIgnore.slice(1, specificIgnore.length).indexOf(plugin) !== -1)
+                        ignoreCommandInSpecificPluginList.some(function (element, index, array) {
+                            if(element[0] === commandName && element.slice(1, element.length).indexOf(plugin) !== -1)
                             {
                                 client.note("PluginCommands", format("Ignoring '%s:%s'.", plugin, commandName));
                                 return;
                             }
-                        }
+                        });
                                             
                         if (commandName in registry) {
-                            var errorMessage = format("Command '%s' already has a handler from plugin '%s'.", commandName, registry[commandName].plugin);
+                            const errorMessage = format("Command '%s' already has a handler from plugin '%s'.", commandName, registry[commandName].plugin);
                             client.error("PluginCommands", errorMessage);
                             throw new Error(errorMessage);
                         }

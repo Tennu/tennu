@@ -68,7 +68,20 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
 
     // Parse the configuration object. Make it immutable.
     client._config = config = defaults({}, config, defaultClientConfiguration);
-    // TODO(Havvy): Handle the logic in here better.
+    // TODO(Havvy): Handle the logic in here better. Maybe move config validation to seperate module?
+
+    if(config['ignore-command-list'])
+    {
+        var arrayItems = config['ignore-command-list'].filter(function (item) {
+            return Array.isArray(item);
+        }).filter(function (arrayItem) {
+            return arrayItem.length < 2;
+        });
+        if(element.length < 2)
+        {
+            throw new Error("Invalid command-ignore-list configuration option value. Arrays in command-ignore-list must have more than 1 object.");
+        }        
+    }
 
     if (config.daemon === "twitch") {
         // Twitch.tv doesn't allow capabilities.
