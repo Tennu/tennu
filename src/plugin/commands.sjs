@@ -23,8 +23,20 @@ module.exports = {
         var trigger = client.config("command-trigger");
         trigger = typeof trigger === "string" ? trigger : "!";
 
-        const ignoreList = (client.config("command-ignore-list") || []).map(λ[#.toLowerCase()]);
-
+        const ignoreList = (client.config("command-ignore-list") || []);
+        const ignoreCommandInSpecificPluginList = ignoreList.filter(function (item) {
+            return (Array.isArray(item));
+        }).map(function (commandPluginsList) {
+            return commandPluginsList.map(function (item) {
+                return item.toLowerCase();
+            });
+        });
+        const globalIgnoreItems = ignoreList.filter(function (item) {
+            return typeof(item) === "string"; 
+        }).map(function (item) {
+            return item.toLowerCase();
+        });
+        
         // invariant: keys must be normalized to lower case.
         const registry = {};
 
@@ -87,13 +99,7 @@ module.exports = {
                     const plugin = commandRegistryEntry.plugin;
 
                     client.note("PluginCommands", format("Handler '%s:%s' found.", plugin, commandName));
-
-                    // TODO(Havvy): Move to CommandPlugin.exports.subscribe.emitter.on.
-                    if (ignoreList.indexOf(commandName) !== -1) {
-                        client.note("PluginCommands", format("But command '%s' is ignored.", commandName));
-                        return;
-                    }
-
+                    
                     return handler(command);
                 }
             },
@@ -111,9 +117,31 @@ module.exports = {
                         } else {
                             plugin = "UnknownSource";
                         }
-
+                        
+                        if (globalIgnoreItems.indexOf(commandName) !== -1) {
+                            client.note("PluginCommands", format("Ignoring '%s:%s (global)'.", plugin, commandName));
+                            return;
+                        }
+                        
+                        for(var i = 0; i < ignoreCommandInSpecificPluginList.length; i++)
+                        {
+                            var specificIgnore = ignoreCommandInSpecificPluginList[i];
+                            if(specificIgnore.length < 2)
+                            {
+                                var errorMessage = format("Invalid ignore-command-list configuration option value.");
+                                client.error("PluginCommands", errorMessage);
+                                throw new Error(errorMessage);                                
+                            }
+                            
+                            if(specificIgnore[0] === commandName && specificIgnore.slice(1, specificIgnore.length).indexOf(plugin) !== -1)
+                            {
+                                client.note("PluginCommands", format("Ignoring '%s:%s'.", plugin, commandName));
+                                return;
+                            }
+                        }
+                                            
                         if (commandName in registry) {
-                            const errorMessage = format("Command '%s' already has a handler from plugin '%s'.", commandName, registry[commandName].plugin);
+                            var errorMessage = format("Command '%s' already has a handler from plugin '%s'.", commandName, registry[commandName].plugin);
                             client.error("PluginCommands", errorMessage);
                             throw new Error(errorMessage);
                         }
