@@ -47,6 +47,10 @@ var extensions = {
         }
     },
 
+    topic: function (message) {
+        message.topic = message.params[1];
+    },
+
     nick: function (message) {
         message.old = message.hostmask.nickname;
         message.new = message.params[0];
