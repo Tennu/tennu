@@ -48,6 +48,7 @@ var extensions = {
     },
 
     topic: function (message) {
+        message.channel = message.params[0];
         message.topic = message.params[1];
     },
 
