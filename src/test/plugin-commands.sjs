@@ -3,6 +3,7 @@ const assert = require("better-assert");
 const equal = require("deep-eql");
 const inspect = require("util").inspect;
 const format = require("util").format;
+const Bluebird = require("bluebird");
 require("source-map-support").install();
 
 const debug = false;
@@ -41,8 +42,11 @@ const messages = {
     },
     args:                     privmsg(format("%s %s %s",      commandname, arg1, arg2)),
     args_oddspacing:          privmsg(format("%s  %s   %s  ", commandname, arg1, arg2)),
-    ignore:                   privmsg(format("%s",            "ignored")),
     spaceQuery:               privmsg(format("%s",            " ")),
+    ignore:                   privmsg(format("%s",            "ignored")),
+    ignore_in_ignoreme:       privmsg(format("%s",            "ignored-in-ignoreme")),
+    ignore_in_ignoremes:      privmsg(format("%s",            "ignored-in-ignorme-and-ignoreme2")),
+
     _: ""
 };
 
@@ -61,7 +65,11 @@ describe "Commands Plugin" {
                 if (value === "command-trigger") {
                     return "*";
                 } else if (value === "command-ignore-list") {
-                    return ["ignored"];
+                    return [
+                        "ignored",
+                        ["ignored-in-ignoreme", "ignoreme"],
+                        ["ignored-in-ignorme-and-ignoreme2", "ignoreme", "ignoreme2"]
+                    ];
                 } else {
                     throw new Error(format("Unknown config value (%s) requested by Commands Plugin.", value));
                 }
@@ -203,12 +211,14 @@ describe "Commands Plugin" {
     it "disallows multiple handlers to the same command" {
         emitter.on(commandname, function () {});
 
+        var errorThrown = false;
         try {
             emitter.on(commandname, function () {});
-            assert(false);
         } catch (e) {
-            // catch block required by lexical grammar.
+            errorThrown = true;
         }
+
+        assert(errorThrown === true);
     }
 
     it "command handler return values are returned to the messages emitter" {
@@ -221,12 +231,114 @@ describe "Commands Plugin" {
         assert(acceptPrivmsg(messages.detect.trigger) === returnSetinel);
     }
 
-    it "ignores commands on the ignore-list" {
-        emitter.on("ignored", function () {
-            throw new Error("Ignored command still handled.");
-        });
+    describe "Ignoring commands" {
+        // In these tests, we use the fact that handlers for one command
+        // are handled before the next command's handlers are handled.
+        // Thus, if an ignored command is handled first and fires a
+        // reject first, the test will fail. Likewise, if a command that
+        // shouldn't be ignored is ignored, then the "command" command
+        // handler will reject for those, but if it is not ignored properly,
+        // the resolve() will fire first making the reject() do donthing,
+        // since rejecting a resolved promise does nothing.
 
-        acceptPrivmsg(messages.ignore);
+        // We also move promise/resolve/reject into an outer scope
+        // so that we don't have to repeat them for every test.
+        // In 'real' code, you should have everything you care about in
+        // the function that gives resolve/reject when possible.
+        var resolve, reject, promise;
+
+        beforeEach {
+            promise = new Bluebird(function (resolver, rejecter) {
+                resolve = resolver;
+                reject = rejecter;
+            });
+        }
+
+        it "from anywhere given only a string" {
+            emitter.on("ignored", function () {
+                reject();
+            });
+            emitter.on("command", function () {
+                resolve();
+            });
+
+            acceptPrivmsg(messages.ignore);
+            acceptPrivmsg(messages.command);
+
+            return promise;
+        }
+
+        it "but not from non-plugins when ignored from specific plugins" {
+            emitter.on("ignored-in-ignoreme", function () {
+                resolve();
+            });
+            emitter.on("command", function () {
+                reject();
+            });
+
+            acceptPrivmsg(messages.ignore_in_ignoreme);
+            acceptPrivmsg(messages.command);
+
+            return promise;
+        }
+
+        it "from a specific plugin when ignored from a specific plugin" {
+            emitter.on("ignored-in-ignoreme", function () {
+                reject();
+            }, {plugin: "ignoreme"});
+            emitter.on("command", function () {
+                resolve();
+            });
+
+            acceptPrivmsg(messages.ignore_in_ignoreme);
+            acceptPrivmsg(messages.command);
+
+            return promise;
+        }
+
+        it "but not from a different plugin when ignored from specific plugins" {
+            emitter.on("ignored-in-ignoreme", function () {
+                resolve();
+            }, {plugin: "other"});
+            emitter.on("command", function () {
+                reject();
+            });
+
+            acceptPrivmsg(messages.ignore_in_ignoreme);
+            acceptPrivmsg(messages.command);
+
+            return promise;
+        }
+
+        it "from all plugins when ignored from specific plugins" {
+            emitter.on("ignored-in-ignorme-and-ignoreme2", function () {
+                reject();
+            }, {plugin: "ignoreme"});
+            emitter.on("ignored-in-ignorme-and-ignoreme2", function () {
+                reject();
+            }, {plugin: "ignoreme2"});
+            emitter.on("command", function () {
+                resolve();
+            });
+
+            acceptPrivmsg(messages.ignore_in_ignoremes);
+            acceptPrivmsg(messages.command);
+
+            return promise;
+        }
+
+        it "allows another plugin to handle the command when ignored from specific plugins" {
+            emitter.on("ignored-in-ignoreme", function () {
+                reject();
+            }, {plugin: "ignoreme"});
+            emitter.on("ignored-in-ignoreme", function () {
+                resolve();
+            }, {plugin: "other"});
+
+            acceptPrivmsg(messages.ignore_in_ignoreme);
+
+            return promise;
+        }
     }
 
     it skip "privmsg of identified command with no handler" {}

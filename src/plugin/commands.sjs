@@ -23,7 +23,25 @@ module.exports = {
         var trigger = client.config("command-trigger");
         trigger = typeof trigger === "string" ? trigger : "!";
 
-        const ignoreList = (client.config("command-ignore-list") || []).map(λ[#.toLowerCase()]);
+        const ignoreList = (client.config("command-ignore-list") || []);
+
+        const isValidIgnorableCommand = function (ignoredCommand) {
+            return typeof ignoredCommand === "string" ||
+                (Array.isArray(ignoredCommand) &&
+                    ignoredCommand.every(λ[typeof # === "string"]));
+        };
+        if (!ignoreList.every(isValidIgnorableCommand)) {
+            throw new Error("Invalid command-ignore-list configuration option value. " + 
+                "Must either be a string or an array of multiple strings where the first value " +
+                "is the command to ignore and the rest are plugins to ignore it from.");
+        }
+
+        const ignoreCommandInSpecificPluginList = ignoreList
+        .filter(λ[Array.isArray(#)])
+        .map(function (commandPluginsList) {
+            return commandPluginsList.map(λ[#.toLowerCase()]);
+        });
+        const globalIgnoreItems = ignoreList.filter(λ[typeof # === "string"]).map(λ[#.toLowerCase()]);
 
         // invariant: keys must be normalized to lower case.
         const registry = {};
@@ -87,13 +105,7 @@ module.exports = {
                     const plugin = commandRegistryEntry.plugin;
 
                     client.note("PluginCommands", format("Handler '%s:%s' found.", plugin, commandName));
-
-                    // TODO(Havvy): Move to CommandPlugin.exports.subscribe.emitter.on.
-                    if (ignoreList.indexOf(commandName) !== -1) {
-                        client.note("PluginCommands", format("But command '%s' is ignored.", commandName));
-                        return;
-                    }
-
+                    
                     return handler(command);
                 }
             },
@@ -111,7 +123,24 @@ module.exports = {
                         } else {
                             plugin = "UnknownSource";
                         }
-
+                        
+                        if (globalIgnoreItems.indexOf(commandName) !== -1) {
+                            client.note("PluginCommands", format("Ignoring '%s:%s (global)'.", plugin, commandName));
+                            return;
+                        }
+                        
+                        var ignoreMatchFound = ignoreCommandInSpecificPluginList.some(function (element, index, array) {
+                            if(element[0] === commandName && element.slice(1, element.length).indexOf(plugin) !== -1)
+                            {
+                                client.note("PluginCommands", format("Ignoring '%s:%s'.", plugin, commandName));
+                                return true;
+                            }
+                        });
+                        if(ignoreMatchFound)
+                        {
+                            return;
+                        }
+                                            
                         if (commandName in registry) {
                             const errorMessage = format("Command '%s' already has a handler from plugin '%s'.", commandName, registry[commandName].plugin);
                             client.error("PluginCommands", errorMessage);
