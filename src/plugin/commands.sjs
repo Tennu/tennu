@@ -24,19 +24,25 @@ module.exports = {
         trigger = typeof trigger === "string" ? trigger : "!";
 
         const ignoreList = (client.config("command-ignore-list") || []);
-        const ignoreCommandInSpecificPluginList = ignoreList.filter(function (item) {
-            return (Array.isArray(item));
-        }).map(function (commandPluginsList) {
-            return commandPluginsList.map(function (item) {
-                return item.toLowerCase();
-            });
+
+        const isValidIgnorableCommand = function (ignoredCommand) {
+            return typeof ignoredCommand === "string" ||
+                (Array.isArray(ignoredCommand) &&
+                    ignoredCommand.every(λ[typeof # === "string"]));
+        };
+        if (!ignoreList.every(isValidIgnorableCommand)) {
+            throw new Error("Invalid command-ignore-list configuration option value. " + 
+                "Must either be a string or an array of multiple strings where the first value " +
+                "is the command to ignore and the rest are plugins to ignore it from.");
+        }
+
+        const ignoreCommandInSpecificPluginList = ignoreList
+        .filter(λ[Array.isArray(#)])
+        .map(function (commandPluginsList) {
+            return commandPluginsList.map(λ[#.toLowerCase()]);
         });
-        const globalIgnoreItems = ignoreList.filter(function (item) {
-            return typeof(item) === "string"; 
-        }).map(function (item) {
-            return item.toLowerCase();
-        });
-        
+        const globalIgnoreItems = ignoreList.filter(λ[typeof # === "string"]).map(λ[#.toLowerCase()]);
+
         // invariant: keys must be normalized to lower case.
         const registry = {};
 
