@@ -32,28 +32,6 @@ const pluginHelps = {
     f: ["{{!}}", "{{!}}"]
 };
 
-const client = {
-    config: function (value) {
-        if (value === "disable-help") {
-            return false;
-        }
-
-        if (value === "command-trigger") {
-            return "@";
-        }
-
-        if (value === "help-helpfile") {
-            return undefined;
-        }
-
-        if (value === "command-ignore-list") {
-            return [];
-        }
-
-        throw new Error(format("Error in testing: Plugin expects config value (%s) we don't have.", value));
-    }
-};
-
 const defaultConfigObject = {
     "disable-help": false,
     "command-trigger": "@",
