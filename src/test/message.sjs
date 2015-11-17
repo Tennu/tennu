@@ -8,6 +8,7 @@ require("source-map-support").install();
 const Message = require("../lib/message");
 
 const hostmask = "sender!malicious@test.suite.net";
+const hostmaskNick = "sender";
 const nickname = "buddy";
 const server = "server.network.net";
 const channel = "#channel";
@@ -34,6 +35,9 @@ const messages = {
 
     part:                       format(":%s PART %s", hostmask, channel),
     part_reason:                format(":%s PART %s :%s", hostmask, channel, reason),
+
+    kick:                       format(":%s KICK %s %s", hostmask, channel, nick1),
+    kick_reason:                format(":%s KICK %s %s :%s", hostmask, channel, nick1, reason),
 
     quit:                       format(":%s QUIT", hostmask),
     quit_reason:                format(":%s QUIT :%s", hostmask, reason),
@@ -150,6 +154,27 @@ describe "Message" {
                 assert(message.channel === channel);
                 assert(message.reason === undefined);
                 assert(message.hasOwnProperty("reason"));
+            }
+        }
+
+        describe "kick:" {
+            it "with reason" {
+                const message = Message(messages.kick_reason);
+
+                assert(message.channel === channel);
+                assert(message.reason === reason);
+                assert(message.kicked === nick1);
+                assert(message.kicker === hostmaskNick);
+            }
+
+            it "without reason" {
+                const message = Message(messages.kick);
+
+                assert(message.channel === channel);
+                assert(message.reason === undefined);
+                assert(message.hasOwnProperty("reason"));
+                assert(message.kicked === nick1);
+                assert(message.kicker === hostmaskNick);
             }
         }
 

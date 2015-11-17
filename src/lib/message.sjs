@@ -2,7 +2,7 @@ var RFCMessage = require("irc-message");
 var mircColors = /\u0003\d?\d?,?\d?\d?/g;
 var util = require("util");
 
-// Note(Havvy): All numerics are listed at https://www.alien.net.au/irc/irc2numerics.html
+// NOTE(Havvy): All numerics are listed at https://www.alien.net.au/irc/irc2numerics.html
 var extensions = {
     join: function (message) {
         message.channel = message.params[0].toLowerCase();
@@ -16,7 +16,8 @@ var extensions = {
     kick: function (message) {
         message.channel = message.params[0].toLowerCase();
         message.kicked = message.params[1];
-        message.kicker = message.params[2];
+        message.reason = message.params[2];
+        message.kicker = message.nickname;
     },
 
     quit: function (message) {
@@ -24,7 +25,7 @@ var extensions = {
     },
 
     privmsg: function (message) {
-        // Test fails if new channel prefixes are created by IRCds, but that's unlikely.
+        // NOTE(Havvy): Test fails if new channel prefixes are created by IRCds, but that's unlikely.
         message.isQuery = ("#!+.~".indexOf(message.params[0][0]) === -1);
         message.message = message.params[1].trim().replace(mircColors, "");
 
