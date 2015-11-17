@@ -7,7 +7,7 @@ module.exports = function (tennu) {
         exports: {
             help: {
                 sandwhich: "Makes a sandwhich for you."
-            };
+            }
         },
         handlers: {
             "!sandwhich" : function (command) {
