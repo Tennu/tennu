@@ -141,12 +141,12 @@ describe "Tennu Client:" {
 
     describe "misc" {
         // This test triggers an assertion error in libuv somehow...
-        it skip "with a complex config file" {
+        it "with a complex config file" {
             const config = {
                 "server": "irc.irc2.net",
                 "password": null,
                 "port": 6697,
-                "tls": true,
+                "tls": false,
                 "nickname": "nicky",
                 "username": "testuser",
                 "realname": "bot in tennu",
