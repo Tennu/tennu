@@ -130,14 +130,12 @@ module.exports = {
                         }
                         
                         var ignoreMatchFound = ignoreCommandInSpecificPluginList.some(function (element, index, array) {
-                            if(element[0] === commandName && element.slice(1, element.length).indexOf(plugin) !== -1)
-                            {
+                            if (element[0] === commandName && element.slice(1, element.length).indexOf(plugin) !== -1) {
                                 client.note("PluginCommands", format("Ignoring '%s:%s'.", plugin, commandName));
                                 return true;
                             }
                         });
-                        if(ignoreMatchFound)
-                        {
+                        if (ignoreMatchFound) {
                             return;
                         }
                                             
@@ -155,8 +153,14 @@ module.exports = {
                         };
                     },
 
-                    off: function () {
-                        throw new Error("Cannot remove command handlers once attached.");
+                    off: function (commandName) {
+                        if (commandName in registry) {
+                            delete registry[commandName];
+                        } else {
+                            const error = format("Cannot remove command handler '%s', as there is no such command handler.", commandName);
+                            client.error(error);
+                            throw new Error(error);
+                        }
                     },
 
                     once: function () {
