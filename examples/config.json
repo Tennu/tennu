@@ -12,5 +12,5 @@
     "nickserv": "nickserv",
     "auth-password": null,
 
-    "tls": false,
+    "tls": false
 }
