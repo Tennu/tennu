@@ -220,14 +220,14 @@ describe "Commands Plugin" {
         assert(errorThrown === true);
     }
 
-    it "command handler return values are returned to the messages emitter" {
+    it "command handler return values are returned to the messages emitter wrapped in a Promise" {
         const returnSetinel = {};
 
         emitter.on(commandname, function () {
             return returnSetinel;
         });
 
-        assert(acceptPrivmsg(messages.detect.trigger) === returnSetinel);
+        return acceptPrivmsg(messages.command).then(function (retval) { assert(retval === returnSetinel); });
     }
 
     describe "Ignoring commands" {
@@ -384,6 +384,37 @@ describe "Commands Plugin" {
             acceptPrivmsg(messages.command);
         }
 
+        it "can return a Promise" (done) {
+            commands.hooks.commandMiddleware("test", function (command) {
+                return Promise.resolve(command);
+            });
+
+            emitter.on(commandname, function (command) {
+                assert(command.command === commandname);
+                done();
+            });
+
+            acceptPrivmsg(messages.command);
+        }
+
+        it "can rename the command" (done) {
+            commands.hooks.commandMiddleware("test", function (command) {
+                command.command = "renamed";
+                return command;
+            });
+
+            emitter.on(commandname, function (command) {
+                done("Command was not renamed!");
+            });
+
+            emitter.on("renamed", function (command) {
+                done();
+            });
+
+            acceptPrivmsg(messages.command);
+        }
+
         it skip "throws an error on adding non-functional middleware" {}
+        it skip "returning `undefined` cancels handling" {}
     }
 }

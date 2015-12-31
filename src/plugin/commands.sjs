@@ -1,6 +1,7 @@
 const inspect = require("util").inspect;
 const format = require("util").format;
 const create = require("lodash.create");
+const Promise = require("bluebird");
 
 const badResponseFormat = "Command handler for %s returned with invalid value: %s";
 
@@ -87,6 +88,7 @@ module.exports = {
         return {
             handlers: {
                 "privmsg": function (privmsg) {
+                    // TODO(Havvy): use R-Result to simplify.
                     const maybeCommandString = tryParseCommandString(privmsg);
 
                     if (!maybeCommandString) {
@@ -96,36 +98,40 @@ module.exports = {
                     const preMiddlewareCommand = Command(privmsg, maybeCommandString);
                     client.note("PluginCommands", format("Command detected: %s", preMiddlewareCommand.command));
 
-                    const maybeCommand = middleware.reduce(function (maybeCommand, ware) {
-                        if (maybeCommand) {
-                            return ware(maybeCommand);
-                        } else {
-                            return undefined;
+                    const promiseOfMaybeCommand = middleware.reduce(function (promiseOfMaybeCommand, ware) {
+                        return promiseOfMaybeCommand.then(function (maybeCommand) { 
+                            if (maybeCommand) {
+                                return ware(maybeCommand);
+                            } else {
+                                return undefined;
+                            }
+                        });
+                    }, Promise.resolve(preMiddlewareCommand));
+
+                    return promiseOfMaybeCommand.then(function (maybeCommand) {
+                        const afterMiddlewareName = maybeCommand ? maybeCommand.name : "Command ignored by middleware function.";
+                        client.note("PluginCommands", format("Command after middleware: %s", afterMiddlewareName))
+                        if (!maybeCommand) {
+                            return;
                         }
-                    }, preMiddlewareCommand);
 
-                    const afterMiddlewareName = maybeCommand ? maybeCommand.name : "Command ignored by middleware function.";
-                    client.note("PluginCommands", format("Command after middleware: %s", afterMiddlewareName))
-                    if (!maybeCommand) {
-                        return;
-                    }
+                        const command = maybeCommand;
+                        const commandName = command.command;
+                        const maybeCommandRegistryEntry = registry[command.command];
 
-                    const command = maybeCommand;
-                    const commandName = command.command;
-                    const maybeCommandRegistryEntry = registry[command.command];
+                        if (!maybeCommandRegistryEntry) {
+                            client.note("PluginCommands", format("Handler for '%s' not found.", commandName));
+                            return;
+                        }
+                        const commandRegistryEntry = maybeCommandRegistryEntry;
 
-                    if (!maybeCommandRegistryEntry) {
-                        client.note("PluginCommands", format("Handler for '%s' not found.", commandName));
-                        return;
-                    }
-                    const commandRegistryEntry = maybeCommandRegistryEntry;
+                        const handler = commandRegistryEntry.handler;
+                        const plugin = commandRegistryEntry.plugin;
 
-                    const handler = commandRegistryEntry.handler;
-                    const plugin = commandRegistryEntry.plugin;
-
-                    client.note("PluginCommands", format("Handler '%s:%s' found.", plugin, commandName));
-                    
-                    return handler(command);
+                        client.note("PluginCommands", format("Handler '%s:%s' found.", plugin, commandName));
+                        
+                        return handler(command);
+                    });
                 }
             },
 
