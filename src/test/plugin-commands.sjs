@@ -5,7 +5,7 @@ const inspect = require("util").inspect;
 const format = require("util").format;
 require("source-map-support").install();
 
-const debug = false;
+const debug = true;
 const logfn = debug ? console.log.bind(console) : function () {};
 
 const CommandsPluginFactory = require("../tennu_plugins/commands");
@@ -414,7 +414,14 @@ describe "Commands Plugin" {
             acceptPrivmsg(messages.command);
         }
 
+        it "can choose to end the command handling by returning a Response" {
+            commands.hooks.commandMiddleware("test", function (command) {
+                return "Intercepted";
+            });
+
+            return acceptPrivmsg(messages.command).then(function (response) { assert(response === "Intercepted"); });
+        }
+
         it skip "throws an error on adding non-functional middleware" {}
-        it skip "returning `undefined` cancels handling" {}
     }
 }

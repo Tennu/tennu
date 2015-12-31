@@ -50,9 +50,9 @@ module.exports = {
         // Pushed to by the `commandMiddleware` hook; Read by the `privmsg` handler.
         const middleware = [];
 
-        // Returns false if privmsg is *not* a command query.
-        // Otherwise, returns the string that is the command query.
-        // e.g.  "commandname arg1 arg2 ..."
+        /// Returns false if privmsg is *not* a command query.
+        /// Otherwise, returns the string that is the command query.
+        /// e.g.  "commandname arg1 arg2 ..."
         function tryParseCommandString (privmsg) {
             function removeTrigger (string) {
                 return string.slice(trigger.length);
@@ -95,29 +95,31 @@ module.exports = {
                         return;
                     }
 
-                    const preMiddlewareCommand = Command(privmsg, maybeCommandString);
-                    client.note("PluginCommands", format("Command detected: %s", preMiddlewareCommand.command));
+                    const command = Command(privmsg, maybeCommandString);
+                    client.note("PluginCommands", format("Command detected: %s", command.command));
 
-                    const promiseOfMaybeCommand = middleware.reduce(function (promiseOfMaybeCommand, ware) {
-                        return promiseOfMaybeCommand.then(function (maybeCommand) { 
-                            if (maybeCommand) {
-                                return ware(maybeCommand);
+                    const promiseOfCommandOrResponse = middleware.reduce(function (promiseOfCommandOrResponse, ware) {
+                        return promiseOfCommandOrResponse.then(function (commandOrResponse) { 
+                            if (commandOrResponse === command) {
+                                return ware(commandOrResponse);
                             } else {
-                                return undefined;
+                                return commandOrResponse;
                             }
                         });
-                    }, Promise.resolve(preMiddlewareCommand));
+                    }, Promise.resolve(command));
 
-                    return promiseOfMaybeCommand.then(function (maybeCommand) {
-                        const afterMiddlewareName = maybeCommand ? maybeCommand.name : "Command ignored by middleware function.";
-                        client.note("PluginCommands", format("Command after middleware: %s", afterMiddlewareName))
-                        if (!maybeCommand) {
-                            return;
+                    return promiseOfCommandOrResponse.then(function (commandOrResponse) {
+                        if (commandOrResponse !== command) {
+                            // It's a Response.
+
+                            client.note("PluginCommands", "Command handled by middleware.");
+                            return commandOrResponse;
                         }
 
-                        const command = maybeCommand;
+                        // It's still the same command as above. We can continue using that variable.
                         const commandName = command.command;
-                        const maybeCommandRegistryEntry = registry[command.command];
+                        client.note("PluginCommands", format("Command after middleware: %s", commandName));
+                        const maybeCommandRegistryEntry = registry[commandName];
 
                         if (!maybeCommandRegistryEntry) {
                             client.note("PluginCommands", format("Handler for '%s' not found.", commandName));
