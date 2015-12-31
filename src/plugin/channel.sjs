@@ -34,7 +34,7 @@ var Channel = function Channel(name) {
 
 Channel.prototype = {
     toString: function () {
-        return channel.name;
+        return this.name;
     },
     
     addUser: function (nick) {
