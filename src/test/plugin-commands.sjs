@@ -3,7 +3,6 @@ const assert = require("better-assert");
 const equal = require("deep-eql");
 const inspect = require("util").inspect;
 const format = require("util").format;
-const Bluebird = require("bluebird");
 require("source-map-support").install();
 
 const debug = false;
@@ -248,7 +247,7 @@ describe "Commands Plugin" {
         var resolve, reject, promise;
 
         beforeEach {
-            promise = new Bluebird(function (resolver, rejecter) {
+            promise = new Promise(function (resolver, rejecter) {
                 resolve = resolver;
                 reject = rejecter;
             });
@@ -373,5 +372,18 @@ describe "Commands Plugin" {
         it "returns false for non-commands" {
             assert(commands.exports.isHandledCommand(Message(messages.noncommand)) === false);
         }
+    }
+
+    describe "Middleware" {
+        it "calls each ware function (even with or without a handler)" (done) {
+            commands.hooks.commandMiddleware("test", function (command) {
+                assert(command.command === commandname);
+                done();
+            });
+
+            acceptPrivmsg(messages.command);
+        }
+
+        it skip "throws an error on adding non-functional middleware" {}
     }
 }

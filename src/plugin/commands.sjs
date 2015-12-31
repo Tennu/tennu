@@ -46,6 +46,9 @@ module.exports = {
         // invariant: keys must be normalized to lower case.
         const registry = {};
 
+        // Pushed to by the `commandMiddleware` hook; Read by the `privmsg` handler.
+        const middleware = [];
+
         // Returns false if privmsg is *not* a command query.
         // Otherwise, returns the string that is the command query.
         // e.g.  "commandname arg1 arg2 ..."
@@ -84,22 +87,38 @@ module.exports = {
         return {
             handlers: {
                 "privmsg": function (privmsg) {
-                    const maybeCommand = tryParseCommandString(privmsg);
+                    const maybeCommandString = tryParseCommandString(privmsg);
 
+                    if (!maybeCommandString) {
+                        return;
+                    }
+
+                    const preMiddlewareCommand = Command(privmsg, maybeCommandString);
+                    client.note("PluginCommands", format("Command detected: %s", preMiddlewareCommand.command));
+
+                    const maybeCommand = middleware.reduce(function (maybeCommand, ware) {
+                        if (maybeCommand) {
+                            return ware(maybeCommand);
+                        } else {
+                            return undefined;
+                        }
+                    }, preMiddlewareCommand);
+
+                    const afterMiddlewareName = maybeCommand ? maybeCommand.name : "Command ignored by middleware function.";
+                    client.note("PluginCommands", format("Command after middleware: %s", afterMiddlewareName))
                     if (!maybeCommand) {
                         return;
                     }
 
-                    const command = Command(privmsg, maybeCommand);
+                    const command = maybeCommand;
                     const commandName = command.command;
-                    client.note("PluginCommands", format("Command detected: %s", commandName));
+                    const maybeCommandRegistryEntry = registry[command.command];
 
-                    const commandRegistryEntry = registry[command.command];
-
-                    if (!commandRegistryEntry) {
+                    if (!maybeCommandRegistryEntry) {
                         client.note("PluginCommands", format("Handler for '%s' not found.", commandName));
                         return;
                     }
+                    const commandRegistryEntry = maybeCommandRegistryEntry;
 
                     const handler = commandRegistryEntry.handler;
                     const plugin = commandRegistryEntry.plugin;
@@ -166,6 +185,18 @@ module.exports = {
                     once: function () {
                         throw new Error("Cannot only listen to a command once.");
                     }
+                }
+            },
+
+            hooks: {
+                commandMiddleware: function (plugin, ware) {
+                    if (typeof ware !== "function") {
+                        const error = format("Plugin %s tried to add non-function middleware.", plugin);
+                        client.error(error);
+                        throw new Error(error);
+                    }
+
+                    middleware.push(ware);
                 }
             },
 
