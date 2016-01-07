@@ -231,6 +231,7 @@ Client.prototype.notice                 = delegate_ret _action notice;
 Client.prototype.part                   = delegate_ret _action part;
 Client.prototype.quit                   = delegate_ret _action quit;
 Client.prototype.say                    = delegate_ret _action say;
+Client.prototype.respond                = delegate_ret _action respond;
 Client.prototype.userhost               = delegate_ret _action userhost;
 Client.prototype.who                    = delegate_ret _action who;
 Client.prototype.whois                  = delegate_ret _action whois;
