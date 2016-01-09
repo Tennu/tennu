@@ -68,17 +68,17 @@ const defaultClientConfiguration = Object.freeze({
     "port": 6667,
     "password": undefined,
     "capabilities": {},
-    "nicknames": ["tennubot"],
+    "nicknames": Object.freeze(["tennubot"]),
     "username": "tennu",
     "realname": "tennu " + require("../package.json")["version"],
     "connectOptions": undefined,
 
     // Tennu Config
     "tls": false,
-    "channels": [],
+    "channels": Object.freeze([]),
     "nickserv": "nickserv",
     "auth-password": undefined,
-    "plugins": [],
+    "plugins": Object.freeze([]),
     "command-trigger": "!",
     "disable-help": false
 });
@@ -98,29 +98,10 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
  const Client = function (config, dependencies) {
     const client = Object.create(Client.prototype);
 
-    // Parse the configuration object. Make it immutable.
-    client._config = config = clonedDefaults({}, config, defaultClientConfiguration);
-    // TODO(Havvy): Handle the logic in here better.
+    // Parse the configuration object.
+    client._configObject = config = clonedDefaults({}, config, defaultClientConfiguration);
 
-    if (config.daemon === "twitch" || config.daemon === "irc2") {
-        if (config.capabilities && config.capabilities.requires && config.capabilities.requires.length > 0) {
-            throw new Error("IRCd doesn't support capabilities. Cannot require them. Fix your configuration.");
-        }
-        // Twitch.tv doesn't allow capabilities.
-        // GameSurge doesn't support capabilities.
-        config.capabilities = undefined;
-    } else {
-        if (!config.capabilities) {
-            config.capabilities = { requires: ["multi-prefix"] };
-        } else if (!config.capabilities.requires) {
-            config.capabilities.requires = ["multi-prefix"];
-        } else {
-            if (config.capabilities.requires.indexOf("multi-prefix") === -1) {
-                config.capabilities.requires.push("multi-prefix");
-            }
-        }
-    }
-
+    // Allow dependencies to either be constructors or objects.
     dependencies = mapValues(dependencies, function (dep) {
         if (typeof dep === "object") {
             return function () { return dep; };
@@ -148,13 +129,32 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
         });
     }
 
+    // NOTE(Havvy): The config plugin has to be loaded before the IRC socket is started.
+    //              It also has to be loaded so that we have a value for client._config
+    //              so that client.config() works for other plugins.
+    client._plugins = new di.Plugins("tennu", client);
+    client._plugins.use(["config"], __dirname);
+    client._config = client.getPlugin("config");
+
     // The socket reads and sends messages from/to the IRC server.
+    // TODO(Havvy): Put the Socket into a plugin.
     client._socket = new di.IrcSocket(config, netSocket);
 
     // Configure the plugin system.
-    client._plugins = new di.Plugins("tennu", client);
     client.note("Tennu", "Loading base plugins");
-    var basePlugins = ["subscriber", "messages", "commands", "server", "action", "ctcp", "help", "user", "channel", "startup", "self"];
+    var basePlugins = [
+        "subscriber",
+        "messages",
+        "commands",
+        "server",
+        "action",
+        "ctcp",
+        "help",
+        "user",
+        "channel",
+        "startup",
+        "self"
+    ];
     if (config.daemon === "twitch" || config.daemon === "irc2") {
         // The channel plugin requires certain capabilities that these networks cannot provide.
         basePlugins = basePlugins.filter(function (plugin) { return plugin !== "channel"; });
@@ -165,6 +165,8 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
 
     // Grab a reference to various plugin exports
     // so that the client can delegate the actions to it.
+    // TODO(Havvy): Have a static hook for doing this.
+    //              Note how "config" has to be loaded specially above.
     client._action = client.getPlugin("action");
     client._self = client.getPlugin("self");
     client._subscriber = client.getPlugin("subscriber");
@@ -175,12 +177,6 @@ const loggerMethods = ["debug", "info", "notice", "warn", "error", "crit", "aler
 
     client.note("Tennu", "Client created.");
     return client;
-};
-
-// implements ConfigurationStorage
-
-Client.prototype.config = function (param) {
-    return this._config[param];
 };
 
 // implements Runnable ;)
@@ -214,6 +210,9 @@ const disconnect = function () {
 
 Client.prototype.disconnect = disconnect;
 Client.prototype.end = disconnect;
+
+// implements Config Plugin
+Client.prototype.config                 = delegate_ret _config get
 
 // implements IRC Output Socket
 Client.prototype.act                    = delegate_ret _action act;
