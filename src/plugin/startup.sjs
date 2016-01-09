@@ -2,7 +2,7 @@ var IrcSocket = require("irc-socket");
 var format = require("util").format;
 
 module.exports = {
-    init: function (client) {
+    init: function (client, deps) {
         const nickname = client.config("nickname");
         const authPassword = client.config("auth-password");
         const nickserv = client.config("nickserv");
@@ -54,5 +54,5 @@ module.exports = {
         };
     },
 
-    requires: ["messages"]
+    requires: ["config", "messages"]
 }

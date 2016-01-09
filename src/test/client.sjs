@@ -68,6 +68,7 @@ describe "Tennu Client:" {
         }
     }
 
+    // TODO(Havvy): Move to 'config' plugin.
     describe "Capabilities always requires `multi-prefix`" {
         it "even when no capabilities passed" {
             var client = Client(networkConfig, {
@@ -78,6 +79,7 @@ describe "Tennu Client:" {
             client.connect();
 
             client._socket.impl.acceptConnect();
+            assert(client._socket.impl.write.called);
             assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_cap_ls);
             assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
