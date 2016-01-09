@@ -3,10 +3,16 @@ const format = require("util").format;
 const chunk = require("chunk");
 const Promise = require("bluebird");
 const EventEmitter = require("events").EventEmitter;
+const Response = require("../../lib/response");
 
 module.exports = ActionPlugin = {
     init: function (client, imports) {
         const emitter = new EventEmitter();
+
+        function respond (handlerResponse, message) {
+            var response = Response.create(handlerResponse, message);
+            Response.send(response, client);
+        }
 
         function raw (line) {
             if (Array.isArray(line)) { line = line.join(" "); }
@@ -136,6 +142,8 @@ module.exports = ActionPlugin = {
         return {
             exports: {
                 emitter: emitter,
+
+                respond: respond,
 
                 raw: raw,
                 rawf: rawf,
