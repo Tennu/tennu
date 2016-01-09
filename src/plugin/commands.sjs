@@ -20,11 +20,18 @@ function startsWith(string, prefix) {
 }
 
 module.exports = {
-    init: function (client, deps) {
-        var trigger = client.config("command-trigger");
-        trigger = typeof trigger === "string" ? trigger : "!";
+    name: "commands",
 
-        const ignoreList = (client.config("command-ignore-list") || []);
+    configDefaults: {
+        "command-trigger": "!",
+        "command-ignore-list": []
+    },
+
+    init: function (client, deps) {
+        const trigger = client.config("command-trigger");
+        const ignoreList = client.config("command-ignore-list");
+
+        client.debug("ignoreList is " + require("util").inspect(ignoreList));
 
         const isValidIgnorableCommand = function (ignoredCommand) {
             return typeof ignoredCommand === "string" ||

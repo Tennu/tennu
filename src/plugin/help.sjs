@@ -11,6 +11,23 @@ const inspect = require("util").inspect;
 const Set = require("simplesets").Set;
 
 module.exports = {
+    name: "help",
+
+    configDefaults: {
+        "help-helpfile": [
+            "{{!}}help <query>",
+            " ",
+            "Display the help message for the topic located at the given query.",
+            "Query can be made of multiple subtopics",
+            "Without a query, shows this help message.",
+            " ",
+            "Ex: {{!}}help commands",
+            "Ex: {{!}}help learn formats"
+        ],
+
+        "disable-help": false,
+    },
+
     init: function (client, imports) {
         const enabled = !(client.config("disable-help"));
 
@@ -19,8 +36,8 @@ module.exports = {
             return {};
         }
 
-        const commandTrigger = client.config("command-trigger") || "!";
-        const commandIgnoreList = client.config("command-ignore-list") || [];
+        const commandTrigger = client.config("command-trigger");
+        const commandIgnoreList = client.config("command-ignore-list");
 
         // (string | [string]) -> string | [string]
         function replaceCommandTrigger (response) {
@@ -134,16 +151,7 @@ module.exports = {
             },
 
             help: {
-                help: client.config("help-helpfile") || [
-                    "{{!}}help <query>",
-                    " ",
-                    "Display the help message for the topic located at the given query.",
-                    "Query can be made of multiple subtopics",
-                    "Without a query, shows this help message.",
-                    " ",
-                    "Ex: {{!}}help commands",
-                    "Ex: {{!}}help uno start"
-                ],
+                help: client.config("help-helpfile"),
 
                 commands: [
                     "{{!}}commands",
@@ -156,5 +164,5 @@ module.exports = {
         };
     },
 
-    requires: ["commands"]
+    requires: ["config", "subscriber", "messages", "commands"]
 };

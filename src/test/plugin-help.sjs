@@ -11,6 +11,7 @@ const debug = false;
 const logfn = debug ? console.log.bind(console) : function () {};
 
 const HelpPlugin = require("../tennu_plugins/help");
+const CommandsPlugin = require("../tennu_plugins/commands");
 
 const pluginHelps = {
     a: "a *",
@@ -33,10 +34,10 @@ const pluginHelps = {
 };
 
 const defaultConfigObject = {
-    "disable-help": false,
     "command-trigger": "@",
-    "help-helpfile": undefined,
-    "command-ignore-list": undefined
+    "disable-help": HelpPlugin.configDefaults["disable-help"],
+    "command-ignore-list": CommandsPlugin.configDefaults["command-ignore-list"],
+    "help-helpfile": HelpPlugin.configDefaults["help-helpfile"]
 };
 
 const makeConfigFn = function (configChanges) {
