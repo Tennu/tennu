@@ -338,6 +338,8 @@ also log debug messages.
 See the contributors.md file for specific ways you can help, if you're just
 looking for any way to help.
 
+You can also contribute by publishing plugins you write on npm.
+
 ### Directory Structure ###
 
 The `lib`, `tennu_plugins`, `bin`, and `test` directories are all auto-generated files,
