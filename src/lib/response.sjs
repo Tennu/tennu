@@ -40,35 +40,74 @@
  *
  **/
 
-module.exports = {
-    create: function (handlerResponse, message) {
-        if (typeof handlerResponse === "undefined") {
-            return {
-                intent: "none",
-                message: undefined,
-                target: undefined
-            };
-        } else if (typeof handlerResponse === "string" || Array.isArray(handlerResponse)) {
-            return {
-                intent: "say",
-                message: handlerResponse,
-                target: message.channel
-            };
-        } else if (typeof handlerResponse === "object") {
-            if (handlerResponse.toIrcResponse) {
-                // NOTE(Havvy): Assume property is a function.
-                return handlerResponse.toIrcResponse(message);
-            } else {
-                // NOTE(Havvy): Assume otherwise, plain object where there exists at least "message" property.
-                return {
-                    message: handlerResponse.message,
-                    intent: handlerResponse.intent || "say",
-                    target: handlerResponse.query ? message.nickname : (handlerResponse.target || message.channel)
-                };
-            }
-        } else {
-            throw new Error("Bad Response");
+const Response = Object.freeze({
+    /// create(FromResponse, IrcMessage) -> IrcResponse
+    /// Polymorphic (megamorphic too) method for creating responses.
+    create: function (fromResponse, message) {
+        switch (typeof fromResponse) {
+            case "undefined": return Response.fromUndefined(fromResponse, message);
+            case "string": return Response.fromString(fromResponse, message);
+            case "object":
+                if (Array.isArray(fromResponse)) {
+                    return Response.fromArray(fromResponse, message);
+                } 
+
+                if (fromResponse === null) {
+                    return Response.fromUndefined(fromResponse, message);
+                }
+
+                if (typeof fromResponse.toIrcResponse === "function") {
+                    return fromResponse.toIrcResponse(message);
+                } 
+
+                if (typeof fromResponse.message === "string") {
+                    return Response.fromPlainObject(fromResponse, message);
+                } 
+
+                throw new TypeError("Cannot create response from object. No string 'message' or function 'toIrcResponse' property. Must have one or the other.")
+            default: throw new TypeError("Cannot create response from passed value of type " + typeof fromResponse);
         }
+    },
+
+    fromUndefined: function (_undefined, _message) {
+        return {
+            intent: "none",
+            message: undefined,
+            target: undefined
+        };
+    },
+
+    fromString: function (string, message) {
+        return {
+            intent: "say",
+            message: string,
+            target: message.channel
+        };
+    },
+
+    /// fromPlainObject(Object, IrcMessage) -> IrcResponse
+    /// At minimum, requires that the 'message' property exist on it as a string.
+    /// If the intent is left out, defaults to "say".
+    /// If the 'query' field in the plain Object is truthy, it forces the target to
+    /// be the sender of the IrcMessage, otherwise, if there's a target property
+    /// on the plain message, it is sent to that. Failing that, the message is sent
+    /// to the originating channel, which may be a query.
+    fromPlainObject: function (plainObject, message) {
+        return {
+            message: plainObject.message,
+            intent: plainObject.intent || "say",
+            target: plainObject.query ? message.nickname : (plainObject.target || message.channel)
+        };
+    },
+
+    // Note(Havvy): This will soon have different behaviour that
+    //              behaves the same for all current use cases.
+    fromArray: function (array, message) {
+        return {
+            intent: "say",
+            message: array,
+            target: message.channel
+        };
     },
 
     send: function (response, client) {
@@ -99,4 +138,6 @@ module.exports = {
 
         intents[response.intent](response.target, response.message);
     }
-}
+});
+
+module.exports = Response;
