@@ -2,16 +2,16 @@
  *
  * A Response is a struct with three fields:
  *
- * intent: "say" | "act" | "notice" | "ctcp" | "none"
+ * intent: "say" | "act" | "notice" | "ctcpResponse" | "ctcpRequest" "none"
  * message: String | [SingleWordString, String]
  * target: Target
  *
- * The "message" is always a String unless the intent is "ctcp".
+ * The "message" is always a String unless the intent is "ctcpResponse".
  *
  * When the intent is "none", no message should be sent.
  * When the intent is "say" or "notice", a "privmsg" or "notice"
  *      should be sent.
- * When the intent is "ctcp", a CTCP should be sent with the type
+ * When the intent is "ctcpResponse", a CTCP should be sent with the type
  *      being the first value and the body being the second.
  * When the intent is "act", it is equivalent to a CTCP where the
  *      type is "ACTION" and the body is the message.
@@ -23,9 +23,13 @@
  * undefined:  The intent shall be "none", with the other values left
  *             undefined, since they are unused.
  * string | [string]:  The intent shall be "say", with the value
-                       used as the message. The target will be the
-                       original channel or query that the handler
-                       is responding to.
+ *                     used as the message. The target will be the
+ *                     original channel or query that the handler
+ *                     is responding to.
+ * object with #toIrcResponse\1:  Returns what this method returns.
+ *                                We assume that the object impls
+ *                                this correctly by calling `create`
+ *                                again with different arguments.
  * object: The object must have a message property. If there is no
  *         intent property, the intent is set to "say". If there is
  *         a query property, and it is true, then the target is set to
@@ -51,11 +55,17 @@ module.exports = {
                 target: message.channel
             };
         } else if (typeof handlerResponse === "object") {
-            return {
-                message: handlerResponse.message,
-                intent: handlerResponse.intent || "say",
-                target: handlerResponse.query ? message.nickname : (handlerResponse.target || message.channel)
-            };
+            if (handlerResponse.toIrcResponse) {
+                // NOTE(Havvy): Assume property is a function.
+                return handlerResponse.toIrcResponse(message);
+            } else {
+                // NOTE(Havvy): Assume otherwise, plain object where there exists at least "message" property.
+                return {
+                    message: handlerResponse.message,
+                    intent: handlerResponse.intent || "say",
+                    target: handlerResponse.query ? message.nickname : (handlerResponse.target || message.channel)
+                };
+            }
         } else {
             throw new Error("Bad Response");
         }

@@ -44,63 +44,80 @@ describe "Response" {
         }
 
         describe "given an Object" {
-            it "copies all the properties from an object with the same shape as a Response" {
-                assert(equal(Response.create({
-                    intent: "say",
-                    message: "Goodbye World!",
-                    target: "#channel"
-                }, message), {
-                    intent: "say",
-                    message: "Goodbye World!",
-                    target: "#channel"
-                }));
+            describe "with a toIrcResponse method" {
+                it "returns the return value of the toIrcResponse method" {
+                    const toResponse = {
+                        toIrcResponse: function (message) {
+                            return Response.create("foo", message);
+                        }
+                    };
+
+                    assert(equal(
+                        Response.create(toResponse, message),
+                        Response.create("foo", message)
+                    ));
+                }
             }
 
-            it "copies all properties from an object with the same shape as a Response but changes target if 'query' is true" {
-                assert(equal(Response.create({
-                    intent: "say",
-                    message: "Hello User!",
-                    target: "#channel",
-                    query: true
-                }, message), {
-                    intent: "say",
-                    message: "Hello User!",
-                    target: "sender"
-                }));
-            }
+            describe "without a toIrcResponse method" {
+                it "copies all the properties from an object with the same shape as a Response" {
+                    assert(equal(Response.create({
+                        intent: "say",
+                        message: "Goodbye World!",
+                        target: "#channel"
+                    }, message), {
+                        intent: "say",
+                        message: "Goodbye World!",
+                        target: "#channel"
+                    }));
+                }
 
-            it "missing a target with no or false query" {
-                assert(equal(Response.create({
-                    intent: "say",
-                    message: "Hello Who?",
-                }, message), {
-                    intent: "say",
-                    message: "Hello Who?",
-                    target: "#channel"
-                }));
-            }
+                it "copies all properties from an object with the same shape as a Response but changes target if 'query' is true" {
+                    assert(equal(Response.create({
+                        intent: "say",
+                        message: "Hello User!",
+                        target: "#channel",
+                        query: true
+                    }, message), {
+                        intent: "say",
+                        message: "Hello User!",
+                        target: "sender"
+                    }));
+                }
 
-            it "missing an intent" {
-                assert(equal(Response.create({
-                    message: "Hello!",
-                    target: "#channel"
-                }, message), {
-                    intent: "say",
-                    message: "Hello!",
-                    target: "#channel"
-                }));
-            }
+                it "missing a target with no or false query" {
+                    assert(equal(Response.create({
+                        intent: "say",
+                        message: "Hello Who?",
+                    }, message), {
+                        intent: "say",
+                        message: "Hello Who?",
+                        target: "#channel"
+                    }));
+                }
 
-            it "non-say intent" {
-                assert(equal(Response.create({
-                    intent: "act",
-                    message: "does something.",
-                    target: "#channel"
-                }, message), {
-                    intent: "act",
-                    message: "does something.",
-                    target: "#channel"
-                }))
+                it "missing an intent" {
+                    assert(equal(Response.create({
+                        message: "Hello!",
+                        target: "#channel"
+                    }, message), {
+                        intent: "say",
+                        message: "Hello!",
+                        target: "#channel"
+                    }));
+                }
+
+                it "non-say intent" {
+                    assert(equal(Response.create({
+                        intent: "act",
+                        message: "does something.",
+                        target: "#channel"
+                    }, message), {
+                        intent: "act",
+                        message: "does something.",
+                        target: "#channel"
+                    }))
+                }
             }
         }
     }
