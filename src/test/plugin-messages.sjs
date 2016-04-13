@@ -168,19 +168,26 @@ describe "Messages Plugin" {
         }
 
         it "[string] response" (done) {
-            client.say = function (target, response) {
+            client.say = function self (target, response) {
                 try {
-                    assert(channel === target);
-                    assert(equal(response, ["response"]));
-                    assert(arguments.length === 2);
-                    done();   
+                    if (!self.called) {
+                        assert(channel === target);
+                        assert(equal(response, "first line"));
+                        assert(arguments.length === 2);
+                        self.called = true;
+                    } else {
+                        assert(channel === target);
+                        assert(equal(response, "second line"));
+                        assert(arguments.length === 2);
+                        done();
+                    }
                 } catch (e) {
                     done(e);
                 }
             };
 
             emitter.on("join", function () {
-                return ["response"];
+                return ["first line", "second line"];
             });
 
             acceptData(raws.join);
@@ -206,19 +213,26 @@ describe "Messages Plugin" {
         }
 
         it "Promise<[string]> response" (done) {
-            client.say = function (target, response) {
+            client.say = function self (target, response) {
                 try {
-                    assert(channel === target);
-                    assert(equal(response, ["response"]));
-                    assert(arguments.length === 2);
-                    done();   
+                    if (!self.called) {
+                        assert(channel === target);
+                        assert(equal(response, "first line"));
+                        assert(arguments.length === 2);
+                        self.called = true;
+                    } else {
+                        assert(channel === target);
+                        assert(equal(response, "second line"));
+                        assert(arguments.length === 2);
+                        done();
+                    }
                 } catch (e) {
                     done(e);
                 }
             };
 
             emitter.on("join", function () {
-                return Promise.resolve(["response"]);
+                return Promise.resolve(["first line", "second line"]);
             });
 
             acceptData(raws.join);

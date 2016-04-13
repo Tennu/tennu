@@ -35,12 +35,41 @@ describe "Response" {
             }));
         }
 
-        it "makes the intent 'say' for an Array" {
+        it "makes the intent 'multi' for an Array" {
             assert(equal(Response.create(["Hello", "World"], message), {
-                intent: "say",
-                message: ["Hello", "World"],
-                target: "#channel"
+                intent: "multi",
+                message: [Response.create("Hello", message), Response.create("World", message)],
+                target: undefined
             }));
+        }
+
+        it "of a more complicated 'multi' intent from an Array" {
+            const fromResponse = [{
+                intent: "say",
+                message: "I love sender."
+            }, {
+                intent: "notice",
+                message: "I actually hate sender.",
+                query: true
+            }];
+
+            const response = {
+                intent: "multi",
+                target: undefined,
+                message: [
+                    {
+                        intent: "say",
+                        message: "I love sender.",
+                        target: "#channel"
+                    }, {
+                        intent: "notice",
+                        message: "I actually hate sender.",
+                        target: "sender"
+                    }
+                ]
+            };
+
+            assert(equal(Response.create(fromResponse, message), response));
         }
 
         describe "given an Object" {
@@ -265,6 +294,30 @@ describe "Response" {
 
             assert(client.ctcpRequest.calledOnce);
             assert(client.ctcpRequest.calledWithExactly("sender", "VERSION"));
+        }
+
+        it "with intent of 'multi'" {
+            Response.send({
+                intent: "multi",
+                message: [{
+                    intent: "say",
+                    message: "Hello world.",
+                    target: "sender"
+                }, {
+                    intent: "notice",
+                    message: "Goodbye world.",
+                    target: "sender"
+                }],
+                target: undefined
+            }, client);
+
+            assert(!client.act.called);
+            assert(!client.ctcpRespond.called);
+
+            assert(client.say.calledOnce);
+            assert(client.say.calledWithExactly("sender", "Hello world."));
+            assert(client.notice.calledOnce);
+            assert(client.notice.calledWithExactly("sender", "Goodbye world."));
         }
     }
 }

@@ -62,7 +62,7 @@ const Response = Object.freeze({
 
                 if (typeof fromResponse.message === "string") {
                     return Response.fromPlainObject(fromResponse, message);
-                } 
+                }
 
                 throw new TypeError("Cannot create response from object. No string 'message' or function 'toIrcResponse' property. Must have one or the other.")
             default: throw new TypeError("Cannot create response from passed value of type " + typeof fromResponse);
@@ -100,13 +100,11 @@ const Response = Object.freeze({
         };
     },
 
-    // Note(Havvy): This will soon have different behaviour that
-    //              behaves the same for all current use cases.
     fromArray: function (array, message) {
         return {
-            intent: "say",
-            message: array,
-            target: message.channel
+            intent: "multi",
+            message: array.map(function (fromResponse) { return Response.create(fromResponse, message); }),
+            target: undefined
         };
     },
 
@@ -133,6 +131,9 @@ const Response = Object.freeze({
             ctcpRequest: function {
                 (target, [tag, message]) => client.ctcpRequest(target, tag, message),
                 (target, [tag]) => client.ctcpRequest(target, tag)
+            },
+            multi: function (_target, responses) {
+                responses.forEach(function (response) { Response.send(response, client); });
             }
         };
 
