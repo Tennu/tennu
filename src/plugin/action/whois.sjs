@@ -4,12 +4,37 @@ const ResultCtors = require("r-result");
 const Ok = ResultCtors.Ok;
 const Fail = ResultCtors.Fail;
 const chunk = require("chunk");
+const memoizeSupport = typeof WeakMap === "function" && typeof Map === "function";
 
 module.exports = function (client, rawf, emitter) {
-    // NOTE(Havvy): `multiple` should not be set by the user, it is used as a recusion flag.
+    const memoizeMap = function () {
+        if (memoizeSupport) {
+            return new WeakMap();
+        } else {
+            return null;
+        }
+    }();
+
+    // opts takes the following values:
+    //  * multiple: true || undefined - Used internally. Don't modify.
+    //  * memoizeOver: Object - An object to memoize over. If called in the future with the same object,
+    //                 won't try the whois again, but reuse the same value.
+    //                 For this function, you probably want to memoize over the privmsg that triggered
+    //                 the want to /whois, so you don't whois more than once per message/command.
     // TODO(Havvy) Figure out what the `server` parameter does.
     // TODO(Havvy) Move the multiple case to `whoisAll` or return a Promise<[Result<WhoisInfo, WhoisFailureMessage>], Error>`?
-    return function whois (nickname, server, multiple) {
+    return function whois (nickname, server, opts) {
+        if (memoizeSupport && opts.memoizeOver) {
+            const nicknameMap = memoizeMap.get(opts.memoizeOver);
+
+            if (nicknameMap) {
+                const memoizedPromise = nicknameMap.get(nickname);
+
+                if (memoizedPromise) {
+                    return memoizedPromise;
+                }
+            }
+        }
 
         // NOTE(Havvy): The logic in this block has two purposes.
         // 1) Check if input is of the correct types, throw an error if not.
@@ -43,7 +68,7 @@ module.exports = function (client, rawf, emitter) {
             return;
         }
 
-        return new Promise(function (resolve, reject) {
+        const whoisPromise = new Promise(function (resolve, reject) {
             const whoisInfo = {
                 nickname: nickname,
                 username: undefined,
@@ -184,5 +209,15 @@ module.exports = function (client, rawf, emitter) {
         .tap(function (result) {
             emitter.emit("join", result);
         });
+
+        if (memoizeSupport && opts.memoizeOver) {
+            if (memoizeMap.has(opts.memoizeOver)) {
+                memoizeMap.get(opts.memoizeOver).set(nickname, whoisPromise);
+            } else {
+                const newNicknameMap = new Map();
+                newNicknameMap.set(nickname, whoisPromise);
+                memoizeMap.set(opts.memoizeOver, newNicknameMap);
+            }
+        }
     };
 };

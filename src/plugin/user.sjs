@@ -3,10 +3,10 @@ const format = require("util").format;
 
 module.exports = {
     init: function (client, imports) {
-        const isIdentifiedAs = function(nickname, accountname) {
+        const isIdentifiedAs = function isIdentifiedAs (nickname, accountname, opts) {
             client.debug("PluginUser", format("isIdentifiedAs(%s, %s)", nickname, accountname));
 
-            return client.whois(nickname)
+            return client.whois(nickname, false, {memoizeOver: opts.memoizeOver})
             .then(function (result) {
                 return result
                 .map(function (whoisInfo) {
