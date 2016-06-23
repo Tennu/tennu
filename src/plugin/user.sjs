@@ -5,8 +5,9 @@ module.exports = {
     init: function (client, imports) {
         const isIdentifiedAs = function isIdentifiedAs (nickname, accountname, opts) {
             client.debug("PluginUser", format("isIdentifiedAs(%s, %s)", nickname, accountname));
+            const memoizeOver = (opts && opts.memoizeOver) || false;
 
-            return client.whois(nickname, false, {memoizeOver: opts.memoizeOver})
+            return client.whois(nickname, false, {memoizeOver: memoizeOver})
             .then(function (result) {
                 return result
                 .map(function (whoisInfo) {

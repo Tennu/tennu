@@ -303,9 +303,107 @@ describe "IRC Output Socket:" {
         }
     }
 
-    describe "Whois" {
+    describe only "Whois" {
+        // Maybe this should be Nicky instead?
+        function emitWhoisNicknameResponse (messageHandler, nickname) {
+            // Default to nickname "nickname".
+            nickname = nickname || "nickname";
+
+            // WHOIS nickname
+            // :irc.server.net 311 testbot nickname username hostname.net * :Real name
+            // :irc.server.net 313 testbot nickname irc.server.net :A test server
+            // :irc.server.net 317 testbot nickname 57895 1465689648 :seconds idle, signon time
+            // :irc.server.net 318 testbot nickname :End of /WHOIS list.
+            messageHandler.emit("rpl_whoisuser", {
+                replyname: "RPL_WHOISUSER",
+                nickname: nickname,
+                username: "username",
+                hostname: "hostname.net",
+                realname: "Real name",
+                hostmask: {
+                    nickname: nickname,
+                    username: "username",
+                    hostname: "hostname.net"
+                }
+            });
+
+            messageHandler.emit("rpl_whoisserver", {
+                nickname: nickname,
+                server: "irc.server.net",
+                serverInfo: "A test server"
+            });
+
+            messageHandler.emit("rpl_whoisidle", {
+                nickname: nickname,
+                seconds: 123,
+                since: 456
+            });
+
+            messageHandler.emit("rpl_endofwhois", {
+                nickname: nickname
+            });
+        }
+
         describe "A single user" {
-            it skip "resolves to Ok(WhoisInfo) when succeeded" {}
+            it "resolves to Ok(WhoisInfo) when succeeded" {
+                const whoisPromise = out.whois("nickname")
+                .then(function (whoisResult) {
+                    assert(whoisResult.isOk());
+
+                    const whois = whoisResult.ok();
+
+                    assert(whois.nickname === "nickname");
+                    assert(whois.username === "username");
+                    assert(whois.hostname === "hostname.net");
+                    assert(equal(whois.hostmask, {
+                        nickname: "nickname",
+                        username: "username",
+                        hostname: "hostname.net"
+                    }));
+                    assert(whois.realname === "Real name");
+                    assert(!whois.identified);
+                    assert(whois.identifiedas === undefined);
+                    assert(whois.server === "irc.server.net");
+                    assert(whois.serverInfo === "A test server");
+                    assert(whois.idleSeconds === 123);
+                    assert(whois.loginTimestamp === 456);
+                    assert(!whois.secureConnection);
+                    assert(!whois.isBot);
+                    assert(!whois.isHelpop);
+                    assert(!whois.isOper);
+                });
+
+                messageHandler.emit("rpl_whoisuser", {
+                    replyname: "RPL_WHOISUSER",
+                    nickname: "nickname",
+                    username: "username",
+                    hostname: "hostname.net",
+                    realname: "Real name",
+                    hostmask: {
+                        nickname: "nickname",
+                        username: "username",
+                        hostname: "hostname.net"
+                    }
+                });
+
+                messageHandler.emit("rpl_whoisserver", {
+                    nickname: "nickname",
+                    server: "irc.server.net",
+                    serverInfo: "A test server"
+                });
+
+                messageHandler.emit("rpl_whoisidle", {
+                    nickname: "nickname",
+                    seconds: 123,
+                    since: 456
+                });
+
+                messageHandler.emit("rpl_endofwhois", {
+                    nickname: "nickname"
+                });
+
+                return whoisPromise;
+            }
 
             describe "Identifying" {
                 it skip "JoinInfo has `\"identified\": false` when user is not identified" {}
@@ -314,6 +412,90 @@ describe "IRC Output Socket:" {
             }
             it skip "resolves to Fail(Numeric421Message) if WHOIS command is unrecognized (e.g. on Twitch.tv)" {}
             it skip "resovles to Fail(Numeric401Message) if WHOIS non-existent nickname" {}
+        }
+
+        describe "memoization" {
+            it "can avoid a whois if memoized over an object of the caller's choice" {
+                // In a real case, this would be a PRIVMSG about the user.
+                const memoizationKey = {};
+                var whoisResult1;
+
+                const whoisPromise = out.whois("nickname", false, {memoizeOver: memoizationKey})
+                .then(function (whoisResult) {
+                    whoisResult1 = whoisResult;
+
+                    return out.whois("nickname", false, {memoizeOver: memoizationKey});
+                })
+                .then(function (whoisResult) {
+                    assert(whoisResult1 === whoisResult);
+                    assert(socket.raw.calledOnce);
+                });
+
+                emitWhoisNicknameResponse(messageHandler);
+
+                return whoisPromise;
+            }
+
+            it "will only avoid the whois request if the memoizeOver object is the same" {
+                const memoizationKey1 = {};
+                const memoizationKey2 = {};
+                var whoisResult1;
+
+                const whoisPromise = out.whois("nickname", false, {memoizeOver: memoizationKey1})
+                .then(function (whoisResult) {
+                    whoisResult1 = whoisResult;
+                    const whoisPromise2 = out.whois("nickname", false, {memoizeOver: memoizationKey2});
+                    emitWhoisNicknameResponse(messageHandler);
+                    return whoisPromise2;
+                })
+                .then(function (whoisResult) {
+                    assert(whoisResult1 !== whoisResult);
+                    assert(socket.raw.calledTwice);
+                });
+
+                emitWhoisNicknameResponse(messageHandler);
+                return whoisPromise;
+            }
+
+            it "will not memoize if there is no memoizeOver object" {
+                var whoisResult1;
+
+                const whoisPromise = out.whois("nickname")
+                .then(function (whoisResult) {
+                    whoisResult1 = whoisResult;
+                    const whoisPromise2 = out.whois("nickname");
+                    emitWhoisNicknameResponse(messageHandler);
+                    return whoisPromise2;
+                })
+                .then(function (whoisResult) {
+                    assert(whoisResult1 !== whoisResult);
+                    assert(socket.raw.calledTwice);
+                });
+
+                emitWhoisNicknameResponse(messageHandler);
+                return whoisPromise;
+            }
+
+            it "will not send whois results for different nicknames and same memoization object" {
+                const memoizationKey = {};
+                var whoisResult1;
+
+                const whoisPromise = out.whois("nickname", false, {memoizeOver: memoizationKey})
+                .then(function (whoisResult) {
+                    whoisResult1 = whoisResult;
+
+                    const whoisPromise = out.whois("nickname2", false, {memoizeOver: memoizationKey});
+                    emitWhoisNicknameResponse(messageHandler, "nickname2");
+                })
+                .then(function (whoisResult) {
+                    assert(whoisResult1 !== whoisResult);
+                    assert(socket.raw.calledTwice);
+                });
+
+                emitWhoisNicknameResponse(messageHandler);
+
+                return whoisPromise;
+            }
         }
 
         describe "timeouts" {}

@@ -24,7 +24,7 @@ module.exports = function (client, rawf, emitter) {
     // TODO(Havvy) Figure out what the `server` parameter does.
     // TODO(Havvy) Move the multiple case to `whoisAll` or return a Promise<[Result<WhoisInfo, WhoisFailureMessage>], Error>`?
     return function whois (nickname, server, opts) {
-        if (memoizeSupport && opts.memoizeOver) {
+        if (memoizeSupport && opts && opts.memoizeOver) {
             const nicknameMap = memoizeMap.get(opts.memoizeOver);
 
             if (nicknameMap) {
@@ -59,7 +59,7 @@ module.exports = function (client, rawf, emitter) {
             throw new Error("Whois command takes either a string (a single nick) or an array (of string nicks)");
         }
 
-        if (server || multiple) {
+        if (server || (opts && opts.multiple)) {
             if (server) {
                 rawf("WHOIS %s %s", server, nickname);
             } else {
@@ -210,7 +210,7 @@ module.exports = function (client, rawf, emitter) {
             emitter.emit("join", result);
         });
 
-        if (memoizeSupport && opts.memoizeOver) {
+        if (memoizeSupport && (opts && opts.memoizeOver)) {
             if (memoizeMap.has(opts.memoizeOver)) {
                 memoizeMap.get(opts.memoizeOver).set(nickname, whoisPromise);
             } else {
@@ -219,5 +219,7 @@ module.exports = function (client, rawf, emitter) {
                 memoizeMap.set(opts.memoizeOver, newNicknameMap);
             }
         }
+
+        return whoisPromise;
     };
 };
