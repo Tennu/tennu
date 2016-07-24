@@ -63,10 +63,10 @@ module.exports = {
 
     send: function (response, client) {
         const intents = {
-            say: λ[client.say(#, #)],
-            act: λ[client.act(#, #)],
-            notice: λ[client.notice(#, #)],
-            none: λ[undefined],
+            say: function (channel, message) { client.say(channel, message); },
+            act: function (channel, message) { client.act(channel, message); },
+            notice: function (channel, message) { client.notice(channel, message); },
+            none: function () { /* no-op */ },
             ctcp: function {
                 (target, [tag, message]) => {
                     client.warn("Tennu", "Received response with deprecated intent 'ctcp'. Change to 'ctcpRespond'.");

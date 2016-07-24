@@ -24,7 +24,7 @@ gulp.task("build", function () {
         .pipe(gulp.dest(to))
     }
 
-    pipeline("lib", "lib", [match, lambda]);
+    pipeline("lib", "lib", [match/*, lambda */]);
     pipeline("plugin", "tennu_plugins", [match, lambda]);
     pipeline("test", "test", [bdd]);
 
