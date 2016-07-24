@@ -303,7 +303,7 @@ describe "IRC Output Socket:" {
         }
     }
 
-    describe only "Whois" {
+    describe "Whois" {
         // Maybe this should be Nicky instead?
         function emitWhoisNicknameResponse (messageHandler, nickname) {
             // Default to nickname "nickname".
