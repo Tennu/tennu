@@ -36,24 +36,24 @@ const other = {
 };
 const channel_a = "#a";
 
-describe "Channel Plugin" {
+describe("Channel Plugin", function () {
     var instance, client;
 
-    beforeEach {
+    beforeEach(function () {
         client = {
             nickname: function () { return "me"; },
 
             mode: function () {}
         };
         instance = ChannelPluginFactory.init(client, {});
-    }
+    });
 
-    it "without having joined any channels only has empty lists" {
+    it("without having joined any channels only has empty lists", function () {
         assert(equal([], instance.exports.all()));
         assert(equal([], instance.exports.chans()));
-    }
+    });
 
-    it "gathers minimal data when joining an empty unregistered channel" {
+    it("gathers minimal data when joining an empty unregistered channel", function () {
         // JOIN #a
         // :me!tennu@tennu.net JOIN :#a
         // :irc.test.net MODE #a +nt 
@@ -119,9 +119,9 @@ describe "Channel Plugin" {
         instance.handlers.part(Message(format(":%s PART %s", self.hostmask, channel_a)));
         assert(equal([], instance.exports.all()));
         assert(equal([], instance.exports.chans()));
-    }
+    });
 
-    it "joining unregistered channel, and then opping and de-opping user who joins after" {
+    it("joining unregistered channel, and then opping and de-opping user who joins after", function () {
         // JOIN #a
         // :me!tennu@tennu.net JOIN :#a
         // :irc.test.net MODE #a +nt 
@@ -189,5 +189,5 @@ describe "Channel Plugin" {
         })));
 
         instance.handlers.part(Message(format(":%s PART %s", self.hostmask, channel_a)));
-    }
-}
+    });
+});

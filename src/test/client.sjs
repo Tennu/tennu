@@ -27,14 +27,14 @@ const messages = {
     _: ""
 };
 
-describe "Tennu Client:" {
+describe("Tennu Client:", function () {
     var netsocket, client;
 
-    beforeEach {
+    beforeEach(function () {
         netsocket = NetSocket(logfn);
-    }
+    });
 
-    it "Basic Connecting and Disconnecting" {
+    it("Basic Connecting and Disconnecting", function () {
         client = Client(networkConfig, {
             NetSocket: netsocket,
             Logger: logger
@@ -47,10 +47,10 @@ describe "Tennu Client:" {
         assert(client.connected === true);
         client.disconnect();
         assert(client.connected === false);
-    }
+    });
 
-    describe "Error handling" {
-        it "tells you which methods are missing on the logger" {
+    describe("Error handling", function () {
+        it("tells you which methods are missing on the logger", function () {
             var config = networkConfig;
 
             try {
@@ -65,12 +65,12 @@ describe "Tennu Client:" {
                 logfn(e.message);
                 assert(e.message === "Logger passed to tennu.Client is missing the following methods: [ 'crit', 'alert', 'emerg' ]");
             }
-        }
-    }
+        });
+    });
 
     // TODO(Havvy): Move to 'config' plugin.
-    describe "Capabilities always requires `multi-prefix`" {
-        it "even when no capabilities passed" {
+    describe("Capabilities always requires `multi-prefix`", function () {
+        it("even when no capabilities passed", function () {
             var client = Client(networkConfig, {
                 NetSocket: netsocket,
                 Logger: logger
@@ -84,9 +84,9 @@ describe "Tennu Client:" {
             client._socket.impl.acceptData(messages.rpl_cap_ls);
             assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
-        }
+        });
 
-        it "even when capabilities is passed without a requires property" {
+        it("even when capabilities is passed without a requires property", function () {
             var config = defaults({capabilities: {}}, networkConfig);
             var client = Client(config, {
                 NetSocket: netsocket,
@@ -99,9 +99,9 @@ describe "Tennu Client:" {
             client._socket.impl.acceptData(messages.rpl_cap_ls);
             assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
-        }
+        });
 
-        it "event when capabilities is passed a requires array property without them" {
+        it("event when capabilities is passed a requires array property without them", function () {
             var config = defaults({ capabilities: { requires: [] } }, networkConfig);
             var client = Client(config, {
                 NetSocket: netsocket,
@@ -114,9 +114,9 @@ describe "Tennu Client:" {
             client._socket.impl.acceptData(messages.rpl_cap_ls);
             assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_ack_default_capabilities);
-        }
+        });
 
-        it "except when the daemon is 'twitch'" {
+        it("except when the daemon is 'twitch'", function () {
             var config = defaults({ daemon: "twitch" }, networkConfig);
             var client = Client(config, {
                 NetSocket: netsocket,
@@ -126,9 +126,9 @@ describe "Tennu Client:" {
             client.connect();
             client._socket.impl.acceptConnect();
             assert(client._socket.impl.write.getCall(0).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
-        }
+        });
 
-        it "except when the daemon is 'irc2'" {
+        it("except when the daemon is 'irc2'", function () {
             var config = defaults({ daemon: "irc2" }, networkConfig);
             var client = Client(config, {
                 NetSocket: netsocket,
@@ -138,12 +138,12 @@ describe "Tennu Client:" {
             client.connect();
             client._socket.impl.acceptConnect();
             assert(client._socket.impl.write.getCall(0).calledWithExactly("USER testuser 8 * :tennu irc bot\r\n", "utf-8"));
-        }
-    }
+        });
+    });
 
-    describe "misc" {
+    describe("misc", function () {
         // This test triggers an assertion error in libuv somehow...
-        it "with a complex config file" {
+        it("with a complex config file", function () {
             const config = {
                 "server": "irc.irc2.net",
                 "password": null,
@@ -167,6 +167,6 @@ describe "Tennu Client:" {
                 NetSocket: netsocket,
                 Logger: logger
             });
-        }
-    }
-}
+        });
+    });
+});

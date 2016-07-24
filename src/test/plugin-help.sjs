@@ -54,7 +54,7 @@ const makeConfigFn = function (configChanges) {
 
 const defaultConfigFn = makeConfigFn({});
 
-describe "Help plugin" {
+describe("Help plugin", function () {
     var instance, help, HELP_NOT_FOUND, client;
 
     const config = function (opts) {
@@ -75,98 +75,98 @@ describe "Help plugin" {
         help = instance.exports.help;
     }
 
-    it "returns HELP_NOT_FOUND for unknown topics" {
+    it("returns HELP_NOT_FOUND for unknown topics", function () {
         config({});
         assert(help(["dnd"]) === HELP_NOT_FOUND);
-    }
+    });
 
-    it "returns HELP_NOT_FOUND for subtopics of unknown topics" {
+    it("returns HELP_NOT_FOUND for subtopics of unknown topics", function () {
         config({});
         assert(help(["dne", "subtopic"]) === HELP_NOT_FOUND);
-    }
+    });
 
-    it "assigns the topic of the plugin name the value of the string when given a string" {
+    it("assigns the topic of the plugin name the value of the string when given a string", function () {
         config({});
         logfn(inspect(help(["a"])));
         assert(help(["a"]) === "a *");
-    }
+    });
 
-    it "assigns the topic of the plugin name the value of the array when given an array" {
+    it("assigns the topic of the plugin name the value of the array when given an array", function () {
         config({});
         logfn(inspect(help(["d"])));
         assert(equal(help(["d"]), ["d *_1", "d *_2"]));
-    }
+    });
 
-    it "gives the * property of topics with an object value" {
+    it("gives the * property of topics with an object value", function () {
         config({});
         assert(help(["b"]) === "b *");
-    }
+    });
 
-    it "gives HELP_NOT_FOUND for topics with an object value without the * property" {
+    it("gives HELP_NOT_FOUND for topics with an object value without the * property", function () {
         config({});
         assert(help(["c"]) === HELP_NOT_FOUND);
-    }
+    });
 
-    it "gives the subtopic string value for subtopic type of string" {
+    it("gives the subtopic string value for subtopic type of string", function () {
         config({});
         logfn(inspect(help(["b", "b1"])));
         assert(help(["b", "b1"]) === "b 1");
-    }
+    });
 
-    it "gives the subtopic array value for subtopic type of array" {
+    it("gives the subtopic array value for subtopic type of array", function () {
         config({});
         logfn(inspect(help(["b", "b2"])));
         assert(equal(help(["b", "b2"]), ["b 2_1", "b 2_2"]));
-    }
+    });
 
-    it "gives the * property of subtopic type of object" {
+    it("gives the * property of subtopic type of object", function () {
         config({});
         logfn(inspect(help(["b", "b3"])));
         assert(help(["b", "b3"]) === "b 3 *");
-    }
+    });
 
-    it "gives HELP_NOT_FOUND for nonexistent subtopic of existing topic" {
+    it("gives HELP_NOT_FOUND for nonexistent subtopic of existing topic", function () {
         config({});
         logfn(inspect(help(["b", "b4"])));
         assert(help(["b", "b4"]) === HELP_NOT_FOUND);
-    }
+    });
 
-    it "replaces {{!}} with the command trigger (string)" {
+    it("replaces {{!}} with the command trigger (string)", function () {
         config({});
         logfn(inspect(help(["e"])));
 
         assert(help(["e"]) === "@e");
-    }
+    });
 
-    it "replaces {{!}} with the command trigger (array)" {
+    it("replaces {{!}} with the command trigger (array)", function () {
         config({});
         assert(equal(help(["f"]), ["@", "@"]));
-    }
+    });
 
-    describe "!commands" {
-        it "shows installed commands" {
+    describe("!commands", function () {
+        it("shows installed commands", function () {
             config({});
 
             instance.hooks.commands("help", instance.commands);
 
             assert(equal(instance.handlers["!commands"](), ["List of known commands:", "help, commands"]));
-        }
+        });
 
-        it "shows installed commands from all plugins" {
+        it("shows installed commands from all plugins", function () {
             config({});
 
             instance.hooks.commands("help", instance.commands);
             instance.hooks.commands("test", ["a", "b"]);
 
             assert(equal(instance.handlers["!commands"](), ["List of known commands:", "help, commands, a, b"]));
-        }
+        });
 
-        it "doesn't show ignored commands" {
+        it("doesn't show ignored commands", function () {
             config({config: makeConfigFn({"command-ignore-list": ["ignored"]})});
 
             instance.hooks.commands("test", ["a", "b", "ignored"]);
 
             assert(equal(instance.handlers["!commands"](), ["List of known commands:", "a, b"]));
-        }
-    }
-}
+        });
+    });
+});

@@ -27,16 +27,16 @@ const messages = {
     _: ""
 };
 
-describe "Integration tests:" {
+describe("Integration tests:", function () {
     var netsocket, client;
 
-    beforeEach {
+    beforeEach(function () {
         netsocket = NetSocket(logfn);
-    }
+    });
 
     // TODO(Havvy): Move this to a test for the Self plugin.
-    describe "Self plugin:" {
-        beforeEach (done) {
+    describe("Self plugin:", function () {
+        beforeEach(function (done) {
             client = Client(networkConfig, {
                 NetSocket: netsocket,
                 Logger: logger
@@ -45,18 +45,18 @@ describe "Integration tests:" {
             netsocket.on("connect", done);
             client.connect();
             client._socket.impl.acceptConnect();
-        }
+        });
 
-        afterEach (done) {
+        afterEach(function (done) {
             netsocket.on("close", done);
             client.disconnect();
-        }
+        });
 
-        it "does not know its nickname until startup finishes" {
+        it("does not know its nickname until startup finishes", function () {
             assert(client.nickname() === undefined);
-        }
+        });
 
-        it "tracks its initial nickname" (done) {
+        it("tracks its initial nickname", function (done) {
             assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_cap_ls);
             assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
@@ -72,9 +72,9 @@ describe "Integration tests:" {
                     done();
                 });
             });
-        }
+        });
 
-        it "tracks its changed nick" {
+        it("tracks its changed nick", function () {
             assert(client._socket.impl.write.getCall(0).calledWithExactly("CAP LS\r\n", "utf-8"));
             client._socket.impl.acceptData(messages.rpl_cap_ls);
             assert(client._socket.impl.write.getCall(1).calledWithExactly("CAP REQ :multi-prefix\r\n", "utf-8"));
@@ -95,19 +95,19 @@ describe "Integration tests:" {
             .then(function () {
                 assert(client.nickname() === "changed-nick");
             });
-        }
-    }
+        });
+    });
 
     // TODO(havvy): Move to own file.
-    describe "Startup Plugin" {
+    describe("Startup Plugin", function () {
 
-        afterEach (done) {
+        afterEach(function (done) {
             netsocket.on("close", done);
             client.disconnect();
-        }
+        });
 
-        describe "autojoin" {
-            it "automatically joins specified channels." (done) {
+        describe("autojoin", function () {
+            it("automatically joins specified channels.", function (done) {
                 client = Client(defaults({channels: ["#test"]}, networkConfig), {
                     NetSocket: netsocket,
                     Logger: logger
@@ -134,11 +134,11 @@ describe "Integration tests:" {
                     // client._socket.impl.acceptData(messages.rpl_endofnames_test);
                     done();
                 });
-            }
-        }
+            });
+        });
 
-        describe "autoidentify" {
-            it "automatically identifies to services." (done) {
+        describe("autoidentify", function () {
+            it("automatically identifies to services.", function (done) {
                 var config = defaults({
                     "nickserv": "nickserv",
                     "auth-password": "123456"
@@ -165,15 +165,15 @@ describe "Integration tests:" {
                     assert(spyCall.calledWithExactly("PRIVMSG nickserv :identify 123456\r\n", "utf-8"));
                     done();
                 });
-            }
-        }
+            });
+        });
 
         // When ERROR is sent before 001.
-        it skip "does not do post-startup tasks if server never started" {}
-        it skip "tells you why startup failed when it fails" {}
-    }
+        it.skip("does not do post-startup tasks if server never started", function () {});
+        it.skip("tells you why startup failed when it fails", function () {});
+    });
 
-    it "CTCP VERSION handling" (done) {
+    it("CTCP VERSION handling", function (done) {
         client = Client(networkConfig, {
             NetSocket: netsocket,
             Logger: logger
@@ -202,9 +202,9 @@ describe "Integration tests:" {
                 done(e);
             }
         });
-    }
+    });
 
-    it "Add plugin with command that returns a String response and is then called" (done) {
+    it("Add plugin with command that returns a String response and is then called", function (done) {
         client = Client(networkConfig, {
             NetSocket: netsocket,
             Logger: logger
@@ -245,5 +245,5 @@ describe "Integration tests:" {
         });
 
         client._socket.impl.acceptData(":user!user@user.net PRIVMSG user :!foo\r\n");
-    }
-}
+    });
+});

@@ -49,10 +49,10 @@ const messages = {
     _: ""
 };
 
-describe "Commands Plugin" {
+describe("Commands Plugin", function () {
     var client, deps, commands, emitter, acceptPrivmsg;
 
-    beforeEach {
+    beforeEach(function () {
         client = {
             // Logger
             debug: logfn, 
@@ -86,33 +86,33 @@ describe "Commands Plugin" {
             assert(typeof privmsg === "string");
             return commands.handlers["privmsg"](Message(privmsg));
         }
-    }
+    });
 
-    describe "command detection:" {
-        it "subscribes to the '!' prefix" {
+    describe("command detection:", function () {
+        it("subscribes to the '!' prefix", function () {
             assert(commands.subscribe.prefix === "!");
-        }
+        });
 
-        it "does nothing with privmsgs that aren't commands" {
+        it("does nothing with privmsgs that aren't commands", function () {
             client.note = sinon.spy(client.note);
             acceptPrivmsg(messages.noncommand);
             assert(!client.note.called);
-        }
+        });
 
-        it "does not detect a command for ' ' in query" {
+        it("does not detect a command for ' ' in query", function () {
             client.note = sinon.spy(client.note);
             acceptPrivmsg(messages.spaceQuery);
             assert(!client.note.called);
-        }
+        });
 
-        it "does not consider CTCPs commands" {
+        it("does not consider CTCPs commands", function () {
             client.note = sinon.spy(client.note);
             acceptPrivmsg(messages.noncommand_ctcp);
             assert(!client.note.called);
-        }
+        });
 
-        describe "Recognition Types:" {
-            it "Trigger" (done) {
+        describe("Recognition Types:", function () {
+            it("Trigger", function (done) {
                 emitter.on(commandname, function (command) {
                     assert(command.command === commandname);
                     assert(equal(command.args, []));
@@ -120,9 +120,9 @@ describe "Commands Plugin" {
                 });
 
                 acceptPrivmsg(messages.detect.trigger);
-            }
+            });
 
-            it "Highlights" (done) {
+            it("Highlights", function (done) {
                 emitter.on(commandname, function (command) {
                     assert(command.command === commandname);
                     assert(equal(command.args, []));
@@ -130,9 +130,9 @@ describe "Commands Plugin" {
                 });
 
                 acceptPrivmsg(messages.detect.highlight);
-            }
+            });
 
-            it "Highlights in case insensitive way" (done) {
+            it("Highlights in case insensitive way", function (done) {
                 emitter.on(commandname, function (command) {
                     assert(command.command === commandname);
                     assert(equal(command.args, []));  
@@ -140,9 +140,9 @@ describe "Commands Plugin" {
                 });
 
                 acceptPrivmsg(messages.detect.case_insensitive_highlight);          
-            }
+            });
 
-            it "Query" (done) {
+            it("Query", function (done) {
                 emitter.on(commandname, function (command) {
                     assert(command.command === commandname);
                     assert(equal(command.args, []));
@@ -150,9 +150,9 @@ describe "Commands Plugin" {
                 });
 
                 acceptPrivmsg(messages.detect.query);
-            }
+            });
 
-            it "Query with trigger" (done) {
+            it("Query with trigger", function (done) {
                 emitter.on(commandname, function (command) {
                     assert(command.command === commandname);
                     assert(equal(command.args, []));
@@ -160,10 +160,10 @@ describe "Commands Plugin" {
                 });
 
                 acceptPrivmsg(messages.detect.query_with_trigger);
-            }
-        }
+            });
+        });
 
-        it "'args' property an array of the words of the message" (done) {
+        it("'args' property an array of the words of the message", function (done) {
             emitter.on(commandname, function (command) {
                 assert(command.command === commandname);
                 assert(equal(command.args, [arg1, arg2]));
@@ -171,10 +171,10 @@ describe "Commands Plugin" {
             });
 
             acceptPrivmsg(messages.args);
-        }
+        });
 
-        describe "Odd Spacing:" {
-            it "Highlight" (done) {
+        describe("Odd Spacing:", function () {
+            it("Highlight", function (done) {
                 emitter.on(commandname, function (command) {
                     assert(command.command === commandname);
                     assert(equal(command.args, []));
@@ -182,9 +182,9 @@ describe "Commands Plugin" {
                 });
 
                 acceptPrivmsg(messages.detect.highlight_oddspacing);
-            }
+            });
 
-            it "Args" (done) {
+            it("Args", function (done) {
                 emitter.on(commandname, function (command) {
                     assert(command.command === commandname);
                     assert(equal(command.args, [arg1, arg2]));
@@ -192,22 +192,22 @@ describe "Commands Plugin" {
                 });
 
                 acceptPrivmsg(messages.args_oddspacing);
-            }
-        }
-    }
+            });
+        });
+    });
 
-    describe "events are emitted" {
-        it "of the command name" (done) {
+    describe("events are emitted", function () {
+        it("of the command name", function (done) {
             emitter.on(commandname, function (command) {
                 assert(command.command === commandname);
                 done();
             });
 
             acceptPrivmsg(messages.command);
-        }
-    }
+        });
+    });
 
-    it "disallows multiple handlers to the same command" {
+    it("disallows multiple handlers to the same command", function () {
         emitter.on(commandname, function () {});
 
         var errorThrown = false;
@@ -218,9 +218,9 @@ describe "Commands Plugin" {
         }
 
         assert(errorThrown === true);
-    }
+    });
 
-    it "command handler return values are returned to the messages emitter wrapped in a Promise" {
+    it("command handler return values are returned to the messages emitter wrapped in a Promise", function () {
         const returnSetinel = {};
 
         emitter.on(commandname, function () {
@@ -228,9 +228,9 @@ describe "Commands Plugin" {
         });
 
         return acceptPrivmsg(messages.command).then(function (retval) { assert(retval === returnSetinel); });
-    }
+    });
 
-    describe "Ignoring commands" {
+    describe("Ignoring commands", function () {
         // In these tests, we use the fact that handlers for one command
         // are handled before the next command's handlers are handled.
         // Thus, if an ignored command is handled first and fires a
@@ -246,14 +246,14 @@ describe "Commands Plugin" {
         // the function that gives resolve/reject when possible.
         var resolve, reject, promise;
 
-        beforeEach {
+        beforeEach(function () {
             promise = new Promise(function (resolver, rejecter) {
                 resolve = resolver;
                 reject = rejecter;
             });
-        }
+        });
 
-        it "from anywhere given only a string" {
+        it("from anywhere given only a string", function () {
             emitter.on("ignored", function () {
                 reject();
             });
@@ -265,9 +265,9 @@ describe "Commands Plugin" {
             acceptPrivmsg(messages.command);
 
             return promise;
-        }
+        });
 
-        it "but not from non-plugins when ignored from specific plugins" {
+        it("but not from non-plugins when ignored from specific plugins", function () {
             emitter.on("ignored-in-ignoreme", function () {
                 resolve();
             });
@@ -279,9 +279,9 @@ describe "Commands Plugin" {
             acceptPrivmsg(messages.command);
 
             return promise;
-        }
+        });
 
-        it "from a specific plugin when ignored from a specific plugin" {
+        it("from a specific plugin when ignored from a specific plugin", function () {
             emitter.on("ignored-in-ignoreme", function () {
                 reject();
             }, {plugin: "ignoreme"});
@@ -293,9 +293,9 @@ describe "Commands Plugin" {
             acceptPrivmsg(messages.command);
 
             return promise;
-        }
+        });
 
-        it "but not from a different plugin when ignored from specific plugins" {
+        it("but not from a different plugin when ignored from specific plugins", function () {
             emitter.on("ignored-in-ignoreme", function () {
                 resolve();
             }, {plugin: "other"});
@@ -307,9 +307,9 @@ describe "Commands Plugin" {
             acceptPrivmsg(messages.command);
 
             return promise;
-        }
+        });
 
-        it "from all plugins when ignored from specific plugins" {
+        it("from all plugins when ignored from specific plugins", function () {
             emitter.on("ignored-in-ignorme-and-ignoreme2", function () {
                 reject();
             }, {plugin: "ignoreme"});
@@ -324,9 +324,9 @@ describe "Commands Plugin" {
             acceptPrivmsg(messages.command);
 
             return promise;
-        }
+        });
 
-        it "allows another plugin to handle the command when ignored from specific plugins" {
+        it("allows another plugin to handle the command when ignored from specific plugins", function () {
             emitter.on("ignored-in-ignoreme", function () {
                 reject();
             }, {plugin: "ignoreme"});
@@ -337,54 +337,54 @@ describe "Commands Plugin" {
             acceptPrivmsg(messages.ignore_in_ignoreme);
 
             return promise;
-        }
-    }
+        });
+    });
 
-    it skip "privmsg of identified command with no handler" {}
+    it.skip("privmsg of identified command with no handler", function () {});
 
-    describe "Triggers" {
-        it skip "can be the empty string" {}
-        it skip "does not trigger for message: ' ' when trigger is empty string" {}
-        it skip "can be multiple characters long" {}
-    }
+    describe("Triggers", function () {
+        it.skip("can be the empty string", function () {});
+        it.skip("does not trigger for message: ' ' when trigger is empty string", function () {});
+        it.skip("can be multiple characters long", function () {});
+    });
 
-    describe "isCommand" {
-        it "returns true for commands" {
+    describe("isCommand", function () {
+        it("returns true for commands", function () {
             assert(commands.exports.isCommand(Message(messages.command)) === true);
-        }
+        });
 
-        it "returns false for non-commands" {
+        it("returns false for non-commands", function () {
             assert(commands.exports.isCommand(Message(messages.noncommand)) === false);
-        }
-    }
+        });
+    });
 
-    describe "isHandledCommand" {
-        it "returns true for commands that are handled" {
+    describe("isHandledCommand", function () {
+        it("returns true for commands that are handled", function () {
             emitter.on(commandname, function () {});
 
             assert(commands.exports.isHandledCommand(Message(messages.detect.trigger)) === true);
-        }
+        });
 
-        it "returns false for commands that are not handled" {
+        it("returns false for commands that are not handled", function () {
             assert(commands.exports.isHandledCommand(Message(messages.detect.trigger)) === false);
-        }
+        });
 
-        it "returns false for non-commands" {
+        it("returns false for non-commands", function () {
             assert(commands.exports.isHandledCommand(Message(messages.noncommand)) === false);
-        }
-    }
+        });
+    });
 
-    describe "Middleware" {
-        it "calls each ware function (even with or without a handler)" (done) {
+    describe("Middleware", function () {
+        it("calls each ware function (even with or without a handler)", function (done) {
             commands.hooks.commandMiddleware("test", function (command) {
                 assert(command.command === commandname);
                 done();
             });
 
             acceptPrivmsg(messages.command);
-        }
+        });
 
-        it "can return a Promise" (done) {
+        it("can return a Promise", function (done) {
             commands.hooks.commandMiddleware("test", function (command) {
                 return Promise.resolve(command);
             });
@@ -395,9 +395,9 @@ describe "Commands Plugin" {
             });
 
             acceptPrivmsg(messages.command);
-        }
+        });
 
-        it "can rename the command" (done) {
+        it("can rename the command", function (done) {
             commands.hooks.commandMiddleware("test", function (command) {
                 command.command = "renamed";
                 return command;
@@ -412,16 +412,16 @@ describe "Commands Plugin" {
             });
 
             acceptPrivmsg(messages.command);
-        }
+        });
 
-        it "can choose to end the command handling by returning a Response" {
+        it("can choose to end the command handling by returning a Response", function () {
             commands.hooks.commandMiddleware("test", function (command) {
                 return "Intercepted";
             });
 
             return acceptPrivmsg(messages.command).then(function (response) { assert(response === "Intercepted"); });
-        }
+        });
 
-        it skip "throws an error on adding non-functional middleware" {}
-    }
-}
+        it.skip("throws an error on adding non-functional middleware", function () {});
+    });
+});

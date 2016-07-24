@@ -19,7 +19,7 @@ const ResultCtors = require("r-result");
 const Ok = ResultCtors.Ok;
 const Fail = ResultCtors.Fail;
 
-describe "User Plugin" {
+describe("User Plugin", function () {
     var userPlugin, client;
 
     const whoisReturns = {
@@ -47,7 +47,7 @@ describe "User Plugin" {
         "error": Promise.reject(new Error("An Error"))
     };
 
-    beforeEach {
+    beforeEach(function () {
         logfn(/* newline */);
 
         client = {
@@ -65,62 +65,62 @@ describe "User Plugin" {
         };
 
         userPlugin = UserPluginFactory.init(client, {});
-    }
+    });
 
-    describe "isIdentifiedAs" {
+    describe("isIdentifiedAs", function () {
         var isIdentifiedAs;
 
-        beforeEach {
+        beforeEach(function () {
             isIdentifiedAs = userPlugin.exports.isIdentifiedAs;
-        }
+        });
 
-        it "returns false for unidentified nicks" {
+        it("returns false for unidentified nicks", function () {
             return isIdentifiedAs("unidentified", "identified-self")
             .then(function (isIdentifiedAs) {
                 assert(isIdentifiedAs === false);
             });
-        }
+        });
 
-        it "returns true for identified to self" {
+        it("returns true for identified to self", function () {
             return isIdentifiedAs("identified-self", "identified-self")
             .then(function (isIdentifiedAs) {
                 assert(isIdentifiedAs === true);
             });
-        }
+        });
 
-        it "returns true for identified to self from an alt nickname" {
+        it("returns true for identified to self from an alt nickname", function () {
             return isIdentifiedAs("identified-alt", "identified-self")
             .then(function (isIdentifiedAs) {
                 assert(isIdentifiedAs === true);
             });
-        }
+        });
 
-        it "returns false for identified to an other nickname" {
+        it("returns false for identified to an other nickname", function () {
             return isIdentifiedAs("identified-other", "identified-self")
             .then(function (isIdentifiedAs) {
                 assert(isIdentifiedAs === false);
             });
-        }
+        });
 
-        it "returns false when whois fails" {
+        it("returns false when whois fails", function () {
             return isIdentifiedAs("failure", "identified-self")
             .then(function (isIdentifiedAs) {
                 assert(isIdentifiedAs === false);
             });
-        }
+        });
 
-        it "returns false when client.whois() errors" {
+        it("returns false when client.whois() errors", function () {
             return isIdentifiedAs("error", "identified-self")
             .then(function (isIdentifiedAs) {
                 assert(isIdentifiedAs === false);
             });
-        }
+        });
 
-        it "is case insensitive" {
+        it("is case insensitive", function () {
             return isIdentifiedAs("CaSe", "cAsE")
             .then(function (isIdentifiedAs) {
                 assert(isIdentifiedAs === true);
-            })
-        }
-    }
-}
+            });
+        });
+    });
+});

@@ -64,12 +64,9 @@
     "gulp": "^3.9.1",
     "gulp-concat-util": "^0.5.1",
     "gulp-rename": "^1.2.2",
-    "gulp-sourcemaps": "^1.2.4",
-    "gulp-sweetjs": "^0.6.0",
     "mocha": "^2.0.0",
     "sinon": "^1.11.1",
-    "source-map-support": "^0.2.7",
-    "sweet-bdd": "^1.1.0"
+    "source-map-support": "^0.2.7"
   },
   "scripts": {
     "test": "gulp build && mocha -R spec",

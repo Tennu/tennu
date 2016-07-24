@@ -30,10 +30,10 @@ const raws = {
     _: ""
 };
 
-describe "Messages Plugin" {
+describe("Messages Plugin", function () {
     var defaultPrefix, client, deps, messages, emitter, afterEmit, acceptData;
 
-    beforeEach {
+    beforeEach(function () {
         defaultPrefix = {}
         client = {
             say: logfn,
@@ -50,14 +50,14 @@ describe "Messages Plugin" {
         acceptData = function (data) {
             client._socket.emit("data", data);
         };
-    }
+    });
 
-    it "subscribes to the default prefix" {
+    it("subscribes to the default prefix", function () {
         assert(messages.subscribe.prefix === defaultPrefix);
-    }
+    });
 
-    describe "Parsing Socket Data Events" {
-        it "Emits the Message.command name" {
+    describe("Parsing Socket Data Events", function () {
+        it("Emits the Message.command name", function () {
             emitter.on("generic", function (message) {
                 assert(evtval.prefix === prefix);
                 assert(evtval.command === command);
@@ -68,9 +68,9 @@ describe "Messages Plugin" {
             });
 
             acceptData(raws.generic);
-        }
+        });
 
-        it "Emits Message.command in lower case" {
+        it("Emits Message.command in lower case", function () {
             emitter.on("generic", function (message) {
                 assert(evtval.prefix === prefix);
                 assert(evtval.command === command);
@@ -81,9 +81,9 @@ describe "Messages Plugin" {
             });
 
             acceptData(raws.generic_upper);
-        }
+        });
 
-        it "subscribes command names case insenitively" {
+        it("subscribes command names case insenitively", function () {
             emitter.on("GENERIC", function (message) {
                 assert(evtval.prefix === prefix);
                 assert(evtval.command === command);
@@ -94,25 +94,25 @@ describe "Messages Plugin" {
             });
 
             acceptData(raws.generic);
-        }
+        });
 
-        it "Emits the Replyname too" {
+        it("Emits the Replyname too", function () {
             emitter.on("rpl_welcome", function (message) {
                 done();
             });
 
             acceptData(raws.welcome);
-        }
+        });
 
-        it "subscribes replyname case insenitively" {
+        it("subscribes replyname case insenitively", function () {
             emitter.on("RPL_WELCOME", function (message) {
                 done();
             });
 
             acceptData(raws.welcome);
-        }
+        });
 
-        it "emits '*'" (done) {
+        it("emits '*'", function (done) {
             var count = 0;
 
             emitter.on("*", function (message) {
@@ -125,11 +125,11 @@ describe "Messages Plugin" {
 
             acceptData(raws.generic);
             acceptData(raws.generic);
-        }
-    }
+        });
+    });
 
-    describe "Response handling" {
-        it "no response" (done) {
+    describe("Response handling", function () {
+        it("no response", function (done) {
             client.say = sinon.spy(client.say);
 
             afterEmit(function () {
@@ -146,9 +146,9 @@ describe "Messages Plugin" {
             });
 
             acceptData(raws.join);
-        }
+        });
 
-        it "string response" (done) {
+        it("string response", function (done) {
             client.say = function (target, response) {
                 try {
                     assert(channel === target);
@@ -165,9 +165,9 @@ describe "Messages Plugin" {
             });
 
             acceptData(raws.join);
-        }
+        });
 
-        it "[string] response" (done) {
+        it("[string] response", function (done) {
             client.say = function (target, response) {
                 try {
                     assert(channel === target);
@@ -184,9 +184,9 @@ describe "Messages Plugin" {
             });
 
             acceptData(raws.join);
-        }
+        });
 
-        it "Promise<string> response" (done) {
+        it("Promise<string> response", function (done) {
             client.say = function (target, response) {
                 try {
                     assert(channel === target);
@@ -203,9 +203,9 @@ describe "Messages Plugin" {
             });
 
             acceptData(raws.join);
-        }
+        });
 
-        it "Promise<[string]> response" (done) {
+        it("Promise<[string]> response", function (done) {
             client.say = function (target, response) {
                 try {
                     assert(channel === target);
@@ -222,9 +222,9 @@ describe "Messages Plugin" {
             });
 
             acceptData(raws.join);
-        }
+        });
 
-        it "Promise<string> after Promise#catch()" (done) {
+        it("Promise<string> after Promise#catch()", function (done) {
             const failHandler = function (command) {
                 return Promise
                 .reject(new Error())
@@ -246,10 +246,10 @@ describe "Messages Plugin" {
             emitter.on("join", failHandler);
 
             acceptData(raws.join);
-        }
+        });
 
-        it skip "Invalid response (string includes newlines)" {
+        it.skip("Invalid response (string includes newlines)", function () {
             // Response = "abc\ndef"
-        }
-    }
-}
+        });
+    });
+});

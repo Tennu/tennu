@@ -17,34 +17,34 @@ const message = {
 
 // See https://tennu.github.io/documentation/api/response for user facing documentation.
 
-describe "Response" {
-    describe "Creation" {
-        it "gives no response to an `undefined` value" {
+describe("Response", function () {
+    describe("Creation", function () {
+        it("gives no response to an `undefined` value", function () {
             assert(equal(Response.create(undefined, message), {
                 intent: "none",
                 message: undefined,
                 target: undefined
             }));
-        }
+        });
 
-        it "makes the intent 'say' for a String" {
+        it("makes the intent 'say' for a String", function () {
             assert(equal(Response.create("Hello World!", message), {
                 intent: "say",
                 message: "Hello World!",
                 target: "#channel"
             }));
-        }
+        });
 
-        it "makes the intent 'say' for an Array" {
+        it("makes the intent 'say' for an Array", function () {
             assert(equal(Response.create(["Hello", "World"], message), {
                 intent: "say",
                 message: ["Hello", "World"],
                 target: "#channel"
             }));
-        }
+        });
 
-        describe "given an Object" {
-            it "copies all the properties from an object with the same shape as a Response" {
+        describe("given an Object", function () {
+            it("copies all the properties from an object with the same shape as a Response", function () {
                 assert(equal(Response.create({
                     intent: "say",
                     message: "Goodbye World!",
@@ -54,9 +54,9 @@ describe "Response" {
                     message: "Goodbye World!",
                     target: "#channel"
                 }));
-            }
+            });
 
-            it "copies all properties from an object with the same shape as a Response but changes target if 'query' is true" {
+            it("copies all properties from an object with the same shape as a Response but changes target if 'query' is true", function () {
                 assert(equal(Response.create({
                     intent: "say",
                     message: "Hello User!",
@@ -67,9 +67,9 @@ describe "Response" {
                     message: "Hello User!",
                     target: "sender"
                 }));
-            }
+            });
 
-            it "missing a target with no or false query" {
+            it("missing a target with no or false query", function () {
                 assert(equal(Response.create({
                     intent: "say",
                     message: "Hello Who?",
@@ -78,9 +78,9 @@ describe "Response" {
                     message: "Hello Who?",
                     target: "#channel"
                 }));
-            }
+            });
 
-            it "missing an intent" {
+            it("missing an intent", function () {
                 assert(equal(Response.create({
                     message: "Hello!",
                     target: "#channel"
@@ -89,9 +89,9 @@ describe "Response" {
                     message: "Hello!",
                     target: "#channel"
                 }));
-            }
+            });
 
-            it "non-say intent" {
+            it("non-say intent", function () {
                 assert(equal(Response.create({
                     intent: "act",
                     message: "does something.",
@@ -101,14 +101,14 @@ describe "Response" {
                     message: "does something.",
                     target: "#channel"
                 }))
-            }
-        }
-    }
+            });
+        });
+    });
 
-    describe "Sending" {
+    describe("Sending", function () {
         var client;
 
-        beforeEach {
+        beforeEach(function () {
             client = {
                 notice: sinon.spy(),
                 say: sinon.spy(),
@@ -117,9 +117,9 @@ describe "Response" {
                 ctcpRespond: sinon.spy(),
                 warn: sinon.spy()
             }
-        }
+        });
 
-        it "with intent of 'none'" {
+        it("with intent of 'none'", function () {
             Response.send({
                 intent: "none",
                 message: undefined,
@@ -131,9 +131,9 @@ describe "Response" {
             assert(!client.act.called);
             assert(!client.ctcpRequest.called);
             assert(!client.ctcpRespond.called);
-        }
+        });
 
-        it "with intent of 'notice'" {
+        it("with intent of 'notice'", function () {
             Response.send({
                 intent: "notice",
                 message: "Do you really want to know?",
@@ -147,9 +147,9 @@ describe "Response" {
 
             assert(client.notice.calledOnce);
             assert(client.notice.calledWithExactly("sender", "Do you really want to know?"));
-        }
+        });
 
-        it "with intent of 'say'" {
+        it("with intent of 'say'", function () {
             Response.send({
                 intent: "say",
                 message: "Your bot greets you!",
@@ -163,9 +163,9 @@ describe "Response" {
 
             assert(client.say.calledOnce);
             assert(client.say.calledWithExactly("#channel", "Your bot greets you!"));
-        }
+        });
 
-        it "with intent of 'act'" {
+        it("with intent of 'act'", function () {
             Response.send({
                 intent: "act",
                 message: "dances wildly!",
@@ -179,9 +179,9 @@ describe "Response" {
 
             assert(client.act.calledOnce);
             assert(client.act.calledWithExactly("#channel", "dances wildly!"));
-        }
+        });
 
-        it "with intent of 'ctcp' with body" {
+        it("with intent of 'ctcp' with body", function () {
             Response.send({
                 intent: "ctcp",
                 message: ["FINGER", "gives you the index finger!"],
@@ -198,9 +198,9 @@ describe "Response" {
 
             // Because this intent is deprecated.
             assert(client.warn.calledOnce);
-        }
+        });
 
-        it "with intent of 'ctcp' without body" {
+        it("with intent of 'ctcp' without body", function () {
             Response.send({
                 intent: "ctcp",
                 message: ["VERSION"],
@@ -216,9 +216,9 @@ describe "Response" {
             assert(client.ctcpRequest.calledWithExactly("sender", "VERSION"));
 
             assert(client.warn.calledOnce);
-        }
+        });
 
-        it "with intent of 'ctcpRespond'" {
+        it("with intent of 'ctcpRespond'", function () {
             Response.send({
                 intent: "ctcp",
                 message: ["FINGER", "gives you the index finger!"],
@@ -232,9 +232,9 @@ describe "Response" {
 
             assert(client.ctcpRespond.calledOnce);
             assert(client.ctcpRespond.calledWithExactly("sender", "FINGER", "gives you the index finger!"));
-        }
+        });
 
-        it "with intent of 'ctcpRequest'" {
+        it("with intent of 'ctcpRequest'", function () {
             Response.send({
                 intent: "ctcp",
                 message: ["VERSION"],
@@ -248,6 +248,6 @@ describe "Response" {
 
             assert(client.ctcpRequest.calledOnce);
             assert(client.ctcpRequest.calledWithExactly("sender", "VERSION"));
-        }
-    }
-}
+        });
+    });
+});

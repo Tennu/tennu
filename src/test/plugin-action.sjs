@@ -20,10 +20,10 @@ const nicknamefn = function () { return nickname; };
 const ActionPluginFactory = require("../tennu_plugins/action");
 const EventEmitter = require("after-events");
 
-describe "IRC Output Socket:" {
+describe("IRC Output Socket:", function () {
     var socket, actionPlugin, out, messageHandler;
 
-    beforeEach {
+    beforeEach(function () {
         logfn(/* newline */);
         messageHandler = new EventEmitter();
         socket = { raw: sinon.spy() };
@@ -49,11 +49,11 @@ describe "IRC Output Socket:" {
         });
 
         out = actionPlugin.exports;
-    }
+    });
 
-    describe "Join" {
-        describe "A single channel" {
-            it "resolves to Ok(JoinInfo) when succeeded" {
+    describe("Join", function () {
+        describe("A single channel", function () {
+            it("resolves to Ok(JoinInfo) when succeeded", function () {
                 // JOIN #success
                 // :testbot!tennu@tennu.github.io JOIN :#success
                 // :irc.server.net 332 testbot #success :Topic for #success.
@@ -96,9 +96,9 @@ describe "IRC Output Socket:" {
                 messageHandler.emit("rpl_endofnames", endofnamesmsg);
 
                 return promise;
-            }
+            });
 
-            it "can handle multiple RPL_NAMREPLYs" {
+            it("can handle multiple RPL_NAMREPLYs", function () {
                 // JOIN #success
                 // :testbot!tennu@tennu.github.io JOIN :#success
                 // :irc.server.net 332 testbot #success :Topic for #success.
@@ -144,9 +144,9 @@ describe "IRC Output Socket:" {
                 messageHandler.emit("rpl_endofnames", endofnamesmsg);
 
                 return promise;
-            }
+            });
 
-            it "resolves to Fail(Numeric403Message) trying to join a non-existent channel" {
+            it("resolves to Fail(Numeric403Message) trying to join a non-existent channel", function () {
                 // JOIN not_a_channel
                 //:irc.server.net 403 testbot not_a_channel :No such channel
                 const channel = "not_a_channel";
@@ -164,9 +164,9 @@ describe "IRC Output Socket:" {
                 messageHandler.emit("err_nosuchchannel", nosuchchannelmsg);
 
                 return promise;
-            }
+            });
 
-            it "resolves to Fail(Numeric471Message) trying to join a full channel" {
+            it("resolves to Fail(Numeric471Message) trying to join a full channel", function () {
                 // JOIN #full
                 // :irc.server.net 471 testbot #full :Cannot join channel (+i)
                 const channel = "#full";
@@ -184,9 +184,9 @@ describe "IRC Output Socket:" {
                 messageHandler.emit("err_channelisfull", fullmsg);
 
                 return promise;
-            }
+            });
 
-            it "resolves to Fail(Numeric473Message) trying to join an invite only channel bot is not invited to" {
+            it("resolves to Fail(Numeric473Message) trying to join an invite only channel bot is not invited to", function () {
                 // JOIN #invite_only
                 // :irc.server.net 473 testbot #invite_only :Cannot join channel (+i)
                 const channel = "#invite_only";
@@ -204,9 +204,9 @@ describe "IRC Output Socket:" {
                 messageHandler.emit("err_inviteonlychan", inviteonlymsg);
 
                 return promise;
-            }
+            });
 
-            it "resolves to Fail(Numeric474Message) trying to join a message bot is banned in" {
+            it("resolves to Fail(Numeric474Message) trying to join a message bot is banned in", function () {
                 // JOIN #banned
                 // :irc.server.net 474 testbot #banned :Cannot join channel (+b)
                 const channel = "#banned";
@@ -224,9 +224,9 @@ describe "IRC Output Socket:" {
                 messageHandler.emit("err_bannedfromchan", bannedmsg);
 
                 return promise;
-            }
+            });
 
-            it "resolves to Fail(Numeric475Message) trying to join a channel with the wrong channel key" {
+            it("resolves to Fail(Numeric475Message) trying to join a channel with the wrong channel key", function () {
                 // JOIN #private
                 // :irc.server.net 475 testbot #private :Cannot join channel (+k)
                 const channel = "#private";
@@ -244,9 +244,9 @@ describe "IRC Output Socket:" {
                 messageHandler.emit("err_badchannelkey", badkeymsg);
 
                 return promise;
-            }
+            });
 
-            it "resolves to Fail(Numeric520Message) trying to join an oper only channel" {
+            it("resolves to Fail(Numeric520Message) trying to join an oper only channel", function () {
                 // JOIN #oper
                 // :irc.server.net 520 testbot :Cannot join channel #oper (IRCops only)
 
@@ -265,24 +265,24 @@ describe "IRC Output Socket:" {
                 messageHandler.emit("err_operonly", openonlymsg);
 
                 return promise;
-            }
-        }
+            });
+        });
 
-        describe skip "channel keys" {}
-        describe skip "Interleaved joins" {}
+        describe.skip("channel keys", function () {});
+        describe.skip("Interleaved joins", function () {});
 
-        describe "timeouts" {
+        describe("timeouts", function () {
             var clock;
 
-            beforeEach {
+            beforeEach(function () {
                 clock = sinon.useFakeTimers();
-            }
+            });
 
-            afterEach {
+            afterEach(function () {
                 clock.restore();
-            }
+            });
 
-            it "cause rejection of the promise" (done) {
+            it("cause rejection of the promise", function (done) {
                 // Note: This should never happen. But if it does...
                 // JOIN #channel
                 // <silence>
@@ -295,15 +295,15 @@ describe "IRC Output Socket:" {
                 });
 
                 clock.tick(60 * 60 * 1000 + 1);
-            }
-        }
+            });
+        });
 
-        describe "Multiple channels" {
-            it skip "returns an array of Result<JoinInfo, JoinFailureMessage>s" {}
-        }
-    }
+        describe("Multiple channels", function () {
+            it.skip("returns an array of Result<JoinInfo, JoinFailureMessage>s", function () {});
+        });
+    });
 
-    describe "Whois" {
+    describe("Whois", function () {
         // Maybe this should be Nicky instead?
         function emitWhoisNicknameResponse (messageHandler, nickname) {
             // Default to nickname "nickname".
@@ -344,8 +344,8 @@ describe "IRC Output Socket:" {
             });
         }
 
-        describe "A single user" {
-            it "resolves to Ok(WhoisInfo) when succeeded" {
+        describe("A single user", function () {
+            it("resolves to Ok(WhoisInfo) when succeeded", function () {
                 const whoisPromise = out.whois("nickname")
                 .then(function (whoisResult) {
                     assert(whoisResult.isOk());
@@ -403,19 +403,19 @@ describe "IRC Output Socket:" {
                 });
 
                 return whoisPromise;
-            }
+            });
 
-            describe "Identifying" {
-                it skip "JoinInfo has `\"identified\": false` when user is not identified" {}
-                it skip "JoinInfo has `\"identified\": true, \"identifiedas\": nickname` when user is identified (307)" {}
-                it skip "JoinInfo has `\"identified\": true, \"identifiedas\": accountname` when user is identified (330)" {}
-            }
-            it skip "resolves to Fail(Numeric421Message) if WHOIS command is unrecognized (e.g. on Twitch.tv)" {}
-            it skip "resovles to Fail(Numeric401Message) if WHOIS non-existent nickname" {}
-        }
+            describe("Identifying", function () {
+                it.skip("JoinInfo has `\"identified\": false` when user is not identified", function () {});
+                it.skip("JoinInfo has `\"identified\": true, \"identifiedas\": nickname` when user is identified (307)", function () {});
+                it.skip("JoinInfo has `\"identified\": true, \"identifiedas\": accountname` when user is identified (330)", function () {});
+            });
+            it.skip("resolves to Fail(Numeric421Message) if WHOIS command is unrecognized (e.g. on Twitch.tv)", function () {});
+            it.skip("resovles to Fail(Numeric401Message) if WHOIS non-existent nickname", function () {});
+        });
 
-        describe "memoization" {
-            it "can avoid a whois if memoized over an object of the caller's choice" {
+        describe("memoization", function () {
+            it("can avoid a whois if memoized over an object of the caller's choice", function () {
                 // In a real case, this would be a PRIVMSG about the user.
                 const memoizationKey = {};
                 var whoisResult1;
@@ -434,9 +434,9 @@ describe "IRC Output Socket:" {
                 emitWhoisNicknameResponse(messageHandler);
 
                 return whoisPromise;
-            }
+            });
 
-            it "will only avoid the whois request if the memoizeOver object is the same" {
+            it("will only avoid the whois request if the memoizeOver object is the same", function () {
                 const memoizationKey1 = {};
                 const memoizationKey2 = {};
                 var whoisResult1;
@@ -455,9 +455,9 @@ describe "IRC Output Socket:" {
 
                 emitWhoisNicknameResponse(messageHandler);
                 return whoisPromise;
-            }
+            });
 
-            it "will not memoize if there is no memoizeOver object" {
+            it("will not memoize if there is no memoizeOver object", function () {
                 var whoisResult1;
 
                 const whoisPromise = out.whois("nickname")
@@ -474,9 +474,9 @@ describe "IRC Output Socket:" {
 
                 emitWhoisNicknameResponse(messageHandler);
                 return whoisPromise;
-            }
+            });
 
-            it "will not send whois results for different nicknames and same memoization object" {
+            it("will not send whois results for different nicknames and same memoization object", function () {
                 const memoizationKey = {};
                 var whoisResult1;
 
@@ -495,92 +495,92 @@ describe "IRC Output Socket:" {
                 emitWhoisNicknameResponse(messageHandler);
 
                 return whoisPromise;
-            }
-        }
+            });
+        });
 
-        describe "timeouts" {}
-    }
+        describe.skip("timeouts", function () {});
+    });
 
-    describe "Mode" {
-        it "can set a single mode with an argument" {
+    describe("Mode", function () {
+        it("can set a single mode with an argument", function () {
             out.mode("#test", "v", "", "SomeUser");
             logfn(format("'%s'", socket.raw.firstCall.args.join("', '")));
             assert(socket.raw.calledWithExactly("MODE #test :+v SomeUser"));
-        }
+        });
 
-        it "can set a single usermode without an argument" {
+        it("can set a single usermode without an argument", function () {
             out.mode("myself", "B");
             logfn(format("'%s'", socket.raw.firstCall.args.join("', '")));
             assert(socket.raw.calledWithExactly("MODE myself :+B"));
-        }
-    }
+        });
+    });
 
-    it "can send private messages" {
+    it("can send private messages", function () {
         out.say("#test", "Hi");
         assert(socket.raw.calledWithExactly("PRIVMSG #test :Hi"));
-    }
+    });
 
-    it "can quit without a reason" {
+    it("can quit without a reason", function () {
         out.quit();
         assert(socket.raw.calledWithExactly("QUIT"));
-    }
+    });
 
-    it "can quit with a reason" {
+    it("can quit with a reason", function () {
         out.quit("the reason");
         assert(socket.raw.calledWithExactly("QUIT :the reason"));
-    }
+    });
 
-    describe "Part" {
-        it "can part without a reason" {
+    describe("Part", function () {
+        it("can part without a reason", function () {
             var promise = out.part("#test");
             assert(socket.raw.calledWithExactly("PART #test"));
             messageHandler.emit("part", {channel: "#test", nickname: "testbot"});
             return promise;
-        }
+        });
 
-        it "can part with a reason" {
+        it("can part with a reason", function () {
             var promise = out.part("#test", "the reason");
             assert(socket.raw.calledWithExactly("PART #test :the reason"));
             messageHandler.emit("part", {channel: "#test", nickname: "testbot"});
             return promise;
-        }
+        });
 
-        it skip "parting successfully resolves to Ok(PartInfo)" {}
-        it skip "parting non-existent channel resolves to Fail(NoSuchChannelMessage)" {}
-        it skip "parting channel not in resolves to Fail(NotInChannelMessage)" {}
-    }
+        it.skip("parting successfully resolves to Ok(PartInfo)", function () {});
+        it.skip("parting non-existent channel resolves to Fail(NoSuchChannelMessage)", function () {});
+        it.skip("parting channel not in resolves to Fail(NotInChannelMessage)", function () {});
+    });
 
-    describe "Kick" {
-        it "with a reason" {
+    describe("Kick", function () {
+        it("with a reason", function () {
             out.kick("#test", "user", "naughty naughty");
             assert(socket.raw.calledWithExactly("KICK #test user :naughty naughty"));
-        }
+        });
 
-        it "without a reason" {
+        it("without a reason", function () {
             out.kick("#test", "user");
             assert(socket.raw.calledWithExactly("KICK #test user"));
-        }
-    }
+        });
+    });
 
-    describe "Ctcp" {
-        it "can send a ctcp request" {
+    describe("Ctcp", function () {
+        it("can send a ctcp request", function () {
             out.ctcpRequest("user", "VERSION");
             assert(socket.raw.calledWithExactly("PRIVMSG user :\u0001VERSION\u0001"));
-        }
+        });
 
-        it "can send a ctcp response" {
+        it("can send a ctcp response", function () {
             out.ctcpRespond("user", "VERSION", "Tennu test version");
             assert(socket.raw.calledWithExactly("NOTICE user :\u0001VERSION Tennu test version\u0001"));
-        }
+        });
 
-        it "capitalizes the CTCP tag" {
+        it("capitalizes the CTCP tag", function () {
             out.ctcpRequest("user", "version");
             assert(socket.raw.calledWithExactly("PRIVMSG user :\u0001VERSION\u0001"));
-        }
-    }
+        });
+    });
 
-    describe "EventEmitter" {
-        it "emits the resolved promise as an event" (done) {
+    describe("EventEmitter", function () {
+        it("emits the resolved promise as an event", function (done) {
             const emitter = out.emitter;
 
             emitter.on("join", function (joinInfoResult) {
@@ -616,11 +616,11 @@ describe "IRC Output Socket:" {
             messageHandler.emit("rpl_topicwhotime", topicwhotimemsg);
             messageHandler.emit("rpl_namreply", namesmsg);
             messageHandler.emit("rpl_endofnames", endofnamesmsg);
-        }
+        });
 
-        it "annouces itself as part of the 'subscribe' hook" {
+        it("annouces itself as part of the 'subscribe' hook", function () {
             assert(actionPlugin.subscribe.emitter === out.emitter);
             assert(actionPlugin.subscribe.prefix === "action:");
-        }
-    }
-}
+        });
+    });
+});
