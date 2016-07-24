@@ -9,9 +9,13 @@ module.exports = {
                 '005': function (isupportMessage) {
                     isupportMessage.params.slice(1, -1).map(function (param) {
                         return param.split('=');
-                    }).forEach(function {
-                        ([supported]) => isupport[supported] = true,
-                        ([supported, value]) => isupport[supported] = value
+                    }).forEach(function (param) {
+                        // Note(Havvy): param is either [param] or [param, value]
+                        if (param.length === 1) {
+                            isupport[param[0]] = true;
+                        } else {
+                            isupport[param[0]] = param[1];
+                        }
                     });
                 }
             },

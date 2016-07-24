@@ -4,7 +4,6 @@ const sourcemaps = require('gulp-sourcemaps');
 const concat = require('gulp-concat-util');
 
 // Macro packages.
-const match = "sparkler/macros";
 const bdd = "sweet-bdd";
 
 gulp.task('default', function() {
@@ -24,7 +23,7 @@ gulp.task("build", function () {
     }
 
     pipeline("lib", "lib", []);
-    pipeline("plugin", "tennu_plugins", [match]);
+    pipeline("plugin", "tennu_plugins", []);
     pipeline("test", "test", [bdd]);
 
     gulp.src("src/bin/**/*.sjs")
