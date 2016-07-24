@@ -4,25 +4,6 @@ const inspect = require("util").inspect;
 const defaults = require("lodash.defaults");
 const mapValues = require("lodash.mapvalues");
 
-// delegate x y -> function () { this.x.y.apply(this.x, arguments); return this; }
-macro delegate {
-    rule { $property:ident $method:ident } => {
-        function () {
-            this . $property . $method . apply (this . $property , arguments);
-            return this;
-        }
-    }
-}
-
-// delegate_ret x y -> function () { return this.x.y.apply(this.x, arguments); }
-macro delegate_ret {
-    rule { $property:ident $method:ident } => {
-        function () {
-            return this . $property . $method . apply (this . $property, arguments);
-        }
-    }
-}
-
 const deepClone = function (obj) {
     if (obj === null) {
         return null;
@@ -198,13 +179,12 @@ Client.prototype.start = connect;
 
 const disconnect = function () {
     if (!this.connected) {
-        this.warn("Tennu", "Attempted to disconnect already disconnected client.");
+        this.warn('Tennu', 'Attempted to disconnect already disconnected client.');
         return this;
     }
-
     this._socket.end();
     this.connected = false;
-    this.note("Tennu", "Disconnected");
+    this.note('Tennu', 'Disconnected');
     return this;
 };
 
@@ -212,56 +192,173 @@ Client.prototype.disconnect = disconnect;
 Client.prototype.end = disconnect;
 
 // implements Config Plugin
-Client.prototype.config                 = delegate_ret _config get
+Client.prototype.config = function () {
+    return this._config.get.apply(this._config, arguments);
+};
 
 // implements IRC Output Socket
-Client.prototype.act                    = delegate_ret _action act;
+Client.prototype.act = function () {
+    return this._action.act.apply(this._action, arguments);
+};
 
 // Deprecated(4.2.x)
-Client.prototype.ctcp                   = delegate_ret _action ctcp;
+Client.prototype.ctcp = function () {
+    return this._action.ctcp.apply(this._action, arguments);
+};
 
-Client.prototype.ctcpRequest            = delegate_ret _action ctcpRequest;
-Client.prototype.ctcpRespond            = delegate_ret _action ctcpRespond;
-Client.prototype.join                   = delegate_ret _action join;
-Client.prototype.kick                   = delegate_ret _action kick;
-Client.prototype.mode                   = delegate_ret _action mode;
-Client.prototype.nick                   = delegate_ret _action nick;
-Client.prototype.notice                 = delegate_ret _action notice;
-Client.prototype.part                   = delegate_ret _action part;
-Client.prototype.quit                   = delegate_ret _action quit;
-Client.prototype.say                    = delegate_ret _action say;
-Client.prototype.respond                = delegate_ret _action respond;
-Client.prototype.userhost               = delegate_ret _action userhost;
-Client.prototype.who                    = delegate_ret _action who;
-Client.prototype.whois                  = delegate_ret _action whois;
-Client.prototype.raw                    = delegate_ret _action raw;
-Client.prototype.rawf                   = delegate_ret _action rawf;
+Client.prototype.ctcpRequest = function () {
+    return this._action.ctcpRequest.apply(this._action, arguments);
+};
+
+Client.prototype.ctcpRespond = function () {
+    return this._action.ctcpRespond.apply(this._action, arguments);
+};
+
+Client.prototype.join = function () {
+    return this._action.join.apply(this._action, arguments);
+};
+
+Client.prototype.kick = function () {
+    return this._action.kick.apply(this._action, arguments);
+};
+
+Client.prototype.mode = function () {
+    return this._action.mode.apply(this._action, arguments);
+};
+
+Client.prototype.nick = function () {
+    return this._action.nick.apply(this._action, arguments);
+};
+
+Client.prototype.notice = function () {
+    return this._action.notice.apply(this._action, arguments);
+};
+
+Client.prototype.part = function () {
+    return this._action.part.apply(this._action, arguments);
+};
+
+Client.prototype.quit = function () {
+    return this._action.quit.apply(this._action, arguments);
+};
+
+Client.prototype.say = function () {
+    return this._action.say.apply(this._action, arguments);
+};
+
+Client.prototype.respond = function () {
+    return this._action.respond.apply(this._action, arguments);
+};
+
+Client.prototype.userhost = function () {
+    return this._action.userhost.apply(this._action, arguments);
+};
+
+Client.prototype.who = function () {
+    return this._action.who.apply(this._action, arguments);
+};
+
+Client.prototype.whois = function () {
+    return this._action.whois.apply(this._action, arguments);
+};
+
+Client.prototype.raw = function () {
+    return this._action.raw.apply(this._action, arguments);
+};
+
+Client.prototype.rawf = function () {
+    return this._action.rawf.apply(this._action, arguments);
+};
 
 // implements Self Plugin Exports
-Client.prototype.nickname               = delegate_ret _self nickname;
+Client.prototype.nickname = function () {
+    return this._self.nickname.apply(this._self, arguments);
+};
 
 // implements Subscriber
-Client.prototype.on                     = delegate _subscriber on;
-Client.prototype.once                   = delegate _subscriber once;
-Client.prototype.off                    = delegate _subscriber off;
+Client.prototype.on = function () {
+    this._subscriber.on.apply(this._subscriber, arguments);
+    return this;
+};
+
+Client.prototype.once = function () {
+    this._subscriber.once.apply(this._subscriber, arguments);
+    return this;
+};
+
+Client.prototype.off = function () {
+    this._subscriber.off.apply(this._subscriber, arguments);
+    return this;
+};
 
 // implements PluginSystem
-Client.prototype.use                    = delegate     _plugins use;
-Client.prototype.getPlugin              = delegate_ret _plugins getPlugin
-Client.prototype.getRole                = delegate_ret _plugins getRole;
-Client.prototype.initializePlugin       = delegate     _plugins initialize;
-Client.prototype.isPluginInitializable  = delegate_ret _plugins isInitializable;
-Client.prototype.addHook                = delegate     _plugins addHook;
+Client.prototype.use = function () {
+    this._plugins.use.apply(this._plugins, arguments);
+    return this;
+};
+
+Client.prototype.getPlugin = function () {
+    return this._plugins.getPlugin.apply(this._plugins, arguments);
+};
+
+Client.prototype.getRole = function () {
+    return this._plugins.getRole.apply(this._plugins, arguments);
+};
+
+Client.prototype.initializePlugin = function () {
+    this._plugins.initialize.apply(this._plugins, arguments);
+    return this;
+};
+
+Client.prototype.isPluginInitializable = function () {
+    return this._plugins.isInitializable.apply(this._plugins, arguments);
+};
+
+Client.prototype.addHook = function () {
+    this._plugins.addHook.apply(this._plugins, arguments);
+    return this;
+};
 
 // implements Logger
-Client.prototype.debug                  = delegate _logger debug;
-Client.prototype.info                   = delegate _logger info;
-Client.prototype.note                   = delegate _logger notice;
-Client.prototype.warn                   = delegate _logger warn;
-Client.prototype.error                  = delegate _logger error;
-Client.prototype.crit                   = delegate _logger crit;
-Client.prototype.alert                  = delegate _logger alert;
-Client.prototype.emerg                  = delegate _logger emerg;
+Client.prototype.debug = function () {
+    this._logger.debug.apply(this._logger, arguments);
+    return this;
+};
+
+Client.prototype.info = function () {
+    this._logger.info.apply(this._logger, arguments);
+    return this;
+};
+
+Client.prototype.note = function () {
+    this._logger.notice.apply(this._logger, arguments);
+    return this;
+};
+
+Client.prototype.warn = function () {
+    this._logger.warn.apply(this._logger, arguments);
+    return this;
+};
+
+Client.prototype.error = function () {
+    this._logger.error.apply(this._logger, arguments);
+    return this;
+};
+
+Client.prototype.crit = function () {
+    this._logger.crit.apply(this._logger, arguments);
+    return this;
+};
+
+Client.prototype.alert = function () {
+    this._logger.alert.apply(this._logger, arguments);
+    return this;
+};
+
+Client.prototype.emerg = function () {
+    this._logger.emerg.apply(this._logger, arguments);
+    return this;
+};
 
 Client.prototype.log = function (level) {
     const args = Array.prototype.slice.call(arguments, 1);
