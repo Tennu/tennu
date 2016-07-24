@@ -27,7 +27,7 @@ module.exports = ActionPlugin = {
 
         function say (target, body) {
             if (Array.isArray(body)) {
-                body.forEach(λ[say(target, #)]);
+                body.forEach(function (message) { say(target, message); });
                 return;
             }
 
@@ -38,7 +38,7 @@ module.exports = ActionPlugin = {
         function makeCtcpFn (responseFn) {
             return function ctcpRequest (target, tag, body) {
                 if (Array.isArray(body)) {
-                    body.forEach(λ[ctcpRequest(target, tag, #)]);
+                    body.forEach(function (message) { ctcpRequest(target, tag, message); });
                     return;
                 }
 
@@ -67,7 +67,7 @@ module.exports = ActionPlugin = {
 
         function notice (target, body) {
             if (Array.isArray(body)) {
-                body.forEach(λ[notice(target, #)]);
+                body.forEach(function (message) { notice(target, message); });
                 return;
             }
 

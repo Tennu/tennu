@@ -36,7 +36,7 @@ module.exports = {
         const isValidIgnorableCommand = function (ignoredCommand) {
             return typeof ignoredCommand === "string" ||
                 (Array.isArray(ignoredCommand) &&
-                    ignoredCommand.every(λ[typeof # === "string"]));
+                    ignoredCommand.every(function (igoredCommand) { return typeof igoredCommand === "string"; }));
         };
         if (!ignoreList.every(isValidIgnorableCommand)) {
             throw new Error("Invalid command-ignore-list configuration option value. " + 
@@ -45,11 +45,13 @@ module.exports = {
         }
 
         const ignoreCommandInSpecificPluginList = ignoreList
-        .filter(λ[Array.isArray(#)])
+        .filter(Array.isArray)
         .map(function (commandPluginsList) {
-            return commandPluginsList.map(λ[#.toLowerCase()]);
+            return commandPluginsList.map(function (commandPlugin) { return commandPlugin.toLowerCase(); });
         });
-        const globalIgnoreItems = ignoreList.filter(λ[typeof # === "string"]).map(λ[#.toLowerCase()]);
+        const globalIgnoreItems = ignoreList
+        .filter(function (ignoreItem) { return typeof ignoreItem === "string"; })
+        .map(function (ignoreItem) { return ignoreItem.toLowerCase(); });
 
         // invariant: keys must be normalized to lower case.
         const registry = {};

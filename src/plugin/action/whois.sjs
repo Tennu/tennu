@@ -43,13 +43,13 @@ module.exports = function (client, rawf, emitter) {
         //      If single, return a promise.
         if (Array.isArray(nickname)) {
             const nicknames = nickname; // rename for clarity
-            if (nicknames.some(λ[typeof # !== "string"])) {
+            if (nicknames.some(function (nickname) { return typeof nickname !== "string"; })) {
                 throw new Error("Whois command takes either a string (a single nick) or an array (of string nicks)");
             }
             if (nicknames.length > 15) {
                 chunk(nicknames, 15)
-                .map(λ.join(','))
-                .map(λ[whois(#, server, true)]);
+                .map(function (nicknames) { return nicknames.join(','); })
+                .map(function (nicknames) {whois(nicknames, server, true); });
             }
         } else if (typeof nickname === "string" && nickname.indexOf(",") !== -1) {
             multiple = true;

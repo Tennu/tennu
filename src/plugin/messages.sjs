@@ -51,9 +51,11 @@ module.exports = {
 
             if (message.channel !== undefined) {
                 Promise.resolve(res)
-                .then(λ[Response.create(#, message)])
-                .then(λ[Response.send(#, client)])
-                .catch(λ[client.error("MessageHandler", format("MessageHandler for '%s' returned invalid response `%s`.", message.message, inspect(res)))])
+                .then(function (channel) { return Response.create(channel, message); })
+                .then(function (response) { Response.send(response, client); })
+                .catch(function (_error) {
+                    client.error("MessageHandler", format("MessageHandler for '%s' returned invalid response `%s`.", message.message, inspect(res)));
+                });
             }
         });
 
@@ -66,7 +68,7 @@ module.exports = {
             },
 
             exports: {
-                isupport: λ[isupport = #],
+                isupport: function (isupportObj) { isupport = isupportObj; },
                 afterEmit: emitter.after.bind(emitter)
             }
         };
