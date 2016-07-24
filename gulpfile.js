@@ -1,38 +1,42 @@
-const gulp = require('gulp');
+const gulp = require("gulp");
+const rename = require("gulp-rename")
 const sweetjs = require("gulp-sweetjs");
-const sourcemaps = require('gulp-sourcemaps');
-const concat = require('gulp-concat-util');
+const sourcemaps = require("gulp-sourcemaps");
+const concat = require("gulp-concat-util");
 
 // Macro packages.
 const bdd = "sweet-bdd";
 
-gulp.task('default', function() {
-  console.log("Use either the 'build' or 'test' tasks");
+gulp.task("default", function() {
+  console.log("Use the 'build' task.");
 });
 
 gulp.task("build", function () {
-    function pipeline (from, to, macros) {
-        gulp.src("src/" + from + "/**/*.sjs")
-        .pipe(sourcemaps.init())
-        .pipe(sweetjs({
-            modules: macros,
-            readableNames: true
-        }))
-        .pipe(sourcemaps.write("../sourcemaps/" + from))
-        .pipe(gulp.dest(to))
-    }
+    gulp.src("src/lib/**/*.sjs")
+    .pipe(rename(function (path) {
+        path.extname = ".js";
+    }))
+    .pipe(gulp.dest("lib"));
 
-    pipeline("lib", "lib", []);
-    pipeline("plugin", "tennu_plugins", []);
-    pipeline("test", "test", [bdd]);
+    gulp.src("src/plugin/**/*.sjs")
+    .pipe(rename(function (path) {
+        path.extname = ".js";
+    }))
+    .pipe(gulp.dest("tennu_plugins"));
 
-    gulp.src("src/bin/**/*.sjs")
+    gulp.src("src/test/**/*.sjs")
     .pipe(sourcemaps.init())
     .pipe(sweetjs({
-        modules: [],
+        modules: [bdd],
         readableNames: true
     }))
+    .pipe(sourcemaps.write("../sourcemaps/test"))
+    .pipe(gulp.dest("test"))
+
+    gulp.src("src/bin/**/*.sjs")
     .pipe(concat.header("#! /usr/bin/env node\n\n"))
-    .pipe(sourcemaps.write("../sourcemaps/bin"))
+    .pipe(rename(function (path) {
+        path.extname = ".js";
+    }))
     .pipe(gulp.dest("bin"))
 });

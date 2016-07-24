@@ -63,6 +63,7 @@
     "deep-eql": "^0.1.3",
     "gulp": "^3.9.1",
     "gulp-concat-util": "^0.5.1",
+    "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^1.2.4",
     "gulp-sweetjs": "^0.6.0",
     "mocha": "^2.0.0",
