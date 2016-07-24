@@ -67,23 +67,25 @@ module.exports = {
             act: function (channel, message) { client.act(channel, message); },
             notice: function (channel, message) { client.notice(channel, message); },
             none: function () { /* no-op */ },
-            ctcp: function {
-                (target, [tag, message]) => {
-                    client.warn("Tennu", "Received response with deprecated intent 'ctcp'. Change to 'ctcpRespond'.");
-                    client.ctcpRespond(target, tag, message);
-                },
+            ctcp: function (target, args) {
+                client.warn("Tennu", "Received response with deprecated intent 'ctcp'. Change to 'ctcpRespond'.");
 
-                (target, [tag]) => {
-                    client.warn("Tennu", "Received response with deprecated intent 'ctcp'. Change to 'ctcpRespond'.");
-                    client.ctcpRequest(target, tag);
+                switch (args.length) {
+                    case 2:
+                        client.ctcpRespond(target, args[0] /* tag */, args[1] /* message */);
+                        break;
+                    case 1:
+                        client.ctcpRequest(target, args[0] /* tag */);
+                        break;
+                    default:
+                        throw new TypeError("args must be an array of length 1 or 2");
                 }
             },
-            ctcpRespond: function {
-                (target, [tag, message]) => client.ctcpRespond(target, tag, message)
+            ctcpRespond: function (target, args) {
+                client.ctcpRespond(target, args[0] /* tag */, args[1] /* message */);
             },
-            ctcpRequest: function {
-                (target, [tag, message]) => client.ctcpRequest(target, tag, message),
-                (target, [tag]) => client.ctcpRequest(target, tag)
+            ctcpRequest: function (targets, args) {
+                client.ctcpRequest(target, args[0] /* tag */, args[1] /* optional message */);
             }
         };
 
