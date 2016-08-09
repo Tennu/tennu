@@ -12,7 +12,7 @@ module.exports = function (client, rawf, emitter) {
                 return;
             }
             var password;
-            if (typeof(channel) === "object"){
+            if (typeof(channel) === "object") {
                 password = channel.password;
                 channel = channel.channel;
             }
@@ -108,10 +108,9 @@ module.exports = function (client, rawf, emitter) {
             };
 
             client.debug("PluginAction", formatc("Attempting to join %s."));
-            if (password !== undefined){
+            if (password !== undefined) {
                 rawf("JOIN %s :%s", channel, password);
-            }
-            else {
+            } else {
                 rawf("JOIN :%s", channel);
             }
         })
