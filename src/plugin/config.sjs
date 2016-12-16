@@ -7,14 +7,13 @@ module.exports = {
     init: function (client, deps) {
         const config = client._configObject;
 
-        if (config.daemon === "twitch" || config.daemon === "irc2") {
+        if (config.daemon === "irc2") {
             if (config.capabilities && config.capabilities.requires && config.capabilities.requires.length > 0) {
                 throw new Error("IRCd doesn't support capabilities. Cannot require them. Fix your configuration.");
             }
-            // Twitch.tv doesn't allow capabilities.
             // GameSurge doesn't support capabilities.
             config.capabilities = undefined;
-        } else {
+        } else if (config.daemon !== "twitch") {
             if (!config.capabilities) {
                 config.capabilities = { requires: ["multi-prefix"] };
             } else if (!config.capabilities.requires) {
