@@ -3,10 +3,9 @@ const assert = require("better-assert");
 const equal = require("deep-eql");
 const inspect = require("util").inspect;
 const format = require("util").format;
-require("source-map-support").install();
 const defaults = require("lodash.defaults");
 
-const debug = false;
+const debug = Boolean(false || process.env.VERBOSE);
 const logfn = debug ? console.log.bind(console) : function () {};
 const logger = {debug: logfn, info: logfn, notice: logfn, warn: logfn, error: logfn, crit: logfn, alert: logfn, emerg: logfn};
 
@@ -69,7 +68,7 @@ describe("Integration tests:", function () {
             client._socket.startupPromise.then(function () {
                 setImmediate(function () {
                     assert(client.nickname() === "testbot");
-                    done();
+                   done();
                 });
             });
         });
@@ -195,7 +194,7 @@ describe("Integration tests:", function () {
 
         client._socket.impl.write.on(5, function (spyCall) {
             try {
-                const versionResponseRegexp = /^NOTICE IRC :\u0001VERSION Tennu \d+\.\d+\.\d+ \(https:\/\/tennu\.github\.io\)\u0001\r\n$/;
+                const versionResponseRegexp = /^NOTICE IRC :\u0001VERSION Tennu \d+\.\d+\.\d+\u0001\r\n$/;
                 assert(spyCall.calledWith(sinon.match(versionResponseRegexp), "utf-8"));
                 done();
             } catch (e) {
