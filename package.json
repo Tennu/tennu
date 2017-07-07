@@ -48,7 +48,7 @@
     "chunk": "0.0.2",
     "commander": "^2.1.0",
     "irc-message": "^1.0.0",
-    "irc-socket": "^3.0.5",
+    "irc-socket": "^3.0.8",
     "lodash.create": "^3.1.0",
     "lodash.defaults": "^3.1.1",
     "lodash.mapvalues": "^3.0.1",
