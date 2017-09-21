@@ -94,7 +94,10 @@ module.exports = {
             return false;
         };
 
-        function handleCommand(command) {
+        function handleCommand(privmsg, commandText) {
+            const command = Command(privmsg, commandText);
+            client.note("PluginCommands", format("Command detected: %s", command.command));
+            
             const promiseOfCommandOrResponse = middleware.reduce(function (promiseOfCommandOrResponse, ware) {
                 return promiseOfCommandOrResponse.then(function (commandOrResponse) { 
                     if (commandOrResponse === command) {
@@ -137,16 +140,13 @@ module.exports = {
             handlers: {
                 "privmsg": function (privmsg) {
                     // TODO(Havvy): use R-Result to simplify.
-                    const maybeCommandString = tryParseCommandString(privmsg);
+                    const maybeCommandText = tryParseCommandString(privmsg);
 
-                    if (!maybeCommandString) {
+                    if (!maybeCommandText) {
                         return;
                     }
 
-                    const command = Command(privmsg, maybeCommandString);
-                    client.note("PluginCommands", format("Command detected: %s", command.command));
-
-                    return handleCommand(command);
+                    return handleCommand(privmsg, maybeCommandText);
                 }
             },
 
@@ -238,7 +238,9 @@ module.exports = {
                     const commandRegistryEntry = registry[command.command];
 
                     return commandRegistryEntry !== undefined;
-                }
+                },
+
+                handleCommand: handleCommand
             }
         };
     },
