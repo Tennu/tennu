@@ -44,7 +44,7 @@
   ],
   "dependencies": {
     "after-events": "^1.0.1",
-    "bluebird": "^1.0.0",
+    "bluebird": "^3.0.0",
     "chunk": "0.0.2",
     "commander": "^2.1.0",
     "irc-message": "^1.0.0",

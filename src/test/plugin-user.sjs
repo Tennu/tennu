@@ -22,6 +22,9 @@ const Fail = ResultCtors.Fail;
 describe("User Plugin", function () {
     var userPlugin, client;
 
+    const errorPromise = Promise.reject(new Error("An Error"));
+    errorPromise.suppressUnhandledRejections();
+
     const whoisReturns = {
         "failure": Fail({}),
         "unidentified": Ok({
@@ -44,7 +47,7 @@ describe("User Plugin", function () {
             identified: true,
             identifiedas: "case"
         }),
-        "error": Promise.reject(new Error("An Error"))
+        "error": errorPromise
     };
 
     beforeEach(function () {
