@@ -94,6 +94,45 @@ module.exports = {
             return false;
         };
 
+        function handleCommand(command) {
+            const promiseOfCommandOrResponse = middleware.reduce(function (promiseOfCommandOrResponse, ware) {
+                return promiseOfCommandOrResponse.then(function (commandOrResponse) { 
+                    if (commandOrResponse === command) {
+                        return ware(commandOrResponse);
+                    } else {
+                        return commandOrResponse;
+                    }
+                });
+            }, Promise.resolve(command));
+
+            return promiseOfCommandOrResponse.then(function (commandOrResponse) {
+                if (commandOrResponse !== command) {
+                    // It's a Response.
+
+                    client.note("PluginCommands", "Command handled by middleware.");
+                    return commandOrResponse;
+                }
+
+                // It's still the same command as above. We can continue using that variable.
+                const commandName = command.command;
+                client.note("PluginCommands", format("Command after middleware: %s", commandName));
+                const maybeCommandRegistryEntry = registry[commandName];
+
+                if (!maybeCommandRegistryEntry) {
+                    client.note("PluginCommands", format("Handler for '%s' not found.", commandName));
+                    return;
+                }
+                const commandRegistryEntry = maybeCommandRegistryEntry;
+
+                const handler = commandRegistryEntry.handler;
+                const plugin = commandRegistryEntry.plugin;
+
+                client.note("PluginCommands", format("Handler '%s:%s' found.", plugin, commandName));
+                
+                return handler(command);
+            });
+        }
+
         return {
             handlers: {
                 "privmsg": function (privmsg) {
@@ -107,42 +146,7 @@ module.exports = {
                     const command = Command(privmsg, maybeCommandString);
                     client.note("PluginCommands", format("Command detected: %s", command.command));
 
-                    const promiseOfCommandOrResponse = middleware.reduce(function (promiseOfCommandOrResponse, ware) {
-                        return promiseOfCommandOrResponse.then(function (commandOrResponse) { 
-                            if (commandOrResponse === command) {
-                                return ware(commandOrResponse);
-                            } else {
-                                return commandOrResponse;
-                            }
-                        });
-                    }, Promise.resolve(command));
-
-                    return promiseOfCommandOrResponse.then(function (commandOrResponse) {
-                        if (commandOrResponse !== command) {
-                            // It's a Response.
-
-                            client.note("PluginCommands", "Command handled by middleware.");
-                            return commandOrResponse;
-                        }
-
-                        // It's still the same command as above. We can continue using that variable.
-                        const commandName = command.command;
-                        client.note("PluginCommands", format("Command after middleware: %s", commandName));
-                        const maybeCommandRegistryEntry = registry[commandName];
-
-                        if (!maybeCommandRegistryEntry) {
-                            client.note("PluginCommands", format("Handler for '%s' not found.", commandName));
-                            return;
-                        }
-                        const commandRegistryEntry = maybeCommandRegistryEntry;
-
-                        const handler = commandRegistryEntry.handler;
-                        const plugin = commandRegistryEntry.plugin;
-
-                        client.note("PluginCommands", format("Handler '%s:%s' found.", plugin, commandName));
-                        
-                        return handler(command);
-                    });
+                    return handleCommand(command);
                 }
             },
 
