@@ -51,7 +51,7 @@ module.exports = {
 
             if (message.channel !== undefined) {
                 Promise.resolve(res)
-                .then(function (channel) { return Response.create(channel, message); })
+                .then(function (into_response) { return Response.create(into_response, message); })
                 .then(function (response) { Response.send(response, client); })
                 .catch(function (_error) {
                     client.error("MessageHandler", format("MessageHandler for '%s' returned invalid response `%s`.", message.message, inspect(res)));
