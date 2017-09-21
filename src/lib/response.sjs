@@ -1,41 +1,38 @@
-/**
- *
- * A Response is a struct with three fields:
- *
- * intent: "say" | "act" | "notice" | "ctcp" | "none"
- * message: String | [SingleWordString, String]
- * target: Target
- *
- * The "message" is always a String unless the intent is "ctcp".
- *
- * When the intent is "none", no message should be sent.
- * When the intent is "say" or "notice", a "privmsg" or "notice"
- *      should be sent.
- * When the intent is "ctcp", a CTCP should be sent with the type
- *      being the first value and the body being the second.
- * When the intent is "act", it is equivalent to a CTCP where the
- *      type is "ACTION" and the body is the message.
- *
- *
- * When creating a response from the return value of a handler,
- * what happens depends on the type.
- *
- * undefined:  The intent shall be "none", with the other values left
- *             undefined, since they are unused.
- * string | [string]:  The intent shall be "say", with the value
-                       used as the message. The target will be the
-                       original channel or query that the handler
-                       is responding to.
- * object: The object must have a message property. If there is no
- *         intent property, the intent is set to "say". If there is
- *         a query property, and it is true, then the target is set to
- *         a query of the sender of the message being handled. Otherwise,
- *         it is set to the value of the "target" property on the object,
- *         defaulting to the original channel or query the handler is
- *         responding to.
- *
- **/
-
+/// A message to send to the network in response to some other network.
+///
+/// A Response is a struct with three fields:
+///
+/// intent: "say" | "act" | "notice" | "ctcp" | "none"
+/// message: String | [SingleWordString, String]
+/// target: Target
+///
+/// The "message" is always a String unless the intent is "ctcp".
+/// 
+/// When the intent is "none", no message should be sent.
+/// When the intent is "say" or "notice", a "privmsg" or "notice"
+///      should be sent.
+/// When the intent is "ctcp", a CTCP should be sent with the type
+///      being the first value and the body being the second.
+/// When the intent is "act", it is equivalent to a CTCP where the
+///      type is "ACTION" and the body is the message.
+/// 
+///
+/// When creating a response from the return value of a handler,
+/// what happens depends on the type.
+///
+/// undefined:  The intent shall be "none", with the other values left
+///             undefined, since they are unused.
+/// string | [string]:  The intent shall be "say", with the value
+///                     used as the message. The target will be the
+///                     original channel or query that the handler
+///                     is responding to.
+/// object: The object must have a message property. If there is no
+///         intent property, the intent is set to "say". If there is
+///         a query property, and it is true, then the target is set to
+///         a query of the sender of the message being handled. Otherwise,
+///         it is set to the value of the "target" property on the object,
+///         defaulting to the original channel or query the handler is
+///         responding to.
 module.exports = {
     create: function (handlerResponse, message) {
         if (typeof handlerResponse === "undefined") {
