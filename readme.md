@@ -1,4 +1,4 @@
-[![Travis Status](https://img.shields.io/travis/Tennu/tennu.svg)](https://travis-ci.org/Tennu/tennu) [![NPM Downloads](https://img.shields.io/npm/dm/tennu.svg)](https://npmjs.org/package/tennu) [![Version](https://img.shields.io/npm/v/tennu.svg)](https://npmjs.org/package/tennu) [![ISC Licensed](https://img.shields.io/npm/l/tennu.svg)](http://opensource.org/licenses/ISC) [![Github Issue Count](https://img.shields.io/github/issues/tennu/tennu.svg)](https://github.com/Tennu/tennu/issues) [![Github Stars](https://img.shields.io/github/stars/Tennu/tennu.svg)](https://github.com/Tennu/tennu/stargazers)
+[![Travis Status](https://img.shields.io/travis/Tennu/tennu.svg)](https://travis-ci.org/Tennu/tennu) [![NPM Downloads](https://img.shields.io/npm/dm/tennu.svg)](https://npmjs.org/package/tennu) [![Version](https://img.shields.io/npm/v/tennu.svg)](https://npmjs.org/package/tennu) [![ISC Licensed](https://img.shields.io/npm/l/tennu.svg)](https://opensource.org/licenses/ISC) [![Github Issue Count](https://img.shields.io/github/issues/tennu/tennu.svg)](https://github.com/Tennu/tennu/issues) [![Github Stars](https://img.shields.io/github/stars/Tennu/tennu.svg)](https://github.com/Tennu/tennu/stargazers)
 
 Tennu is an IRC bot framework written in Node.js
 
@@ -181,7 +181,7 @@ All messages have the following fields:
 * tags       - IRC3 tags sent with message.
 
 Some messages have extended information. See
-[Message Properties](http://tennu.github.io/documentation/api/message-properties).
+[Message Properties](https://tennu.github.io/documentation/api/message-properties).
 
 #### Command ####
 
@@ -296,7 +296,7 @@ As raw(message), but the arguments are passed through util.format() first.
 ## Plugin System ##
 
 Tennu has its own (optional to use) plugin system.
-You can read about it at https://github.com/havvy/tennu-plugins/.
+You can read about it at https://github.com/tennu/tennu-plugins.
 
 You may access the plugin system's methods via the Client.plugins property
 or by using one of the following methods:
@@ -310,9 +310,9 @@ or by using one of the following methods:
 
 ### Creating Your Own Plugins ###
 
-See [Creating Your Own Plugins](https://github.com/Havvy/tennu/blob/master/doc/creating-plugins.md).
+See [Write a Plugin](https://tennu.github.io/documentation/by-example/create-a-plugin).
 
-See [Getting Started](http://tennu.github.io/documentation/getting-started).
+See [Getting Started](https://tennu.github.io/documentation/getting-started).
 
 ### Built-In Plugins ###
 
@@ -376,4 +376,4 @@ a build step is used.
 
 * [Tennu's Website](https://tennu.github.io/)
 * [IRC Specifications and other helpful tables](https://www.alien.net.au/irc/)
-* [IRC Wiki](http://www.irc-wiki.org/)
+* [IRC Wiki](https://www.irc-wiki.org/)
