@@ -11,7 +11,11 @@ module.exports = function (client, rawf, emitter) {
                 reject(new Error("No channel given to join action."));
                 return;
             }
-
+            var password;
+            if (typeof(channel) === "object") {
+                password = channel.password;
+                channel = channel.channel;
+            }
             const joinInfo = {
                 names: [],
                 channel: channel,
@@ -104,7 +108,11 @@ module.exports = function (client, rawf, emitter) {
             };
 
             client.debug("PluginAction", formatc("Attempting to join %s."));
-            rawf("JOIN :%s", channel);
+            if (password !== undefined) {
+                rawf("JOIN %s :%s", channel, password);
+            } else {
+                rawf("JOIN :%s", channel);
+            }
         })
         .tap(function (result) {
             emitter.emit("join", result);
